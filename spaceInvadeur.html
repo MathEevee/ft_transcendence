@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jeu Space Invadeur - Borne d'Arcade</title>
+  <link rel="stylesheet" href="spaceInvadeur.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Borne d'arcade complète -->
+  <div class="arcade-machine">
+	<!-- Panneau supérieur avec titre -->
+	<div class="arcade-header">
+	  <h1>Space Invadeur Arcade</h1>
+	</div>
+
+	<!-- Écran de jeu intégré dans la borne -->
+	<div class="arcade-screen">
+	  <canvas id="space-invadeur" width="1000" height="1000"></canvas>
+	</div>
+
+	<!-- Console de commandes factice -->
+	<div class="arcade-console">
+	  <div class="button red" type="button" onclick="startGame()"></div>
+	  <div class="button blue"></div>
+	  <div class="joystick"></div>
+	</div>
+  </div>
+
+  <script src="spaceInvadeur.js"></script>
+</html>
