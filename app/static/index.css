@@ -1,0 +1,26 @@
+body {
+    background-color: rgb(26, 0, 51);
+}
+
+.bord {
+    background-color: #1a0033;
+    padding: 10px;
+    border-bottom: 3px solid #800080;
+    box-shadow: 0px 0px 10px #ff00ff;
+    margin: 15px;
+    display: inline-block;
+	padding: 20px;
+    border-radius: 30px;
+}
+
+.center {
+    text-align: center;
+	font-family: "Kode Mono", monospace;
+    font-size: 2em;
+	font-size: 1.5em;
+	color: #ff00ff;
+	margin: 0;
+	text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
+	justify-content: space-around;
+	padding: 10px;
+}

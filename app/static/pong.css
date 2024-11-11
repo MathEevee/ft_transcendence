@@ -69,7 +69,7 @@ canvas {
 	justify-content: space-around;
 	width: 100%;
 	padding: 10px;
-	background-color: #1a0033;
+	background-color: rgb(26, 0, 51);
 	border-top: 3px solid #800080;
 	box-shadow: inset 0px 0px 10px #800080;
 	border-radius: 0 0 10px 10px;
