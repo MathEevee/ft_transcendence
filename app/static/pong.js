@@ -1,5 +1,9 @@
-const canvas = document.getElementById('pong');
-const context = canvas.getContext('2d');
+function loadPong(){
+	console.log("test");
+	const canvas = document.getElementById('pong');
+	const context = canvas.getContext('2d');
+	const redbutton = document.getElementById('red');
+
 
 // Joueurs
 const paddleWidth = 10;
@@ -212,6 +216,7 @@ function loop()
 
 function startGame()
 {
+	console.log("Game started");
 	if (start === 1)
 		return ;
 	start = 1;
@@ -227,3 +232,5 @@ function wait()
 }
 
 wait();
+redbutton.addEventListener("click", startGame);
+}

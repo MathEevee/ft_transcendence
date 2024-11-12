@@ -1,5 +1,5 @@
 /* Centrage de la borne */
-body {
+#pongPage {
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -11,7 +11,7 @@ body {
 }
 
 /* Structure de la borne */
-.arcade-machine {
+#pongPage .arcade-machine {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -25,7 +25,7 @@ body {
 }
 
 /* Panneau supérieur avec le titre */
-.arcade-header {
+#pongPage .arcade-header {
 	background-color: #1a0033;
 	width: 100%;
 	text-align: center;
@@ -35,7 +35,7 @@ body {
 	margin-bottom: 15px;
 }
 
-.arcade-header h1 {
+#pongPage .arcade-header h1 {
 	font-size: 1.5em;
 	color: #ff00ff;
 	margin: 0;
@@ -43,7 +43,7 @@ body {
 }
 
 /* Cadre de l'écran de jeu */
-.arcade-screen {
+#pongPage .arcade-screen {
 	width: 100%;
 	background-color: #000;
 	border: 3px solid #ff00ff;
@@ -57,13 +57,13 @@ body {
 	transform-style: preserve-3d; /* Conserve l'effet de profondeur */
 }
 
-canvas {
+#pongPage canvas {
 	width: 100%;
 	border-radius: 5px;
 }
 
 /* Console de commandes factice */
-.arcade-console {
+#pongPage .arcade-console {
 	display: flex;
 	align-items: center;
 	justify-content: space-around;
@@ -76,7 +76,7 @@ canvas {
 }
 
 /* Boutons factices */
-.button {
+#pongPage .button {
 	width: 30px;
 	height: 30px;
 	border-radius: 50%;
@@ -84,18 +84,18 @@ canvas {
 	cursor: pointer;
 }
 
-.button.red {
+#pongPage .button.red {
 	background-color: #ff0040;
 	box-shadow: 0px 0px 10px #ff0040, 0px 0px 20px #ff0040;
 }
 
-.button.blue {
+#pongPage .button.blue {
 	background-color: #00bfff;
 	box-shadow: 0px 0px 10px #00bfff, 0px 0px 20px #00bfff;
 }
 
 /* Joystick factice */
-.joystick {
+#pongPage .joystick {
 	width: 15px;
 	height: 15px;
 	background-color: #ff00ff;
@@ -104,7 +104,7 @@ canvas {
 	box-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
 }
 
-.joystick:before {
+#pongPage .joystick:before {
 	content: "";
 	position: absolute;
 	bottom: 100%;

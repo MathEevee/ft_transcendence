@@ -1,8 +1,16 @@
-body {
+.body-container {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+#index {
     background-color: rgb(26, 0, 51);
 }
 
-.bord {
+
+#index .bord {
     background-color: #1a0033;
     padding: 10px;
     border-bottom: 3px solid #800080;
@@ -13,7 +21,7 @@ body {
     border-radius: 30px;
 }
 
-.center {
+#index .center {
     text-align: center;
 	font-family: "Kode Mono", monospace;
     font-size: 2em;
