@@ -12,3 +12,7 @@ def pong(request):
 def index(request):
     template = loader.get_template('index.html')
     return (HttpResponse(template.render()))
+
+def default(request):
+    template = loader.get_template('default.html')
+    return (HttpResponse(template.render()))

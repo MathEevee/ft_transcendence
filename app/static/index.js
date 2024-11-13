@@ -1,6 +1,5 @@
 const allPage = {
-    "/pong/": loadPong
-    
+    "/pong/": loadPong,
 }
 
 
@@ -12,18 +11,13 @@ function loadPage(path){
 
 document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', (event) => {
-        // event.
         if (event.target.tagName === 'A' && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
-            // fetch(event.target.href);
             fetchAndReplaceContent = async() => {
                 const response = await fetch(event.target.getAttribute('href'));
-                // console.log(response);
                 const content = await response.text();
-                // console.log(content);
                 history.pushState({}, '', response.url);
                 document.body.innerHTML = content;
                 loadPage(event.target.getAttribute('href'));
-                console.log(event.target.getAttribute('href'));
                 return (content);
             }
             event.preventDefault();
@@ -31,7 +25,19 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
     });
-    // document.addEventListener('popstate', (event) => {
-        // ICI FAIRE EN SORTE DE LOAD LA PAGE PRECEDENTE
-    // })
+    window.addEventListener('popstate', (event) => {
+        fetchAndReplaceContent = async() => {
+            history.popState({}, '', response.url);
+            const response = await fetch(window.location.pathname);
+            const content = await response.text();
+            document.body.innerHTML = content;
+            loadPage(event.target.getAttribute('href'));
+            return (content);
+        }
+        event.preventDefault();
+        fetchAndReplaceContent();
+        return;
+    });
+    
+
 });

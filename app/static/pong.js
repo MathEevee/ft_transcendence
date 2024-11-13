@@ -1,5 +1,4 @@
 function loadPong(){
-	console.log("test");
 	const canvas = document.getElementById('pong');
 	const context = canvas.getContext('2d');
 	const redbutton = document.getElementById('red');
