@@ -1,15 +1,18 @@
 const allPage = {
     "/pong/": loadPong,
+    "/": loadWelcome,
 }
 
-
-
 function loadPage(path){
-    if (path === '/pong/')
-        loadPong();
+    console.log('Loading page:', path);
+    if (allPage[path])
+        allPage[path]();
 };
 
+function loadWelcome(){};
+
 document.addEventListener('DOMContentLoaded', () => {
+    loadPage(window.location.pathname);
     document.addEventListener('click', (event) => {
         if (event.target.tagName === 'A' && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
             fetchAndReplaceContent = async() => {
@@ -25,19 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
     });
-    window.addEventListener('popstate', (event) => {
-        fetchAndReplaceContent = async() => {
-            history.popState({}, '', response.url);
-            const response = await fetch(window.location.pathname);
-            const content = await response.text();
-            document.body.innerHTML = content;
-            loadPage(event.target.getAttribute('href'));
-            return (content);
-        }
+    window.addEventListener('popstate', async (event) => {
         event.preventDefault();
-        fetchAndReplaceContent();
-        return;
+        const response = await fetch(window.location.pathname);
+        const content = await response.text();
+        document.body.innerHTML = content;
+        loadPage(window.location.pathname);
     });
-    
-
 });
