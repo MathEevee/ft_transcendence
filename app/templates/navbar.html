@@ -1,7 +1,17 @@
 {% load static %}
 
 <div id="navbarBody" class="navbar">
-    <a class="btn btn-primary" href="/">
-        Index
-    </a>
+    <nav>
+        <ul class="navbar-nav">
+            {% comment %} <li class="nav-item">
+                <a class="nav-link" href="{% url 'welcome' %}">Welcome</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'pong' %}">Pong</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+            </li> {% endcomment %}
+        </ul>
+    </nav>
 </div>
