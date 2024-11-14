@@ -109,10 +109,8 @@ document.addEventListener("keyup", (event) =>
 function playerMove()
 {
 	player1.y += player1.dy;
-	player2.y += player2.dy;
 
 	player1.y = Math.max(Math.min(player1.y, canvas.height - paddleHeight), 0);
-	player2.y = Math.max(Math.min(player2.y, canvas.height - paddleHeight), 0);
 }
 
 function ballMove()
