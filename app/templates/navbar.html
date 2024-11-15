@@ -1,17 +1,21 @@
 {% load static %}
 
 <div id="navbarBody" class="navbar">
-    <nav>
-        <ul class="navbar-nav">
-            {% comment %} <li class="nav-item">
-                <a class="nav-link" href="{% url 'welcome' %}">Welcome</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'pong' %}">Pong</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'login' %}">Login</a>
-            </li> {% endcomment %}
-        </ul>
-    </nav>
+        <nav class="bord">
+            {% comment %} <ul>
+                <li class="nav-friend"<a href="/friends">>Friends</a>
+                    <ul class="submenu">
+                        {% comment %} add js to make all case to put all fav friend {% endcomment %}
+                    {% comment %} </ul>
+            </ul> {% endcomment %}
+            <ul>
+                <li class="menu-games"><a href="/games">games</a>
+                    <ul class="submenu">
+                        <li><a href="games/multi">Multiplayer</a></li>
+                        <li><a href="games/solo">Solo</a></li>
+                    </ul>
+
+                </li>
+            </ul>
+        </nav>
 </div>
