@@ -27,6 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "user_profile"
+LOGOUT_REDIRECT_URL = "login"
 
 # Application definition
 
@@ -38,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'cars',
+    'ajastest'
 ]
 
 MIDDLEWARE = [
@@ -72,12 +77,23 @@ WSGI_APPLICATION = 'default.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+# # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ft_transcendance',
+        'USER': 'yoda',
+        'PASSWORD': 'yoda-pwd',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
