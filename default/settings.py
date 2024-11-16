@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'default.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ft_transcendance',
+        'NAME': 'transcendance_db',
         'USER': 'yoda',
         'PASSWORD': 'yoda-pwd',
         'HOST': 'localhost',
