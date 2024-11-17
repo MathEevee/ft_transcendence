@@ -5,6 +5,7 @@
     border-radius: 0px 0px 10px 10px;
     max-height: 5vh;
     height: 5vh;
+	font-family: "Kode Mono", monospace;
 }
 
 #navbarBody .bord {
@@ -17,12 +18,15 @@
 }
 
 #navbarBody .menu-games{
-    margin-bottom: 1vh;
     margin-top: -0.5vh;
-    background-color: #2ff1ff;
+    background-color: #2f71ff;
     border-radius: 5px;
     box-shadow: 0px 5px 1px #145bf5;
+    min-width: 15vh;
+    max-width: 80vh;
+    margin-inline: 8%;
 }
+
 
 #navbarBody nav > ul{
     margin: 0vh;
@@ -35,10 +39,10 @@
 }
 
 #navbarBody nav > ul > li > a{
-   
     display: flex;
-    margin:center;
-    color: #ff5252;
+    margin: center;
+    color:aliceblue;
+    
 }
 
 
@@ -59,8 +63,18 @@
     align-items: center;
     padding: 0.25rem;
     border-radius: 10px;
-    box-shadow: 0px 10px 15px #145bf5;
+    box-shadow: 0px 5px 1vh #145bf5;
     text-decoration: none;
+    color:rgb(255, 255, 255);
+}
+
+#navbarBody .menu-pong .submenupong{
+    display: none;
+    padding: 0;
+}
+
+#navbarBody .menu-pong:hover .submenupong{
+    display: flex;
 }
 
 #navbarBody nav > li{
@@ -73,9 +87,8 @@
 }
 
 #navbarBody li:hover .submenu{
-    box-sizing: 20vw;
-    display: inline-block;
+    display: inline;
     top: 100%;
-    left: 0;
     padding: 0;
+    line-height: 5vh;
 }
