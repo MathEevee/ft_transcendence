@@ -9,11 +9,16 @@ python3 manage.py dumpdata <app_name.ModelName> --indent 2 > data.json
 # to import bdd
 python3 manage.py loaddata data.json
 
-# to connect bdd
-sudo -u postgres psql transcendance_db
+# to connect postgres
+sudo -u postgres psql
+sudo -u postgres psql transcendance_db <!-- to access directly bdd  -->
 
-### If connected at bdd ###
-# to print a list of all tables
+### if connected to postgres ###
+# to print all bdd
+\l
+# to connect bdd
+\c <bdd_name>
+# to print all tables
 \dt
 \dt+ <!-- for more detail -->
 # to print table's structure
@@ -22,6 +27,6 @@ sudo -u postgres psql transcendance_db
 SELECT * FROM <table_name>;
 # to clear terminal
 \! clear
-# to quit bdd
+# to quit postgres
 \q
 
