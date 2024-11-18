@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 
   {% block content %}
+  {% include "navbar.html"%}
     <div id="welcome" class="body-container">
         <div class="center">
             <div class="bord">
@@ -16,8 +17,13 @@
                 </a>
             </div>
             <div class="container">
-                <a class="btn btn-primary" href="/pong/">
+                <a class="btn btn-primary" href="/games/pong/local/">
                     Pong
+                </a>
+            </div>
+            <div class="container">
+                <a class="btn btn-primary" href="/games/spaceinvaders/">
+                    Space
                 </a>
             </div>
         </div>

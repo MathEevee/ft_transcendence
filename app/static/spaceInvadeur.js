@@ -1,5 +1,5 @@
-import { draw } from "./spacedraw.js";
-import { update } from "./spaceupdate.js";
+import { draw } from "/static/spacedraw.js";
+import { update } from "/static/spaceupdate.js";
 
 document.addEventListener('DOMContentLoaded', function() {
 	const canvas = document.getElementById('space-invadeur');
@@ -239,5 +239,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	redButton.addEventListener('click', startGame);
 });
-
-

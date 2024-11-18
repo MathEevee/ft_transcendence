@@ -1,6 +1,7 @@
 const allPage = {
-    "/pong/": loadPong,
+    "/games/pong/local/": loadPong,
     "/": loadWelcome,
+    // "/games/spaceinvaders/" : loadSpaceinvaders,
 }
 
 function loadPage(path){
@@ -8,6 +9,7 @@ function loadPage(path){
     if (allPage[path])
         allPage[path]();
 };
+
 
 function loadWelcome(){};
 

@@ -184,5 +184,4 @@ function update(player, aliens, bullets, canvas, context, score)
 		updatebullets(bullets, canvas, context, aliens, score);
 }
 
-
 export { update }

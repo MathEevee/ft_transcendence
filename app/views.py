@@ -5,7 +5,7 @@ def test(request):
     template = loader.get_template('login.html')
     return (HttpResponse(template.render()))
 
-def pong(request):
+def ponglocal(request):
     template = loader.get_template('pong.html')
     return (HttpResponse(template.render()))
 
@@ -15,4 +15,8 @@ def index(request):
 
 def welcome(request):
     template = loader.get_template('welcome.html')
+    return (HttpResponse(template.render()))
+
+def spaceinvaders(request):
+    template = loader.get_template('spaceInvadeur.html')
     return (HttpResponse(template.render()))
