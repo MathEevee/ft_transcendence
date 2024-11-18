@@ -5,6 +5,7 @@ function updateplayer(player, canvas)
 {
 	player.x += player.dx * player.speed;
 	player.x = Math.max(Math.min(player.x, canvas.width - player.width), 0);
+	
 }
 
 function aliensgodown(aliens, canvas)
@@ -50,7 +51,10 @@ function updatealiens(aliens, canvas)
 				aleretour += 1;
 			}
 			else if (aliens[i][j].x < 0 && diralien === -1)
+			{
 				diralien *= -1;
+				aleretour += 1;
+			}
 			aliens[i][j].x += aliens[i][j].speed * diralien;
 			j++;
 		}
@@ -68,7 +72,7 @@ function alienisshot(bullet, aliens, score)
 		let j = 0;
 		while (j < aliens[i].length)
 		{
-			if (bullet.x < aliens[i][j].coordonnees[0] && bullet.x > aliens[i][j].coordonnees[0] - aliens[i][j].width && bullet.y < aliens[i][j].coordonnees[1] && bullet.y > aliens[i][j].coordonnees[1] - aliens[i][j].height)
+			if (bullet.x > aliens[i][j].hitbox[0] && bullet.x < aliens[i][j].hitbox[2] && bullet.y > aliens[i][j].hitbox[1] && bullet.y < aliens[i][j].hitbox[3])
 			{
 				aliens[i].splice(j, 1);
 				if (aliens[i].length === 0)
@@ -78,6 +82,75 @@ function alienisshot(bullet, aliens, score)
 			j++;
 		}
 		i++;
+	}
+	return (0);
+}
+
+function hitboxcollision(hitbox1, hitbox2)
+{
+	if (hitbox1 == 0 || hitbox1 === undefined)
+		return (false);
+	const [x1, y1, x2, y2] = hitbox1;
+	const [x3, y3, x4, y4] = hitbox2;
+	if (x1 < x4 && x2 > x3 && y1 < y4 && y2 > y3)
+		return (true);
+	return (false);
+}
+
+function playertouchalien(player, aliens)
+{
+	let i = 0;
+
+	while (i < aliens.length)
+	{
+		let j = 0;
+		while (j < aliens[i].length)
+		{
+			if(hitboxcollision(player.hitbox, aliens[i][j].hitbox))
+				return (1);
+			j++;
+		}
+		i++;
+	}
+	return (0);
+}
+
+function alienonearth(aliens, canvas)
+{
+	let i = 0;
+	while (i < aliens.length)
+	{
+		let j = 0;
+		while (j < aliens[i].length)
+		{
+			if (aliens[i][j].hitbox[3] > canvas.height)
+				return (1);
+			j++;
+		}
+		i++;
+	}
+}
+
+function prinsmg(context, text, x, y)
+{
+	context.fillStyle = "white";
+	context.font = "30px Arial";
+	context.fillText(text, x, y);
+}
+
+function gamefinished(aliens, player, canvas, context)
+{
+	if (aliens.length === 0)
+	{
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		prinsmg(context, "YOU WIN", canvas.width / 2 - 100, canvas.height / 2);
+		return (1);
+	}
+	if (player.lives === 0 || playertouchalien(player, aliens) === 1 || alienonearth(aliens, canvas) === 1)
+	{
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		prinsmg(context, "GAME OVER", canvas.width / 2 - 100, canvas.height / 2);
+		return (1);
 	}
 	return (0);
 }
@@ -99,56 +172,16 @@ function updatebullets(bullets, canvas, context, aliens, score)
 	}
 }
 
-function playertouchalien(player, aliens)
-{
-	let i = 0;
-	while (i < aliens.length)
-	{
-		let j = 0;
-		while (j < aliens[i].length)
-		{
-			if (player.x < aliens[i][j].coordonnees[0] + aliens[i][j].width && player.x + player.width > aliens[i][j].coordonnees[0] && player.y < aliens[i][j].coordonnees[1] + aliens[i][j].height && player.y + player.height > aliens[i][j].coordonnees[1])
-				return (1);
-			j++;
-		}
-		i++;
-	}
-	return (0);
-}
-
-function printmsg(msg, x, y, color, context)
-{
-	context.fillStyle = color;
-	context.font = "50px Arial";
-	context.textAlign = "center";
-	context.f
-}
-
-function gamefinished(aliens, player, canvas, context)
-{
-	if (aliens.length === 0)
-	{
-		printmsg("You win", canvas.width / 2, canvas.height / 2, "white", context);
-		return (1);
-	}
-	if (player.lives === 0 || playertouchalien(player, aliens) === 1)
-	{
-		printmsg("You lose", canvas.width / 2, canvas.height / 2, "white", context);
-		return (1);
-	}
-	return (0);
-}
-
 function update(player, aliens, bullets, canvas, context, score)
 {
+	if (gamefinished(aliens, player, canvas, context) === 1)
+	{
+		return (1);
+	}
 	updateplayer(player, canvas);
 	updatealiens(aliens, canvas);
 	if (bullets.length > 0)
 		updatebullets(bullets, canvas, context, aliens, score);
-	if (gamefinished(aliens, player, canvas) === 1)
-	{
-		document.location.reload();
-	}
 }
 
 

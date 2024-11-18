@@ -68,6 +68,8 @@ function drawplayer(canvas, context, player, colorset)
 			{
 				context.fillStyle = color;
 				context.fillRect(x + j * 10, y + i * 10, 10, 10);
+				player.width = 10 * modeleCanon[0].length;
+				player.hitbox = [x, y, x + 10 * modeleCanon[0].length, y + player.height * modeleCanon.length];
 			}
 			j++;
 		}
@@ -89,12 +91,9 @@ function drawalien(context, alien, top, left, x, y, width, height, colorset, mod
 			{
 				context.fillStyle = "green";
 				context.fillRect(left + x + j * width, top + y + i * height, width, height);
-				alien.coordonnees[0] = left + x + j * width;
-				alien.coordonnees[1] = top + y + i * height;
-				if (alien.coordonnees[0] === 480)
-					alien.coordonnees[0] += 10;
-				alien.width = width * alien.modele[i].length;
-				alien.height = height * alien.modele.length;
+				alien.width = width * modele[0].length;
+				alien.height = height * modele.length;
+				alien.hitbox = [left + x, top + y, left + x + width * modele[0].length, top + y + height * modele.length];
 			}
 			j++;
 		}
