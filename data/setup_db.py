@@ -11,37 +11,14 @@ from django.db import IntegrityError
 from accounts.models import CustomUser
 from scores.models import PlayerStats
 
-# create database if not exist
-def create_database(db_name, db_user):
-    try:
-        # check if database exist
-        subprocess.run(
-            ["psql", "-U", db_user, "-c", f"SELECT 1 FROM pg_database WHERE datname='{db_name}';"],
-            check=True,
-            text=True,
-        )
-        print(f"Database '{db_name}' already exists.")
-    except subprocess.CalledProcessError:
-        # create database
-        print(f"Creating database '{db_name}'...")
-        subprocess.run(
-            ["psql", "-U", db_user, "-c", f"CREATE DATABASE {db_name};"],
-            check=True,
-            text=True,
-        )
-        print(f"Database '{db_name}' created successfully.")
-
 def setup_database():
-    # 0 : create database if not exist
-    create_database("transcendance_db", "postgres")
-
     # 1 : execute makemigrations and migrate
-    print("Applying migrations...")
+    print("applying migrations...")
     call_command("makemigrations", interactive=False)
     call_command("migrate", interactive=False)
 
     # 2 : create objects for table 'CustomUser'
-    print("Creating users...")
+    print("creating users...")
     try:
         CustomUser.objects.create_superuser(
             username="ajas",
@@ -59,10 +36,10 @@ def setup_database():
             password="StarKiller",
         )
     except IntegrityError:
-        print("Users already exist, skipping user creation.")
+        print("users already exist, skipping user creation.")
 
     # 3 : create objects for table 'PlayerStats'
-    print("Creating scores...")
+    print("creating scores...")
     try:
         PlayerStats.objects.create(
             username="yoda",
@@ -77,9 +54,9 @@ def setup_database():
             total_score=200
         )
     except IntegrityError:
-        print("Scores already exist, skipping score creation.")
+        print("scores already exist, skipping score creation.")
 
-    print("Database setup complete!")
+    print("database setup complete!")
 
 if __name__ == "__main__":
     setup_database()
