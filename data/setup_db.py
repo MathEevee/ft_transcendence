@@ -1,6 +1,8 @@
 import os
-import subprocess
 import django
+import sys
+
+sys.path.append('/home/ajas/ft_transcendence')
 
 # init Django Env
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "default.settings")
