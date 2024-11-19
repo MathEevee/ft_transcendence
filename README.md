@@ -7,15 +7,11 @@ sudo apt install python3 python3-pip python3-venv
 python3 -m venv myenv
 # activate virtual env
 source myenv/bin/activate
-# install django
-pip install django
-# install psycopg2 to communicate with postgres
-pip install psycopg2
-
+# install python dependances
+pip install -r requirements.txt
 
 <!-- next commands commented can use to have same versions for all dev_team -->
 # pip freeze > requirements.txt
-# pip install -r requirements.txt
 
 
 python3 manage.py runserver (to run django, install python3 & django)
