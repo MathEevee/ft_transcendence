@@ -1,14 +1,15 @@
 /* Centrage de la borne */
-#space body {
+#space {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	height: 95vh;
+	height: calc(100% - 5vh);
 	margin: 0;
 	background-color: #1a0033;
 	font-family: 'Press Start 2P', sans-serif;
 	overflow: hidden;
 }
+
 
 /* Structure de la borne */
 #space .arcade-machine {

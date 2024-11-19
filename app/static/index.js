@@ -1,6 +1,8 @@
 const allPage = {
     "/games/pong/local/": loadPong,
     "/": loadWelcome,
+    "/games/": loadGames,
+    "/games/pong/": loadPongMenu,
     // "/games/spaceinvaders/" : loadSpaceinvaders,
 }
 
@@ -12,6 +14,10 @@ function loadPage(path){
 
 
 function loadWelcome(){};
+
+function loadGames(){};
+
+function loadPongMenu(){};
 
 document.addEventListener('DOMContentLoaded', () => {
     loadPage(window.location.pathname);
