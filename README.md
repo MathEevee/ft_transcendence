@@ -1,13 +1,36 @@
+# BACKEND
+
+# install python3
+sudo apt update
+sudo apt install python3 python3-pip python3-venv
+# create virtual env
+python3 -m venv myenv
+# activate virtual env
+source myenv/bin/activate
+# install django
+pip install django
+# install psycopg2 to communicate with postgres
+pip install psycopg2
+
+
+<!-- next commands commented can use to have same versions for all dev_team -->
+# pip freeze > requirements.txt
+# pip install -r requirements.txt
+
+
 python3 manage.py runserver (to run django, install python3 & django)
 
 # DATA
-# to export bdd
-python3 manage.py dumpdata > data.json
-# to export specific data
-python3 manage.py dumpdata <app_name.ModelName> --indent 2 > data.json
+<!-- needs files .env and secrets -->
 
-# to import bdd
-python3 manage.py loaddata data.json
+# install postgres
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+
+# create database
+./data/create_db.sh
+# init database
+python3 data/setup_db.py
 
 # to connect postgres
 sudo -u postgres psql

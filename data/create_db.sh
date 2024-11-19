@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# check postgres is active
+if ! systemctl is-active --quiet postgresql; then
+    echo "service postgresql starting..."
+    sudo systemctl start postgresql
+    sudo systemctl enable postgresql
+fi
+
 # env_variables and secrets
 set -o allexport
 source .env
