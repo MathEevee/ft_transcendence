@@ -1,13 +1,17 @@
 const allPage = {
     "/games/pong/local/": loadPong,
     "/": loadWelcome,
+    "/games/spaceinvaders/" : loadSpaceInvadersGame,
     "/games/": loadGames,
     "/games/pong/": loadPongMenu,
-    // "/games/spaceinvaders/" : loadSpaceinvaders,
 }
+
+// import { draw } from "/static/spacedraw.js";
+// import { update } from "/static/spaceupdate.js";
 
 function loadPage(path){
     console.log('Loading page:', path);
+    console.log('Loading function:', allPage[path]);
     if (allPage[path])
         allPage[path]();
 };
@@ -18,6 +22,8 @@ function loadWelcome(){};
 function loadGames(){};
 
 function loadPongMenu(){};
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
     loadPage(window.location.pathname);

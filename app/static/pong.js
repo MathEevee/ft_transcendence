@@ -213,7 +213,7 @@ function loadPong(){
 		requestAnimationFrame(loop);
 	}
 	
-	function startGame()
+	function startPong()
 	{
 		console.log("Game started");
 		if (start === 1)
@@ -231,5 +231,5 @@ function loadPong(){
 	}
 	
 	wait();
-	redbutton.addEventListener("click", startGame);
+	redbutton.addEventListener("click", startPong);
 }
