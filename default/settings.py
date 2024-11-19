@@ -11,7 +11,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-from decouple import config
+from decouple import Config, RepositoryEnv
+
+# load env variables and secrets
+env_conf = Config(RepositoryEnv('.env'))
+secrets_conf = Config(RepositoryEnv('secrets'))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -91,11 +95,11 @@ WSGI_APPLICATION = 'default.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
+        'NAME': env_conf('DB_NAME'),
+        'USER': secrets_conf('DB_USER'),
+        'PASSWORD': secrets_conf('DB_PASSWORD'),
+        'HOST': env_conf('DB_HOST'),
+        'PORT': env_conf('DB_PORT'),
     }
 }
 
