@@ -1,0 +1,31 @@
+{% extends "index.html" %}
+{% load static %}
+<!DOCTYPE html>
+
+  {% block content %}
+  {% include "navbar.html"%}
+    <div id="welcome" class="body-container">
+        <div class="center">
+            <div class="bord">
+                <h1>Welcome to ft_transcendence!</h1>
+                <p>By Ajasnin, Axdubois, Matde-ol</p>
+                </div>
+            </div>
+            <div class="container">
+                <a class="btn btn-primary" href="/login/">
+                    test
+                </a>
+            </div>
+            <div class="container">
+                <a class="btn btn-primary" href="/games/pong/local/">
+                    Pong
+                </a>
+            </div>
+            <div class="container">
+                <a class="btn btn-primary" href="/games/spaceinvaders/">
+                    Space
+                </a>
+            </div>
+        </div>
+    </div>
+  {% endblock %}
