@@ -26,7 +26,7 @@ function loadPong(){
 	const colorpalette = ["#FFFFFF", "#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"];
 	let colorindex = 0;
 	
-	colorset =
+	const colorset =
 	{
 		fontcolor: colorpalette[0],
 		backgroundcolor: colorpalette[1],
@@ -111,7 +111,7 @@ function loadPong(){
 		context.font = "80px Arial";
 		context.fillText("<", x, y);
 		context.font = "50px Arial";
-		context.fillText(colorpalette[colorindex], x + 55, y - 10);
+		context.fillText(colorset[Object.keys(colorset)[optionindex]], x + 55, y - 10);
 		context.font = "80px Arial";
 		context.fillText(">", x + 270, y);
 	}
