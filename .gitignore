@@ -1,1 +1,10 @@
-myenv/
+*env/
+__pycache__/
+*.pyc
+*.log
+*.sql
+db.sqlite3
+.env
+secrets
+.vscode/
+.idea/
