@@ -1,3 +1,4 @@
+import uuid
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import is_password_usable
 from django.contrib.auth.hashers import make_password
@@ -11,7 +12,7 @@ class CustomUser(AbstractUser):
     
     # Champs spécifiques pour l'intégration avec 42
     email = models.EmailField(unique=True)
-    id_42 = models.CharField(max_length=255, unique=True)  # ID fourni par l'API 42
+    id_42 = models.CharField(max_length=255, unique=True, blank=True, null=True, default=uuid.uuid4)  # ID fourni par l'API 42
 
     def __str__(self):
         return self.username
