@@ -11,6 +11,7 @@ const allPage = {
 
 function loadPage(path){
     console.log('Loading page:', path);
+    console.log('Loading function:', allPage[path]);
     if (allPage[path])
         allPage[path]();
 };
