@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-3t6@4euv&+e-7g$u_syy_9cd+de!x^cwe-57i_z*45v3hfnj(g
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+    
 ALLOWED_HOSTS = []
 
 LOGIN_URL = "login"
@@ -35,7 +35,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app',
     'accounts',
-    'scores'
+	'default',
+    'scores',
 ]
 
 MIDDLEWARE = [

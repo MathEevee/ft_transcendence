@@ -8,14 +8,19 @@ const context = canvas.getContext('2d');
 const redButton = document.getElementById('redButton');
 const blueButton = document.getElementById('blueButton');
 
+/*mode*/
+const gamemode = "";
+if (window.location.pathname === "~/game/pong/local")
+	gamemode = "local";
+
 
 /*player*/
 const player =
 {
 	x: context.canvas.width / 2 - 50,
 	y: context.canvas.height - 50,
-	width: 10,
-	height: 10,
+	width: 5,
+	height: 5,
 	dx: 0,
 	dy: 0,
 	speed: 2,
@@ -206,9 +211,9 @@ function drawplayer(canvas, context, player, x, y, drawlifein)
 			if (modeleCanon[i][j] === 1)
 			{
 					context.fillStyle = colorset.playercolor;
-					context.fillRect(x + j * 10, y + i * 10, 10, 10);
-					player.width = 10 * modeleCanon[0].length;
-					player.hitbox = [x, y, x + 10 * modeleCanon[0].length, y + player.height * modeleCanon.length];
+					context.fillRect(x + j * 8, y + i * 8, 8, 8);
+					player.width = 8 * modeleCanon[0].length;
+					player.hitbox = [x, y, x + 8 * modeleCanon[0].length, y + player.height * modeleCanon.length];
 			}
 				j++;
 		}
@@ -462,9 +467,31 @@ function maxonline(aliens)
 	return (max);
 }
 
+function alienisshooting(aliens, bullets)
+{
+	let i = 0;
+	while (i < aliens.length)
+	{
+		let j = 0;
+		while (j < aliens[i].length)
+		{
+			if (Math.random() < 0.1)
+			{
+				bullets.push(new Bullet(aliens[i][j].x + aliens[i][j].width / 2 - 5, aliens[i][j].hitbox[3], 10, 10, 0, 1, 5, 1, 0));
+				return ;
+			}
+			j++;
+		}
+		i++;
+	}
+}
+
 function updatealiens(aliens, canvas)
 {
 	let i = 0;
+
+	if (bullets.length <= 5)
+		alienisshooting(aliens, bullets);
 	while (i < aliens.length)
 	{
 		let j = 0;
@@ -497,7 +524,7 @@ function alienisshot(bullet, aliens, score)
 		let j = 0;
 		while (j < aliens[i].length)
 		{
-			if (bullet.x > aliens[i][j].hitbox[0] && bullet.x < aliens[i][j].hitbox[2] && bullet.y > aliens[i][j].hitbox[1] && bullet.y < aliens[i][j].hitbox[3])
+			if ((bullet.x > aliens[i][j].hitbox[0] && bullet.x < aliens[i][j].hitbox[2] && bullet.y > aliens[i][j].hitbox[1] && bullet.y < aliens[i][j].hitbox[3]) && bullet.isbulletplayer === 1)
 			{
 				aliens[i].splice(j, 1);
 				if (aliens[i].length === 0)
@@ -513,7 +540,7 @@ function alienisshot(bullet, aliens, score)
 
 function hitboxcollision(hitbox1, hitbox2)
 {
-	if (hitbox1 == 0 || hitbox1 === undefined)
+	if (hitbox1 == 0 || hitbox1 === undefined || hitbox2 === undefined || hitbox2 === 0)
 		return (false);
 	const [x1, y1, x2, y2] = hitbox1;
 	const [x3, y3, x4, y4] = hitbox2;
@@ -569,12 +596,14 @@ function gamefinished(aliens, player, canvas, context)
 	{
 		cleartobackground(context, canvas);
 		prinsmg(context, "YOU WIN", canvas.width / 2 - 150, canvas.height / 2);
+		setTimeout(wait, 2000);
 		return (1);
 	}
-	if (player.lives === 0 || playertouchalien(player, aliens) === 1 || alienonearth(aliens, canvas) === 1)
+	if (player.life < 1 || playertouchalien(player, aliens) === 1 || alienonearth(aliens, canvas) === 1)
 	{
 		cleartobackground(context, canvas);
 		prinsmg(context, "GAME OVER", canvas.width / 2 - 150, canvas.height / 2);
+		setTimeout(wait, 2000);
 		return (1);
 	}
 	return (0);
@@ -593,6 +622,13 @@ function updatebullets(bullets, canvas, context, aliens, score)
 			bullets.splice(i, 1);
 			score.value += 100;
 		}
+		else if(hitboxcollision([bullets[i].x, bullets[i].y, bullets[i].x + bullets[i].width, bullets[i].y + bullets[i].height], player.hitbox) && bullets[i].isbulletplayer === 0)
+		{
+			bullets.splice(i, 1);
+			player.life -= 1;
+		}
+		else if (bullets[i].y > canvas.height)
+			bullets.splice(i, 1);
 		i++;
 	}
 }

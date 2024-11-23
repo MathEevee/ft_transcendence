@@ -20,8 +20,7 @@ python3 manage.py runserver (to run django, install python3 & django)
 <!-- needs files .env and secrets -->
 
 # install postgres
-sudo apt update
-sudo apt install postgresql postgresql-contrib
+sudo apt update && sudo apt install postgresql postgresql-contrib
 
 # create database
 ./data/create_db.sh

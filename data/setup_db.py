@@ -2,7 +2,7 @@ import os
 import django
 import sys
 
-sys.path.append('/home/ajas/ft_transcendence')
+sys.path.append('/home/pageblanche/ft_transcendence')
 
 # init Django Env
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "default.settings")
