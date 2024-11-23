@@ -49,13 +49,23 @@ def auth_callback(request):
 
     return redirect('/dashboard')  # Rediriger vers une page de votre application
 
-
 def auth_with_42(request):
     client_id = '<VOTRE_CLIENT_ID>'
     redirect_uri = '<VOTRE_REDIRECT_URI>'
     scope = 'public'  # Demande d'accès aux informations publiques de l'utilisateur
     auth_url = f'https://api.intra.42.fr/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}'
     return redirect(auth_url)
+
+def save_user(user_info):
+    user, created = CustomUser.objects.get_or_create(
+        intra_id=user_info['id'],
+        defaults={
+            'username': user_info['login'],
+            'email': user_info['email'],
+            'profile_image': user_info['image_url'],
+        }
+    )
+    return user
 
 def register_view(request):
     if request.method == 'POST':
