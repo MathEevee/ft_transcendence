@@ -71,7 +71,7 @@ def register_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            form.save()
             messages.success(request, "Inscription réussie ! Connectez-vous.")
             return redirect(reverse('accounts:login'))
     else:
