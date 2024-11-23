@@ -10,6 +10,17 @@ function loadPong(){
 	const player1 = { x: 0, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, dy: 0, ismoving: false};
 	const player2 = { x: canvas.width - paddleWidth, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, dy: 0 , ismoving: false};
 	
+	// Gamemode
+	gamemode = "";
+	if (window.location.pathname === "/games/pong/local/")
+		gamemode = "local";
+	else if (window.location.pathname === "/games/pong/solo/")
+		gamemode = "solo";
+	else if (window.location.pathname === "/games/pong/online/")
+		gamemode = "online";
+
+	let caldest = 0;
+
 	// Balle
 	const ball = { x: canvas.width / 2, y: canvas.height / 2, radius: 8, speed: 5, dx: 1, dy: Math.random() - 0.5 };
 	
@@ -187,12 +198,12 @@ function loadPong(){
 	
 	function keyhookdownforgame(event)
 	{
-		if (event.key === "ArrowUp" && player2.up !== 1)
+		if (event.key === "ArrowUp" && player2.up !== 1 && gamemode === "local")
 		{
 			player2.up = 1;
 			player2.dy += -speed;
 		}
-		else if (event.key === "ArrowDown" && player2.down !== 1)
+		else if (event.key === "ArrowDown" && player2.down !== 1 && gamemode === "local")
 		{
 			player2.down = 1;
 			player2.dy += speed;
@@ -270,12 +281,12 @@ function loadPong(){
 	
 	function keyhookupforgame(event)
 	{
-		if (event.key === "ArrowUp" && player2.up === 1)
+		if (event.key === "ArrowUp" && player2.up === 1 && gamemode === "local")
 		{
 			player2.up = 0;
 			player2.dy -= -speed;
 		}
-		else if (event.key === "ArrowDown" && player2.down === 1)
+		else if (event.key === "ArrowDown" && player2.down === 1 && gamemode === "local")
 		{
 			player2.down = 0;
 			player2.dy -= speed;
@@ -368,6 +379,35 @@ function loadPong(){
 			player2.y = canvas.height / 2 - paddleHeight / 2;
 		}
 	}
+
+	function calballdestination()
+	{
+		if(ball.dx < 0)
+			return canvas.height / 2;
+		let destination = ball.y;
+		let distance = Math.abs(player2.y + player2.height / 2 - destination);
+		let time = distance / ball.speed;
+		let destination2 = destination + ball.dy * time;
+		if (destination2 < 0)
+			return 0;
+		if (destination2 > canvas.height)
+			return canvas.height;
+		return destination2;
+	}
+
+	function updateAI()
+	{
+		playerdestination = calballdestination();
+		if (playerdestination > player2.y && playerdestination < player2.y + player2.height)
+		{
+			player2.dy = 0;
+			return ;
+		}
+		if (playerdestination < player2.y)
+			player2.dy = -speed;
+		else
+			player2.dy = speed;
+	}
 	
 	/* Jeu */
 	function update()
@@ -375,6 +415,8 @@ function loadPong(){
 		playerMove();
 		ballMove();
 		ballCollision()
+		if (gamemode === "solo")
+			setTimeout(updateAI, 1000);
 		if (ballPoint())
 			return 1;
 	}
@@ -431,9 +473,9 @@ function loadPong(){
 	{
 		if (start === 1 || option === 1)
 			return ;
-		start = 1;
 		initvariables();
 		countdown();
+		start = 1;
 		setTimeout(loop, 5000);
 	}
 	

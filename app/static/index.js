@@ -1,5 +1,7 @@
 const allPage = {
     "/games/pong/local/": loadPong,
+    "/games/pong/solo/": loadPong,
+    "/games/pong/online/": loadPong,
     "/": loadWelcome,
     "/games/spaceinvaders/" : loadSpaceInvadersGame,
     "/games/": loadGames,
@@ -10,8 +12,8 @@ const allPage = {
 // import { update } from "/static/spaceupdate.js";
 
 function loadPage(path){
-    console.log('Loading page:', path);
-    console.log('Loading function:', allPage[path]);
+    // console.log('Loading page:', path);
+    // console.log('Loading function:', allPage[path]);
     if (allPage[path])
         allPage[path]();
 };

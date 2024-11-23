@@ -8,12 +8,6 @@ const context = canvas.getContext('2d');
 const redButton = document.getElementById('redButton');
 const blueButton = document.getElementById('blueButton');
 
-/*mode*/
-const gamemode = "";
-if (window.location.pathname === "~/game/pong/local")
-	gamemode = "local";
-
-
 /*player*/
 const player =
 {
