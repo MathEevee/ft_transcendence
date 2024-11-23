@@ -5,6 +5,10 @@ from decouple import Config, RepositoryEnv
 env_conf = Config(RepositoryEnv('.env'))
 secrets_conf = Config(RepositoryEnv('secrets'))
 
+#oauth2
+OAUTH_UID = secrets_conf('OAUTH_UID')
+OAUTH_SECRET = secrets_conf('OAUTH_SECRET')
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -34,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django_extensions',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -51,6 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'default.urls'
