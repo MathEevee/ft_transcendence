@@ -1,17 +1,16 @@
 from pathlib import Path
 from decouple import Config, RepositoryEnv
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 # load env variables and secrets
-env_conf = Config(RepositoryEnv('.env'))
-secrets_conf = Config(RepositoryEnv('secrets'))
+env_conf = Config(RepositoryEnv(BASE_DIR / '.env'))
+secrets_conf = Config(RepositoryEnv(BASE_DIR / 'secrets'))
 
 #oauth2
 OAUTH_UID = secrets_conf('OAUTH_UID')
 OAUTH_SECRET = secrets_conf('OAUTH_SECRET')
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -43,7 +42,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.oauth2',
-    'app',
+    # 'app',
     'accounts',
 	'default',
     'scores',
