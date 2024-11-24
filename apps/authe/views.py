@@ -1,12 +1,16 @@
 import requests
 import pprint
+import logging
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.urls import reverse
 from django.conf import settings
+from django.db.utils import IntegrityError
 from .models import CustomUser
 from .forms import RegistrationForm, LoginForm
+
+logger = logging.getLogger(__name__)
 
 def auth_with_42(request):
     client_id = settings.OAUTH_UID
@@ -49,6 +53,10 @@ def auth_callback(request):
         headers={'Authorization': f'Bearer {access_token}'}
     ).json()
 
+    if 'id' not in user_info or 'email' not in user_info:
+        messages.error(request, "Impossible de récupérer les informations utilisateur.")
+        return redirect('/')
+
     # Débogage : affichez les données reçues dans la console
     pprint.pprint(user_info)
 
@@ -69,15 +77,31 @@ def auth_callback(request):
     return redirect(reverse('profil:profil'))
 
 def save_user(user_info):
-    user, created = CustomUser.objects.get_or_create(
-        intra_id=user_info['id'],
-        defaults={
-            'username': user_info['login'],
-            'email': user_info['email'],
-            'profile_image': user_info.get('image_url', ''),
-        }
-    )
-    return user
+    try:
+        picture_url = user_info.get('image', {}).get('versions', {}).get('medium', '/static/pictures/user-avatar-01.png')
+        user, created = CustomUser.objects.get_or_create(
+            intra_id=user_info['id'],
+            defaults={
+                'username': user_info['login'],
+                'email': user_info['email'],
+                'profil_picture': picture_url,
+            }
+        )
+        
+        if created:
+            logger.info(f"Created new user: {user.username}")
+        else:
+            logger.info(f"Existing user logged in: {user.username}")
+            # Mise à jour des informations si nécessaire
+            user.email = user_info['email']
+            user.profil_picture = picture_url
+            user.save()
+
+        return user
+    
+    except IntegrityError as e:
+        logger.error(f"Error creating or updating user: {e}")
+        return None
 
 def register_view(request):
     if request.method == 'POST':

@@ -13,6 +13,10 @@ Profil - My App
                 <h3 class="card-title">Hello, {{ user.username }}!</h3>
                 <p>Email: {{ user.email }}</p>
                 <p>Joined: {{ user.date_joined|date:"F d, Y" }}</p>
+                <img    src="{{ user.profil_picture }}"
+                        alt="Photo de profil"
+                        class="img-thumbnail mx-auto d-block"
+                        style="width: 150px; height: 150px; border-radius: 50%;">
             </div>
         </div>
         <div class="mt-4">

@@ -8,5 +8,5 @@ class CustomUserAdmin(UserAdmin):
     list_display = ['username', 'email', 'intra_id', 'is_staff', 'is_superuser']
     list_filter = ['is_staff', 'is_superuser']
     fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('intra_id', 'profile_image')}),
+        (None, {'fields': ('intra_id', 'profil_picture')}),
     )
