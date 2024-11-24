@@ -1,8 +1,7 @@
 import requests
 import pprint
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.urls import reverse
 from django.conf import settings
@@ -12,7 +11,7 @@ from .forms import RegistrationForm, LoginForm
 def auth_with_42(request):
     client_id = settings.OAUTH_UID
     # redirect_uri = '<VOTRE_REDIRECT_URI>'
-    redirect_uri = request.build_absolute_uri(reverse('accounts:auth_callback'))
+    redirect_uri = request.build_absolute_uri(reverse('authe:auth_callback'))
     scope = 'public'  # Demande d'accès aux informations publiques de l'utilisateur
     auth_url = f'https://api.intra.42.fr/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}'
     return redirect(auth_url)
@@ -31,7 +30,7 @@ def auth_callback(request):
         'client_id': settings.OAUTH_UID,
         'client_secret': settings.OAUTH_SECRET,
         'code': code,
-        'redirect_uri': request.build_absolute_uri(reverse('accounts:auth_callback')),
+        'redirect_uri': request.build_absolute_uri(reverse('authe:auth_callback')),
     }
     
     # Envoyer la requête pour obtenir un token
@@ -67,7 +66,7 @@ def auth_callback(request):
     # Connecter l'utilisateur
     login(request, user)
     messages.success(request, f"Bienvenue, {user.username}!")
-    return redirect(reverse('accounts:profile'))
+    return redirect(reverse('profil:profil'))
 
 def save_user(user_info):
     user, created = CustomUser.objects.get_or_create(
@@ -86,10 +85,10 @@ def register_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Inscription réussie ! Connectez-vous.")
-            return redirect(reverse('accounts:login'))
+            return redirect(reverse('authe:login'))
     else:
         form = RegistrationForm()
-    return render(request, 'accounts/register.html', {'form': form})
+    return render(request, 'register.html', {'form': form})
 
 def login_view(request):
     if request.method == 'POST':
@@ -101,18 +100,10 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, "Connexion réussie !")
-                return redirect(reverse('accounts:profile'))
+                return redirect(reverse('profil:profil'))
             else:
                 messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
     else:
         form = LoginForm()
-    return render(request, 'accounts/login.html', {'form': form})
+    return render(request, 'login.html', {'form': form})
 
-def logout_view(request):
-    logout(request)
-    messages.success(request, "Déconnexion réussie !")
-    return redirect(reverse('accounts:login'))
-
-@login_required
-def profile_view(request):
-    return render(request, 'accounts/profile.html', {'user': request.user})

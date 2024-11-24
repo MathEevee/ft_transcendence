@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Profil - My App
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h1 class="text-center">Profile</h1>
+        <div class="card mt-4">
+            <div class="card-body">
+                <h3 class="card-title">Hello, {{ user.username }}!</h3>
+                <p>Email: {{ user.email }}</p>
+                <p>Joined: {{ user.date_joined|date:"F d, Y" }}</p>
+            </div>
+        </div>
+        <div class="mt-4">
+            <h4>Game Statistics</h4>
+            <ul class="list-group">
+                <li class="list-group-item">Games Played: {{ stats.games_played }}</li>
+                <li class="list-group-item">Games Won: {{ stats.games_won }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
