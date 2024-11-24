@@ -46,6 +46,10 @@ INSTALLED_APPS = [
     'accounts',
 	'default',
     'scores',
+    'apps.auth',
+    'apps.home',
+    'apps.profil',
+    'apps.game'
 ]
 
 MIDDLEWARE = [
