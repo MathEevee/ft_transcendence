@@ -1,3 +1,10 @@
+{% extends "index.html" %}
+{% load static %}
+<!DOCTYPE html>
+
+{% block content %}
+{% include "navbar.html"%}
+
 <h2>Inscription</h2>
 <form method="post">
     {% csrf_token %}
@@ -5,3 +12,4 @@
     <button type="submit">S'inscrire</button>
 </form>
 <a href="{% url 'accounts:login' %}">Déjà inscrit ? Connectez-vous ici.</a>
+{% endblock %}
