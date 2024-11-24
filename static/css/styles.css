@@ -1,0 +1,21 @@
+.avatar-selection label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+}
+
+.avatar-selection input[type="radio"] {
+    margin-top: 10px;
+}
+
+.avatar-selection img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid #000;
+}
+
+.avatar-selection input[type="radio"]:checked + img {
+    border-color: #007bff;
+}

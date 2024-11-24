@@ -1,6 +1,7 @@
 import requests
 import pprint
 import logging
+import os
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
@@ -107,12 +108,18 @@ def register_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save(commit=False)
+            user.profil_picture = request.POST.get('profil_picture', '/static/pictures/user-avatar-01.png')
+            user.save()
             messages.success(request, "Inscription réussie ! Connectez-vous.")
             return redirect(reverse('authe:login'))
     else:
         form = RegistrationForm()
-    return render(request, 'register.html', {'form': form})
+    
+    avatars_dir = os.path.join(settings.BASE_DIR, 'static/pictures/')
+    avatars = [f"/static/pictures/{img}" for img in os.listdir(avatars_dir) if img.endswith(('.png', '.jpg', '.jpeg'))]
+    
+    return render(request, 'register.html', {'form': form, 'avatars': avatars})
 
 def login_view(request):
     if request.method == 'POST':

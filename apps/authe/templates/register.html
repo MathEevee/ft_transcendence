@@ -1,7 +1,22 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
 <h2>Inscription</h2>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
+
+    <h3>Choisissez un avatar</h3>
+    <div class="avatar-selection">
+        {% for avatar in avatars %}
+            <label>
+                <input type="radio" name="profil_picture" value="{{ avatar }}">
+                <img src="{{ avatar }}" alt="Avatar">
+            </label>
+        {% endfor %}
+    </div>
+
     <button type="submit">S'inscrire</button>
 </form>
 <a href="{% url 'authe:login' %}">Déjà inscrit ? Connectez-vous ici.</a>
