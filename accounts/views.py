@@ -5,8 +5,6 @@ from django.contrib import messages
 from django.urls import reverse
 from .models import CustomUser
 from .forms import RegistrationForm, LoginForm
-from django.http import HttpResponse
-from django.template import loader
 
 def register_view(request):
     if request.method == 'POST':
@@ -29,8 +27,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, "Connexion réussie !")
-                template = loader.get_template('welcome.html')
-                return (HttpResponse(template.render()))
+                return redirect(reverse('accounts:profile'))
             else:
                 messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
     else:
