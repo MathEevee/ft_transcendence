@@ -1,9 +1,38 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Home - My App
+Home
+{% endblock %}
+
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock %}
 
 {% block content %}
-<h1>Welcome to the Home Page</h1>
+{% include "navbar.html"%}
+<div id="welcome" class="body-container">
+    <div class="center">
+        {% comment %} <div class="bord">
+            <h1>Welcome to ft_transcendence!</h1>
+            <p>By Ajasnin, Axdubois, Matde-ol</p>
+            </div>
+        </div> {% endcomment %}
+        <div class="container">
+            <a class="btn btn-primary select" href="/login/">
+                test
+            </a>
+        </div>
+        <div class="container">
+            <a class="btn btn-primary select" href="/games/pong/local/">
+                Pong
+            </a>
+        </div>
+        <div class="container">
+            <a class="btn btn-primary select" href="/games/spaceinvaders/">
+                Space
+            </a>
+        </div>
+    </div>
+</div>
 {% endblock %}

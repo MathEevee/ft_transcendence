@@ -1,9 +1,24 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Game - My App
+Game
+{% endblock %}
+
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/game.css' %}">
 {% endblock %}
 
 {% block content %}
-<h1>Welcome to the Game Page</h1>
-{% endblock %}
+{% include "navbar.html"%}
+  <div id="games">
+    <div class="container">
+        <a class="btn btn-primary" href="/games/spaceinvaders/">
+            Space-Invader
+        </a>
+        <a class="btn btn-primary" href="/games/pong/">
+            Pong
+        </a>
+    </div>
+  </div>
+  {% endblock %}
