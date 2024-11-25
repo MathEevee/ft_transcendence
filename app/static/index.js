@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const content = await response.text();
                 history.pushState({}, '', response.url);
                 document.body.innerHTML = content;
+                liveChat();
                 loadPage(event.target.getAttribute('href'));
                 return (content);
             }

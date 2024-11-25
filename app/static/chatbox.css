@@ -1,0 +1,55 @@
+#chatbox .ChatButton{
+    border-radius:5px;
+    white-space: nowrap;
+    list-style-type: none;
+    border: 0 #cd6aff;
+	font-family: "Kode Mono", monospace;
+    background-color: #17BEBB;
+    box-shadow: 0px 0px 5px #cd6aff;
+    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    position: fixed;
+    bottom: 5px;
+    right: 5px;
+    width: 100px; /* La largeur de la case */
+    height: 30px; /* La hauteur de la case */
+    color: white; /* Texte en blanc */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#chatbox:hover {
+    background-color: #29c7c4; /* Changement de couleur de fond sur le survol */
+    border-color: #29c7c4; /* Changement de couleur de bordure sur le survol */
+    box-shadow: 0px 0px 10px #29c7c4; /* Changement de couleur de l'ombre sur le survol */
+}
+
+#chatbox .liveChat{
+    display: none;
+    border-radius:5px;
+    white-space: nowrap;
+    list-style-type: none;
+    border: 0 #cd6aff;
+	font-family: "Kode Mono", monospace;
+    background-color: #17BEBB;
+    box-shadow: 0px 0px 5px #cd6aff;
+    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    position: fixed;
+    bottom: 5px;
+    right: 5px;
+    width: 500px; /* La largeur de la case */
+    height: 300px; /* La hauteur de la case */
+    color: white; /* Texte en blanc */
+}
+
+#chatbox .minWin{
+	font-family: "Kode Mono", monospace;
+    font-weight: bold;
+    background-color: #cd6aff5e;
+    box-shadow: 0px 0px 5px white;
+    margin-top: 0%;
+    margin-left: 96%;
+    font-size: 30px;
+}
