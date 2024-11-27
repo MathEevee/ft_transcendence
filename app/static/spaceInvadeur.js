@@ -242,6 +242,8 @@ function hitboxcollision(hitbox1, hitbox2)
 
 function prinsmg(context, text, x, y)
 {
+	cleartobackground(context, canvas);
+	drawbackgroundanimation();
 	context.fillStyle = colorset.fontcolor;
 	context.font = "50px Arial";
 	context.fillText(text, x, y);
@@ -251,14 +253,14 @@ function gamefinished(canvas, context, t_game)
 {
 	if (t_game.player1.life <= 0)
 	{
-		cleartobackground(context, canvas);
 		prinsmg(context, "Player 2 wins", canvas.width / 2 - 150, canvas.height / 2);
+		setTimeout(wait, 2000);
 		return (1);
 	}
 	else if (t_game.player2.life <= 0)
 	{
-		cleartobackground(context, canvas);
 		prinsmg(context, "Player 1 wins", canvas.width / 2 - 150, canvas.height / 2);
+		setTimeout(wait, 2000);
 		return (1);
 	}
 	return (0);
@@ -325,6 +327,7 @@ function countdown()
 	const interval = setInterval(() =>
 	{
 		cleartobackground(context, canvas);
+		drawbackgroundanimation();
 		context.fillStyle = colorset.fontcolor;
 		context.font = "100px Arial";
 		context.fillText(count, canvas.width / 2 - 25, canvas.height / 2 + 25);
@@ -365,9 +368,11 @@ function wait()
 	if (start === 1)
 		return ;
 	cleartobackground(context, canvas);
+	drawbackgroundanimation();
 	context.fillStyle = colorset.fontcolor;
 	context.font = "50px Arial";
-	context.fillText("Press red button to start", canvas.width / 2 - 250, canvas.height / 2);
+	context.fillText("Press the red button to start", canvas.width / 2 - 250, canvas.height / 2);
+	requestAnimationFrame(wait);
 }
 
 wait();
