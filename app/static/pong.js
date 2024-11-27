@@ -352,9 +352,11 @@ function loadPong(){
 		{
 			if (ball.y + ball.radius > canvas.height)
 				ball.y = canvas.height - ball.radius;
+			else
+				ball.y = ball.radius;
 			ball.dy *= -1;
 		}
-		if (ball.x - ball.radius < player1.x + player1.width && ball.y > player1.y && ball.y < player1.y + player1.height)
+		else if (ball.x - ball.radius < player1.x + player1.width && ball.y > player1.y && ball.y < player1.y + player1.height)
 		{
 			ball.dx *= -1;
 			ball.dy = (ball.y - (player1.y + player1.height / 2)) / player1.height / 2;
@@ -425,10 +427,7 @@ function loadPong(){
 			{
 				balldest += ball.dy * ball.speed;
 				if (balldest < 0 || balldest > canvas.height)
-				{
 					balldest = balldest < 0 ? -balldest : 2 * canvas.height - balldest;
-					ball.dy *= -1;
-				}
 				step--;
 			}
 			playerdest = balldest;
@@ -442,10 +441,7 @@ function loadPong(){
 			{
 				balldest += ball.dy * ball.speed;
 				if (balldest < 0 || balldest > canvas.height)
-				{
 					balldest = balldest < 0 ? -balldest : 2 * canvas.height - balldest;
-					ball.dy *= -1;
-				}
 				step--;
 			}
 			playerdest = balldest;
