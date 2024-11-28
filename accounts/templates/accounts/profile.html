@@ -1,4 +1,12 @@
+{% extends "index.html" %}
+{% load static %}
+<!DOCTYPE html>
+
+{% block content %}
+{% include "navbar.html"%}
+
 <h2>Profil</h2>
 <p>Nom d'utilisateur : {{ user.username }}</p>
 <p>Email : {{ user.email }}</p>
 <a href="{% url 'accounts:logout' %}">Se déconnecter</a>
+{% endblock %}

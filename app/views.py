@@ -1,9 +1,6 @@
 from django.http import HttpResponse
 from django.template import loader
 
-def test(request):
-    template = loader.get_template('login.html')
-    return (HttpResponse(template.render()))
 
 def ponglocal(request):
     template = loader.get_template('pong.html')
