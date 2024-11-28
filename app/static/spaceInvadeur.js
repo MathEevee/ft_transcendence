@@ -14,7 +14,7 @@ let lasshootplayer2 = 0;
 
 class Player
 {
-	constructor(x, y, width, height, dx, dy, speed, left, right, life, hitbox)
+	constructor(x, y, width, height, dx, dy, speed, left, right, up, down, hitbox, life)
 	{
 		this.x = x;
 		this.y = y;
@@ -25,6 +25,8 @@ class Player
 		this.speed = speed;
 		this.left = left;
 		this.right = right;
+		this.up = up;
+		this.down = down;
 		this.life = life;
 		this.hitbox = hitbox;
 	}
@@ -74,31 +76,31 @@ t_game = {
 };
 
 const modeleplayer1 = [
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
-    [0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
-    [1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1],
-    [1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1],
-    [0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0],
-    [0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0],
-    [0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0],
+	[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+	[0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+	[0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+	[0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+	[0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+	[1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
+	[1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1],
+	[1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1],
+	[0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0],
+	[0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0],
+	[0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0],
 ];
 
 const modeleplayer2 = [
-    [0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0],
-    [0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0],
-    [0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0],
-    [1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1],
-    [1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1],
-    [1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-    [0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
-    [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+	[0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0],
+	[0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0],
+	[0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0],
+	[1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1],
+	[1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1],
+	[1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
+	[0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+	[0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+	[0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0],
+	[0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+	[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
 ];
 
 let bullets = [];
@@ -121,6 +123,35 @@ for (let i = 0; i < 100; i++)
 /*============================================FUNCTIONS============================================*/
 /*============================================FUNCTIONS============================================*/
 /*============================================FUNCTIONS============================================*/
+
+
+// Fonction pour gérer le basculement en mode plein écran
+function toggleFullscreen(element) {
+	if (!document.fullscreenElement) {
+		// Passer en plein écran
+		if (element.requestFullscreen) {
+			element.requestFullscreen();
+		} else if (element.mozRequestFullScreen) { // Pour Firefox
+			element.mozRequestFullScreen();
+		} else if (element.webkitRequestFullscreen) { // Pour Chrome, Safari et Opera
+			element.webkitRequestFullscreen();
+		} else if (element.msRequestFullscreen) { // Pour Internet Explorer/Edge
+			element.msRequestFullscreen();
+		}
+	} else {
+		// Quitter le mode plein écran
+		if (document.exitFullscreen) {
+			document.exitFullscreen();
+		} else if (document.mozCancelFullScreen) { // Pour Firefox
+			document.mozCancelFullScreen();
+		} else if (document.webkitExitFullscreen) { // Pour Chrome, Safari et Opera
+			document.webkitExitFullscreen();
+		} else if (document.msExitFullscreen) { // Pour Internet Explorer/Edge
+			document.msExitFullscreen();
+		}
+	}
+}
+
 
 /*============================================DRAWING============================================*/
 
@@ -209,8 +240,6 @@ function drawbullets(context, bullets, colorset)
 function draw(canvas, context, t_game)
 {
 	cleartobackground(context, canvas);
-	// drawline(0, 50, canvas.width, 50, colorset.fontcolor);
-	// drawline(0, canvas.height - 50, canvas.width, canvas.height - 50, colorset.fontcolor);
 	drawbackgroundanimation();
 	drawplayer(canvas, context, t_game.player1.x, t_game.player1.y, modeleplayer1, colorset.player1color, t_game.player1.width, t_game.player1.height , t_game.player1);
 	drawlifeplayer(context, t_game.player1, colorset.player1color, 10, 10, t_game.player1.x - 5, t_game.player1.y - 20);
@@ -227,6 +256,11 @@ function updateplayer(canvas, context, player1, player2)
 	player2.x += player2.dx;
 	player1.x = Math.min(Math.max(player1.x, 0), canvas.width - player1.width * modeleplayer1[0].length);
 	player2.x = Math.min(Math.max(player2.x, 0), canvas.width - player2.width * modeleplayer2[0].length);
+
+	player1.y += player1.dy;
+	player2.y += player2.dy;
+	player1.y = Math.min(Math.max(player1.y, 50), canvas.height / 2 - 50);
+	player2.y = Math.min(Math.max(player2.y, canvas.height / 2 + 50), canvas.height - 80);
 }
 
 function hitboxcollision(hitbox1, hitbox2)
@@ -345,8 +379,8 @@ function countdown()
 function initvariables()
 {
 	t_game = {
-		player1: new Player(canvas.width / 2 - 10, 50, 5, 5, 0, 0, 7, 0, 0, 6, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10]),
-		player2: new Player(canvas.width / 2 - 10, canvas.height - 110, 5, 5, 0, 0, 7, 0, 0, 6, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10]),
+		player1: new Player(canvas.width / 2 - 10, 50, 5, 5, 0, 0, 7, 0, 0, 0, 0, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10], 6),
+		player2: new Player(canvas.width / 2 - 10, canvas.height - 110, 5, 5, 0, 0, 7, 0, 0, 0, 0, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10], 6),
 		bullets: [],
 		colorset: colorset,
 	};
@@ -394,7 +428,17 @@ function keyhookdownforgame(event)
 		t_game.player2.dx += 7;
 		t_game.player2.right = 1;
 	}
-	else if (event.key === "a" && t_game.player1.left === 0)
+	else if (event.key === "ArrowUp" && t_game.player2.up === 0)
+	{
+		t_game.player2.dy -= 7;
+		t_game.player2.up = 1;
+	}
+	else if (event.key === "ArrowDown" && t_game.player2.down === 0)
+	{
+		t_game.player2.dy += 7;
+		t_game.player2.down = 1;
+	}
+	else if ((event.key === "a" || event.key === "q") && t_game.player1.left === 0)
 	{
 		t_game.player1.dx -= 7;
 		t_game.player1.left = 1;
@@ -403,6 +447,16 @@ function keyhookdownforgame(event)
 	{
 		t_game.player1.dx += 7;
 		t_game.player1.right = 1;
+	}
+	else if ((event.key === "w" || event.key === "z") && t_game.player1.up === 0)
+	{
+		t_game.player1.dy -= 7;
+		t_game.player1.up = 1;
+	}
+	else if (event.key === "s" && t_game.player1.down === 0)
+	{
+		t_game.player1.dy += 7;
+		t_game.player1.down = 1;
 	}
 }
 					
@@ -418,7 +472,6 @@ function keyhookupforgame(event)
 {
 	if (start === 0 || forcountdown === 1)
 		return ;
-
 	const now = Date.now();
 	if (event.key === "ArrowLeft" && t_game.player2.left === 1)
 	{
@@ -430,7 +483,17 @@ function keyhookupforgame(event)
 		t_game.player2.dx -= 7;
 		t_game.player2.right = 0;
 	}
-	else if (event.key === "a" && t_game.player1.left === 1)
+	else if (event.key === "ArrowUp" && t_game.player2.up === 1)
+	{
+		t_game.player2.dy += 7;
+		t_game.player2.up = 0;
+	}
+	else if (event.key === "ArrowDown" && t_game.player2.down === 1)
+	{
+		t_game.player2.dy -= 7;
+		t_game.player2.down = 0;
+	}
+	else if ((event.key === "a" || event.key === "q") && t_game.player1.left === 1)
 	{
 		t_game.player1.dx += 7;
 		t_game.player1.left = 0;
@@ -439,6 +502,16 @@ function keyhookupforgame(event)
 	{
 		t_game.player1.dx -= 7;
 		t_game.player1.right = 0;
+	}
+	else if ((event.key === "w" || event.key === "z") && t_game.player1.up === 1)
+	{
+		t_game.player1.dy += 7;
+		t_game.player1.up = 0;
+	}
+	else if (event.key === "s" && t_game.player1.down === 1)
+	{
+		t_game.player1.dy -= 7;
+		t_game.player1.down = 0;
 	}
 	else if (event.key === "f")
 	{
@@ -458,6 +531,10 @@ function keyhookupforgame(event)
 
 document.addEventListener('keyup', function(event)
 {
+	if (event.key === "r")
+		startGame();
+	else if (event.key === "o" || event.key === "O")
+		toggleFullscreen(canvas);
 	if (start === 1 && forcountdown === 0)
 		keyhookupforgame(event);
 });

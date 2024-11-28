@@ -2,7 +2,7 @@ function loadPong(){
 	const canvas = document.getElementById('pong');
 	const context = canvas.getContext('2d');
 	const redbutton = document.getElementById('red');
-	const bluebutton = document.getElementById('blue');
+	// const bluebutton = document.getElementById('blue');
 	
 	// Joueurs
 	const paddleWidth = 10;
@@ -54,6 +54,32 @@ function loadPong(){
 	let optionindex = 0;
 	let keyoptionpressed = 0;
 	
+
+	function toggleFullscreen(element) {
+		if (!document.fullscreenElement) {
+			// Passer en plein écran
+			if (element.requestFullscreen) {
+				element.requestFullscreen();
+			} else if (element.mozRequestFullScreen) { // Pour Firefox
+				element.mozRequestFullScreen();
+			} else if (element.webkitRequestFullscreen) { // Pour Chrome, Safari et Opera
+				element.webkitRequestFullscreen();
+			} else if (element.msRequestFullscreen) { // Pour Internet Explorer/Edge
+				element.msRequestFullscreen();
+			}
+		} else {
+			// Quitter le mode plein écran
+			if (document.exitFullscreen) {
+				document.exitFullscreen();
+			} else if (document.mozCancelFullScreen) { // Pour Firefox
+				document.mozCancelFullScreen();
+			} else if (document.webkitExitFullscreen) { // Pour Chrome, Safari et Opera
+				document.webkitExitFullscreen();
+			} else if (document.msExitFullscreen) { // Pour Internet Explorer/Edge
+				document.msExitFullscreen();
+			}
+		}
+	}
 	
 	/* Dessin */
 	
@@ -307,6 +333,12 @@ function loadPong(){
 	
 	document.body.addEventListener("keyup", (event) =>
 	{
+		if (event.key === "r")
+			startPong();
+		else if (event.key === "b")
+			startOption();
+		else if (event.key === "o" || event.key === "O")
+			toggleFullscreen(canvas);
 		if (start === 1)
 			keyhookupforgame(event);
 		else if (option === 1)
@@ -526,7 +558,7 @@ function loadPong(){
 		if (gamemode === "solo" && start === 1)
 		{
 			setTimeout(() => {
-				setInterval(updateAI, 1000);
+				setInterval(updateAI, 20);
 			}, 5000);
 		}
 		setTimeout(loop, 5000);
@@ -559,5 +591,5 @@ function loadPong(){
 	
 	wait();
 	redbutton.addEventListener("click", startPong);
-	bluebutton.addEventListener("click", startOption);
+	// bluebutton.addEventListener("click", startOption);
 }
