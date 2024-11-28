@@ -1,3 +1,6 @@
+var tablist = ["alice","bob","salut"]
+
+
 document.addEventListener('DOMContentLoaded', () => {
     for (let i = 0; tablist[i]; i++)
     {
@@ -9,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     liveChat();
 });
 
-var tablist = ["alice","bob","salut"]
 
 function liveChat(){
     const ChatButton = document.getElementById('chat');

@@ -236,7 +236,7 @@ function loadPong(){
 			player2.down = 1;
 			player2.dy += speed;
 		}
-		else if (event.key === "z" && player1.up !== 1)
+		else if ((event.key === "z" || event.key === "w") && player1.up !== 1)
 		{
 			player1.up = 1;
 			player1.dy += -speed;
@@ -319,7 +319,7 @@ function loadPong(){
 			player2.down = 0;
 			player2.dy -= speed;
 		}
-		else if (event.key === "z" && player1.up === 1)
+		else if ((event.key === "z" || event.key === "w") && player1.up === 1)
 		{
 			player1.up = 0;
 			player1.dy -= -speed;
@@ -558,7 +558,7 @@ function loadPong(){
 		if (gamemode === "solo" && start === 1)
 		{
 			setTimeout(() => {
-				setInterval(updateAI, 20);
+				setInterval(updateAI, 1000);
 			}, 5000);
 		}
 		setTimeout(loop, 5000);
