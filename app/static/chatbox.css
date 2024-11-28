@@ -71,14 +71,21 @@
 }
 
 #chatbox #FriendList {
-    background-color: black;
+    background-color: #ff00ff3f;
     width: 100%;
     height: 90%;
     overflow-y: scroll;
 }
 
-#FriendList > p.friends {
+#FriendList > p.friend {
     color: white;
-    width: 100%;
     overflow: hidden;
+    text-align: center;
+    height: 15%;
+    box-shadow: 1px 1px 1px 0px #17bebb6c;
+}
+
+#chatbox p{
+    margin: 0;
+    margin-top: 5%;
 }
