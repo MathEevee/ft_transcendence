@@ -1,9 +1,16 @@
-{% extends "index.html" %}
+{% extends 'base.html' %}
+
+{% block title %}
+SpaceInvader
+{% endblock %}
+
 {% load static %}
-<!DOCTYPE html>
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/spaceInvadeur.css' %}">
+{% endblock %}
 
 {% block content %}
-{% include "navbar.html"%}
+{% include "navbar/navbar.html"%}
 	<div id="space" class="body-container">
 		<!-- Borne d'arcade complète -->
 		<div class="arcade-machine">

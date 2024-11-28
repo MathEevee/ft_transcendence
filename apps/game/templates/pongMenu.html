@@ -1,9 +1,16 @@
-{% extends "index.html" %}
+{% extends 'base.html' %}
+
+{% block title %}
+Pong Menu
+{% endblock %}
+
 {% load static %}
-<!DOCTYPE html>
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/pongMenu.css' %}">
+{% endblock %}
 
 {% block content %}
-{% include "navbar.html"%}
+{% include "navbar/navbar.html"%}
   <div id="pongMenu">
     <div class="container">
         <a class="btn btn-primary" href="/games/pong/local/">
