@@ -4,11 +4,18 @@
     <div id="chatbox">
         <div class="ChatButton" id = "chat" type="button">chatbox</div>
         <div class="liveChat" id = "box">
-            <div class="minWin" id = "closeChat" type="button">-</div>
+            <div class="bar" id="bar">
+                <div class="infoFriend" id = "infoFriend"></div>
+                <div class="minWin" id = "closeChat" type="button">-</div>
+            </div>
+
             <div class="friends" id = "loadFriends">
                 <input class="search" id="addFriends" type="text">
                 <div class="allFriends" id="FriendList"></div>
             </div>
+            <div class="chatMessages" id="chatMessages"></div>
+            {% comment %} <div>all messages</div> {% endcomment %}
+            <div><input class="inputMessages" id="inputMessages"></div>
         </div>
     </div>
 </div>
