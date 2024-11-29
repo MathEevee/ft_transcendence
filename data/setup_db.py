@@ -1,8 +1,10 @@
 import os
 import django
 import sys
+from pathlib import Path
 
-sys.path.append('/home/pageblanche/ft_transcendence')
+BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.append(str(BASE_DIR))
 
 # init Django Env
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "default.settings")
@@ -10,8 +12,8 @@ django.setup()
 
 from django.core.management import call_command
 from django.db import IntegrityError
-from accounts.models import CustomUser
-from scores.models import PlayerStats
+from apps.authe.models import CustomUser
+# from scores.models import PlayerStats
 
 def setup_database():
     # 1 : execute makemigrations and migrate
@@ -40,23 +42,23 @@ def setup_database():
     except IntegrityError:
         print("users already exist, skipping user creation.")
 
-    # 3 : create objects for table 'PlayerStats'
-    print("creating scores...")
-    try:
-        PlayerStats.objects.create(
-            username="yoda",
-            games_play=10,
-            games_win=7,
-            total_score=150
-        )
-        PlayerStats.objects.create(
-            username="luke",
-            games_play=12,
-            games_win=9,
-            total_score=200
-        )
-    except IntegrityError:
-        print("scores already exist, skipping score creation.")
+    # # 3 : create objects for table 'PlayerStats'
+    # print("creating scores...")
+    # try:
+    #     PlayerStats.objects.create(
+    #         username="yoda",
+    #         games_play=10,
+    #         games_win=7,
+    #         total_score=150
+    #     )
+    #     PlayerStats.objects.create(
+    #         username="luke",
+    #         games_play=12,
+    #         games_win=9,
+    #         total_score=200
+    #     )
+    # except IntegrityError:
+    #     print("scores already exist, skipping score creation.")
 
     print("database setup complete!")
 

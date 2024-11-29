@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.oauth2',
     # 'app',
     # 'accounts',
-	'default',
     # 'scores',
     'apps.authe',
     'apps.home',
