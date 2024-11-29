@@ -1,5 +1,6 @@
 from pathlib import Path
 from decouple import Config, RepositoryEnv
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,10 +23,6 @@ SECRET_KEY = 'django-insecure-3t6@4euv&+e-7g$u_syy_9cd+de!x^cwe-57i_z*45v3hfnj(g
 DEBUG = True
     
 ALLOWED_HOSTS = []
-
-LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "user_profile"
-LOGOUT_REDIRECT_URL = "login"
 
 # Application definition
 
@@ -50,6 +47,10 @@ INSTALLED_APPS = [
     'apps.profil',
     'apps.game'
 ]
+
+LOGIN_URL = reverse_lazy('authe:login')
+LOGIN_REDIRECT_URL = "user_profile"
+LOGOUT_REDIRECT_URL = LOGIN_URL
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
