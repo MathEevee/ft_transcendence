@@ -107,7 +107,7 @@ let bullets = [];
 
 const modelebullet = [
 	[0, 1, 0],
-	[1, 1, 1],
+	[0, 1, 0],
 	[0, 1, 0],
 ];
 
@@ -418,6 +418,7 @@ function keyhookdownforgame(event)
 {
 	if (start === 0 || forcountdown === 1)
 		return ;
+	const now = Date.now();
 	if (event.key === "ArrowLeft" && t_game.player2.left === 0)
 	{
 		t_game.player2.dx -= 7;
@@ -458,6 +459,20 @@ function keyhookdownforgame(event)
 		t_game.player1.dy += 7;
 		t_game.player1.down = 1;
 	}
+	if (event.key === "f")
+	{
+		if (now - lasshootplayer1 < 100)
+			return ;
+		lasshootplayer1 = now;
+		t_game.bullets.push(new Bullet(t_game.player1.x - t_game.player1.width / 2 + (modelebullet.length / 2) * 10 , t_game.player1.y + t_game.player1.height, 10, 10, 0, -1, 20, 1, "player1", [t_game.player1.x + t_game.player1.width / 2, t_game.player1.y + t_game.player1.height, 10, 10]));
+	}
+	if (event.key === " ")
+	{
+		if (now - lasshootplayer2 < 100)
+			return ;
+		lasshootplayer2 = now;
+		t_game.bullets.push(new Bullet(t_game.player2.x - t_game.player2.width / 2 + (modelebullet.length / 2) * 10, t_game.player2.y - t_game.player2.height, 10, 10, 0, 1, 20, 1, "player2", [t_game.player2.x + t_game.player2.width / 2, t_game.player2.y - t_game.player2.height, 10, 10]));
+	}
 }
 					
 document.addEventListener('keydown', function(event)
@@ -472,7 +487,6 @@ function keyhookupforgame(event)
 {
 	if (start === 0 || forcountdown === 1)
 		return ;
-	const now = Date.now();
 	if (event.key === "ArrowLeft" && t_game.player2.left === 1)
 	{
 		t_game.player2.dx += 7;
@@ -513,20 +527,7 @@ function keyhookupforgame(event)
 		t_game.player1.dy -= 7;
 		t_game.player1.down = 0;
 	}
-	else if (event.key === "f")
-	{
-		if (now - lasshootplayer1 < 500)
-			return ;
-		lasshootplayer1 = now;
-		t_game.bullets.push(new Bullet(t_game.player1.x + t_game.player1.width / 2 + 20, t_game.player1.y + t_game.player1.height, 10, 10, 0, -1, 20, 1, "player1", [t_game.player1.x + t_game.player1.width / 2, t_game.player1.y + t_game.player1.height, 10, 10]));
-	}
-	else if (event.key === " ")
-	{
-		if (now - lasshootplayer2 < 500)
-			return ;
-		lasshootplayer2 = now;
-		t_game.bullets.push(new Bullet(t_game.player2.x + t_game.player2.width / 2 + 20, t_game.player2.y - t_game.player2.height, 10, 10, 0, 1, 20, 1, "player2", [t_game.player2.x + t_game.player2.width / 2, t_game.player2.y - t_game.player2.height, 10, 10]));
-	}
+
 }
 
 document.addEventListener('keyup', function(event)

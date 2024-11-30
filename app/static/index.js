@@ -1,7 +1,7 @@
 const allPage = {
     "/games/pong/local/": loadPong,
     "/games/pong/solo/": loadPong,
-    "/games/pong/online/": loadPong,
+    "/games/pong/online/": loadPongMulti,
     "/": loadWelcome,
     "/games/spaceinvaders/" : loadSpaceInvadersGame,
     "/games/": loadGames,

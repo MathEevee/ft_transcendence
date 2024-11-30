@@ -1,4 +1,5 @@
 function loadPong(){
+	let interval = null;
 	const canvas = document.getElementById('pong');
 	const context = canvas.getContext('2d');
 	const redbutton = document.getElementById('red');
@@ -80,6 +81,11 @@ function loadPong(){
 			}
 		}
 	}
+
+	function sizeofstringdisplayed(string)
+	{
+		return (context.measureText(string));
+	}
 	
 	/* Dessin */
 	
@@ -87,7 +93,7 @@ function loadPong(){
 		context.fillStyle = color;
 		context.fillRect(x, y, width, height);
 	}
-	
+
 	function drawCircle(x, y, radius, color) {
 		context.fillStyle = color;
 		context.beginPath();
@@ -418,8 +424,8 @@ function loadPong(){
 			context.fillStyle = colorset.backgroundcolor;
 			context.fillRect(0, 0, canvas.width, canvas.height);
 			context.fillStyle = colorset.fontcolor;
-			context.fillText(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!", canvas.width / 2 - 100, canvas.height / 2 + 25);
-			setTimeout(wait, 5000);
+			context.fillText(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!", canvas.width / 2 - sizeofstringdisplayed(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!").width / 2, canvas.height / 2);
+			setTimeout(wait, 2000);
 			start = 0;
 			return 1;
 		}
@@ -484,8 +490,14 @@ function loadPong(){
 
 	function updateAI()
 	{
+		console.log("fdsfdsfdsdf");
 		if (gamemode !== "solo" || start === 0)
+		{
+			if (interval)
+				clearInterval(interval);
+			interval = null;
 			return ;
+		}
 		AIdest = calplayerdest();
 	}
 	
@@ -558,7 +570,7 @@ function loadPong(){
 		if (gamemode === "solo" && start === 1)
 		{
 			setTimeout(() => {
-				setInterval(updateAI, 20);
+				interval = setInterval(updateAI, 20);
 			}, 5000);
 		}
 		setTimeout(loop, 5000);
@@ -584,9 +596,9 @@ function loadPong(){
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		context.fillStyle = colorset.fontcolor;
 		context.font = "50px Arial";
-		context.fillText("Press red button to start", canvas.width / 2 - 250, canvas.height / 2);
+		context.fillText("Press red button to start", canvas.width / 2 - sizeofstringdisplayed("Press red button to start").width / 2, canvas.height / 2);
 		context.font = "30px Arial";
-		context.fillText("Press blue button for options", canvas.width / 2 - 180, canvas.height - 20);
+		context.fillText("Press blue button for options", canvas.width / 2 - sizeofstringdisplayed("Press blue button for options").width / 2, canvas.height - 10);
 	}
 	
 	wait();
