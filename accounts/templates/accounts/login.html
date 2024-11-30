@@ -1,3 +1,10 @@
+{% extends "index.html" %}
+{% load static %}
+<!DOCTYPE html>
+
+{% block content %}
+{% include "navbar.html"%}
+
 <h2>Connexion</h2>
 <a href="{% url 'accounts:oauth42' %}">Se connecter avec 42</a>
 <form method="post">
@@ -6,3 +13,4 @@
     <button type="submit">Se connecter</button>
 </form>
 <a href="{% url 'accounts:register' %}">Pas encore inscrit ? Inscrivez-vous ici.</a>
+{% endblock %}

@@ -1,7 +1,19 @@
-<h2>Inscription</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">S'inscrire</button>
-</form>
-<a href="{% url 'accounts:login' %}">Déjà inscrit ? Connectez-vous ici.</a>
+{% extends "index.html" %}
+{% load static %}
+<!DOCTYPE html>
+
+{% block content %}
+{% include "navbar.html"%}
+
+<div id="register">
+    <div class='box'>
+        <h2>Inscription</h2>
+            <form method="post" class='info'>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">S'inscrire</button>
+            </form>
+    </div>
+    <a href="{% url 'accounts:login' %}">Déjà inscrit ? Connectez-vous ici.</a>
+</div>
+{% endblock %}

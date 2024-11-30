@@ -1,7 +1,7 @@
 const allPage = {
     "/games/pong/local/": loadPong,
     "/games/pong/solo/": loadPong,
-    "/games/pong/online/": loadPong,
+    "/games/pong/online/": loadPongMulti,
     "/": loadWelcome,
     "/games/spaceinvaders/" : loadSpaceInvadersGame,
     "/games/": loadGames,
@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const content = await response.text();
                 history.pushState({}, '', response.url);
                 document.body.innerHTML = content;
+                liveChat();
                 loadPage(event.target.getAttribute('href'));
                 return (content);
             }

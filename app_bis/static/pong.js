@@ -1,8 +1,9 @@
 function loadPong(){
+	let interval = null;
 	const canvas = document.getElementById('pong');
 	const context = canvas.getContext('2d');
 	const redbutton = document.getElementById('red');
-	const bluebutton = document.getElementById('blue');
+	// const bluebutton = document.getElementById('blue');
 	
 	// Joueurs
 	const paddleWidth = 10;
@@ -19,8 +20,6 @@ function loadPong(){
 	else if (window.location.pathname === "/games/pong/online/")
 		gamemode = "online";
 
-	let caldest = 0;
-
 	// Balle
 	const ball = { x: canvas.width / 2, y: canvas.height / 2, radius: 8, speed: 5, dx: 1, dy: Math.random() - 0.5 };
 	
@@ -29,6 +28,10 @@ function loadPong(){
 	let score2 = 0;
 	
 	let speed = 7;
+
+	//AI
+	let AIdest = canvas.height / 2 - paddleHeight / 2;
+	let AItouch = 0;
 	
 	let start = 0;
 	let option = 0;
@@ -52,6 +55,37 @@ function loadPong(){
 	let optionindex = 0;
 	let keyoptionpressed = 0;
 	
+
+	function toggleFullscreen(element) {
+		if (!document.fullscreenElement) {
+			// Passer en plein écran
+			if (element.requestFullscreen) {
+				element.requestFullscreen();
+			} else if (element.mozRequestFullScreen) { // Pour Firefox
+				element.mozRequestFullScreen();
+			} else if (element.webkitRequestFullscreen) { // Pour Chrome, Safari et Opera
+				element.webkitRequestFullscreen();
+			} else if (element.msRequestFullscreen) { // Pour Internet Explorer/Edge
+				element.msRequestFullscreen();
+			}
+		} else {
+			// Quitter le mode plein écran
+			if (document.exitFullscreen) {
+				document.exitFullscreen();
+			} else if (document.mozCancelFullScreen) { // Pour Firefox
+				document.mozCancelFullScreen();
+			} else if (document.webkitExitFullscreen) { // Pour Chrome, Safari et Opera
+				document.webkitExitFullscreen();
+			} else if (document.msExitFullscreen) { // Pour Internet Explorer/Edge
+				document.msExitFullscreen();
+			}
+		}
+	}
+
+	function sizeofstringdisplayed(string)
+	{
+		return (context.measureText(string));
+	}
 	
 	/* Dessin */
 	
@@ -59,7 +93,7 @@ function loadPong(){
 		context.fillStyle = color;
 		context.fillRect(x, y, width, height);
 	}
-	
+
 	function drawCircle(x, y, radius, color) {
 		context.fillStyle = color;
 		context.beginPath();
@@ -305,6 +339,12 @@ function loadPong(){
 	
 	document.body.addEventListener("keyup", (event) =>
 	{
+		if (event.key === "r")
+			startPong();
+		else if (event.key === "b")
+			startOption();
+		else if (event.key === "o" || event.key === "O")
+			toggleFullscreen(canvas);
 		if (start === 1)
 			keyhookupforgame(event);
 		else if (option === 1)
@@ -313,10 +353,29 @@ function loadPong(){
 	
 	function playerMove()
 	{
+		if (start === 0)
+			return ;
 		player1.y += player1.dy;
-		player2.y += player2.dy;
 		player1.y = Math.max(Math.min(player1.y, canvas.height - paddleHeight), 0);
-		player2.y = Math.max(Math.min(player2.y, canvas.height - paddleHeight), 0);
+		if (gamemode === "local")
+		{
+			player2.y += player2.dy;
+			player2.y = Math.max(Math.min(player2.y, canvas.height - paddleHeight), 0);
+		}
+		else if (gamemode === "solo")
+		{
+			if (AItouch === 0)
+			{
+				if (AIdest > player2.y && AIdest < player2.y + paddleHeight)
+					return ;
+				if (player2.y < AIdest)
+					player2.y += speed;
+				else if (player2.y > AIdest)
+					player2.y -= speed;
+			}
+			player2.y = Math.max(Math.min(player2.y, canvas.height - paddleHeight), 0);
+		}
+
 	}
 	
 	function ballMove()
@@ -328,13 +387,20 @@ function loadPong(){
 	function ballCollision()
 	{
 		if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0)
+		{
+			if (ball.y + ball.radius > canvas.height)
+				ball.y = canvas.height - ball.radius;
+			else
+				ball.y = ball.radius;
 			ball.dy *= -1;
-		if (ball.x - ball.radius < player1.x + player1.width && ball.y > player1.y && ball.y < player1.y + player1.height)
+		}
+		else if (ball.x - ball.radius < player1.x + player1.width && ball.y > player1.y && ball.y < player1.y + player1.height)
 		{
 			ball.dx *= -1;
 			ball.dy = (ball.y - (player1.y + player1.height / 2)) / player1.height / 2;
 			ball.speed += 1;
 			ball.x = player1.x + player1.width + ball.radius;
+			AItouch = 0;
 		}
 		else if (ball.x + ball.radius > player2.x && ball.y > player2.y && ball.y < player2.y + player2.height)
 		{
@@ -342,6 +408,7 @@ function loadPong(){
 			ball.dy = (ball.y - (player2.y + player2.height / 2)) / player2.height / 2;
 			ball.speed += 1;
 			ball.x = player2.x - player2.width - ball.radius;
+			AItouch = 1;
 		}
 	}
 	
@@ -357,8 +424,8 @@ function loadPong(){
 			context.fillStyle = colorset.backgroundcolor;
 			context.fillRect(0, 0, canvas.width, canvas.height);
 			context.fillStyle = colorset.fontcolor;
-			context.fillText(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!", canvas.width / 2 - 100, canvas.height / 2 + 25);
-			setTimeout(wait, 5000);
+			context.fillText(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!", canvas.width / 2 - sizeofstringdisplayed(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!").width / 2, canvas.height / 2);
+			setTimeout(wait, 2000);
 			start = 0;
 			return 1;
 		}
@@ -377,36 +444,61 @@ function loadPong(){
 			ball.dy = Math.random() - 0.5;
 			player1.y = canvas.height / 2 - paddleHeight / 2;
 			player2.y = canvas.height / 2 - paddleHeight / 2;
+			AIdest = canvas.height / 2 - paddleHeight / 2;
 		}
 	}
 
-	function calballdestination()
+	// calcul de la destination du joueur 2 suivant le point d arrivéé de la balle
+	function calplayerdest()
 	{
-		if(ball.dx < 0)
-			return canvas.height / 2;
-		let destination = ball.y;
-		let distance = Math.abs(player2.y + player2.height / 2 - destination);
-		let time = distance / ball.speed;
-		let destination2 = destination + ball.dy * time;
-		if (destination2 < 0)
-			return 0;
-		if (destination2 > canvas.height)
-			return canvas.height;
-		return destination2;
+		let playerdest = player2.y;
+		let balldest = ball.y;
+		let dist = 0;
+		let step = 0;
+
+		if (ball.dx > 0)
+		{
+			dist = canvas.width - ball.x;
+			step = dist / ball.speed;
+
+			while (step > 0)
+			{
+				balldest += ball.dy * ball.speed;
+				if (balldest < 0 || balldest > canvas.height)
+					balldest = balldest < 0 ? -balldest : 2 * canvas.height - balldest;
+				step--;
+			}
+			playerdest = balldest;
+		}
+		else
+		{
+			dist = ball.x;
+			step = dist / ball.speed;
+
+			while (step > 0)
+			{
+				balldest += ball.dy * ball.speed;
+				if (balldest < 0 || balldest > canvas.height)
+					balldest = balldest < 0 ? -balldest : 2 * canvas.height - balldest;
+				step--;
+			}
+			playerdest = balldest;
+
+		}
+		return playerdest;
 	}
 
 	function updateAI()
 	{
-		playerdestination = calballdestination();
-		if (playerdestination > player2.y && playerdestination < player2.y + player2.height)
+		console.log("fdsfdsfdsdf");
+		if (gamemode !== "solo" || start === 0)
 		{
-			player2.dy = 0;
+			if (interval)
+				clearInterval(interval);
+			interval = null;
 			return ;
 		}
-		if (playerdestination < player2.y)
-			player2.dy = -speed;
-		else
-			player2.dy = speed;
+		AIdest = calplayerdest();
 	}
 	
 	/* Jeu */
@@ -415,8 +507,6 @@ function loadPong(){
 		playerMove();
 		ballMove();
 		ballCollision()
-		if (gamemode === "solo")
-			setTimeout(updateAI, 1000);
 		if (ballPoint())
 			return 1;
 	}
@@ -467,6 +557,7 @@ function loadPong(){
 		player2.dy = 0;
 		player1.ismoving = false;
 		player2.ismoving = false;
+		AIdest = canvas.height / 2 - paddleHeight / 2;
 	}
 	
 	function startPong()
@@ -476,6 +567,12 @@ function loadPong(){
 		initvariables();
 		countdown();
 		start = 1;
+		if (gamemode === "solo" && start === 1)
+		{
+			setTimeout(() => {
+				interval = setInterval(updateAI, 20);
+			}, 5000);
+		}
 		setTimeout(loop, 5000);
 	}
 	
@@ -499,12 +596,12 @@ function loadPong(){
 		context.fillRect(0, 0, canvas.width, canvas.height);
 		context.fillStyle = colorset.fontcolor;
 		context.font = "50px Arial";
-		context.fillText("Press red button to start", canvas.width / 2 - 250, canvas.height / 2);
+		context.fillText("Press red button to start", canvas.width / 2 - sizeofstringdisplayed("Press red button to start").width / 2, canvas.height / 2);
 		context.font = "30px Arial";
-		context.fillText("Press blue button for options", canvas.width / 2 - 180, canvas.height - 20);
+		context.fillText("Press blue button for options", canvas.width / 2 - sizeofstringdisplayed("Press blue button for options").width / 2, canvas.height - 10);
 	}
 	
 	wait();
 	redbutton.addEventListener("click", startPong);
-	bluebutton.addEventListener("click", startOption);
+	// bluebutton.addEventListener("click", startOption);
 }
