@@ -13,10 +13,18 @@
         <link rel="stylesheet" href="{% static 'spaceInvadeur.css' %}">
         <link rel="stylesheet" href="{% static 'games.css' %}">
         <link rel="stylesheet" href="{% static 'pongMenu.css' %}">
+<<<<<<< HEAD
         <link rel="icon" href="{% static 'pictures/favicon.ico' %}" type="image/x-icon">
+=======
+        <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+        <link rel="stylesheet" href="{% static 'register.css' %}">
+        <link rel="stylesheet" href="{% static 'chatbox.css' %}">
+>>>>>>> main
         <script src="{% static 'pong.js' %}"></script>
+        <script src="{% static 'pongmulti.js' %}"></script>
         <script src="{% static 'spaceInvadeur.js' %}"></script>
         <script src="{% static 'index.js' %}"></script>
+        <script src="{% static 'chatbox.js' %}"></script>
         <!-- <script src="{% static 'navbar.js' %}"></script> -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,7 +35,12 @@
         <title>Index</title>
     </head>
     <body>
-        {% block content %}
-        {% endblock %}
+        <div>
+            {% block content %}
+            {% endblock %}
+        </div>
+        <div>
+            {% include "chatbox.html" %}
+        </div>
     </body>
 </html>
