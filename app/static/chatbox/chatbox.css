@@ -20,11 +20,19 @@
 }
 
 #chatbox .bar {
+    position: absolute; /* Positionner la barre de manière absolue pour qu'elle ne déplace pas les autres éléments */
+    top: 0;
+    left: 0;
+    right: 0;
     background-color: #29c7c4; 
     border-radius: 5px;
-    height: 13%;
+    height: 35px; /* La hauteur de la barre, ajustée */
+    width: 95%;
     box-shadow: 0px 0px 5px #cd6aff;
     text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
+    display:flex;
+    justify-content: center;
+    text-align: center;
 }
 
 #chatbox .minWin{
@@ -32,11 +40,10 @@
     font-weight: bold;
     text-align: center;
     background-color: #cd6aff5e;
-    margin-top: -5%;
     margin-left: 94%;
-    font-size: 30px;
-    width: 30px;
-    height: 92%;
+    width: 6%;
+    height: 12%;
+    font-size: 25px;
     box-shadow: 0px 0px 5px #cd6aff;
 }
 
@@ -66,24 +73,24 @@
 }
 
 #chatbox .friends{
+    background-color: #cd6aff;
     box-shadow: 0px 0px 5px #ffffff;
-    background-color: #ff00ff3f;
     border-radius: 5px;
-    width: 30%;
-    height: 85%;
+    width: 29%;
+    height: 82%;
     margin-left: 70%;
+    margin-top: 2%;
 }
 
 #search input {
     height: 10%;
     border-radius: 5px;
-    box-shadow: 1px 1px 10px 0px #ff00ff;
-    background-color: #ffffff;
+    box-shadow: 1px 1px 10px 0px #ff00ff88;
 }
 
 #chatbox input:focus {
     outline: none;
-    box-shadow: 1px 1px 10px 2px #ff00ff;
+    box-shadow: 1px 1px 10px 2px #ff00ff62;
 }
 
 
@@ -94,14 +101,12 @@
     box-shadow: 1px 1px 10px 0px #ff00ff;
 }
 
-
-
 #chatbox .chatMessages{
     background-color: #29c7c467;
-    margin-top: -49%;
+    margin-top: -50%;
     margin-left: 2%;
     width: 66%;
-    height: 78%;
+    height: 72%;
     box-shadow: 1px 1px 10px 0px #ff00ff;
     border-radius: 5px;
 }
@@ -113,7 +118,7 @@
     margin-top: 1%;
     border-radius: 5px;
     box-shadow: 1px 1px 5px 0px #ff00ff;
-    background-color: #ffffff;
+    display: fixed;
 }
 
 #chatbox button{
@@ -124,7 +129,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #ff00ff3f;
     overflow: hidden;
     width: 100%;
     border-radius: 5px;
@@ -132,17 +136,34 @@
 }
 
 #FriendList {
-    background-color: #ff00ff; /*change the transparence*/
+    margin-top: 4%;
     width: 100%;
-    height: 100%;
+    height: 87%;
     overflow-y: scroll;
+    border-radius: 5px;
 }
 
 #FriendList button.friend {
     color: white;
     overflow: hidden;
-    height: 15%;
-    box-shadow: 1px 1px 1px 1px #17bebb9c;
+    background-color: #ab39e4a2;
+    box-shadow: 1px 2px 0px 1px #e100ffa2;
+    margin-bottom: 5px;
     border-radius: 5px;
-    
+    height: 40px;
+    width: 95%;
+    margin-left: 2%;
+}
+
+#FriendList button.friend:hover {
+    color: rgb(255, 255, 255);
+    overflow: hidden;
+    background-color: #f700ff67;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    text-shadow: 0px 0px 10px #ffffff, 0px 0px 20px #ffffff;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    height:40px;
+    width: 95%;
+    margin-left: 2%;
 }
