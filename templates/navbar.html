@@ -1,10 +1,10 @@
-<div id="navbarBody" class="navbar">
+<!-- <div id="navbarBody" class="navbar">
         <nav class="bord">
             <ul>
-                <li class="menu-games"><a href="/">home</a></li>
+                <li class="menu-games"><a href="/"><i class="bi bi-house-door"></i> home</a></li>
                 <li class="menu-games"><a href="/friends">friends</a></li>
                 {% comment %} add js to load n friends in my fav {% endcomment %}
-                <li class="games"><a href="/games/">games</a>
+                <li class="games"><a href="/games/"><i class="bi bi-controller"></i> games</a>
                     <ul class="submenu">
                         <li><a href="/games/spaceinvaders/">Space-Invader</a></li>
                         <li class="menu-pong"><a href="/games/pong/">Pong</a>
@@ -15,34 +15,48 @@
                             </ul>
                         </li>
                     </ul>
-                    <!-- <li class="menu-games"><a href="/login">login</a></li> -->
                     <li class="menu-games"><a href="/">settings</a>
                 </li>
-                <li class="menu-games"><a href="/profil">profil</a></li>
-                <li class="menu-games"><a class="text-danger" href="/profil/logout/">Logout</a></li>
+                <li class="menu-games"><a href="/profil"><i class="bi bi-person"></i> profil</a></li>
+                <li class="menu-games"><a class="text-danger" href="/profil/logout/"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
             </ul>
         </nav>
-</div>
+</div> -->
 
 
-        <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="/">My App</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/profil/">Profile</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/game/">Game</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-danger" href="/profil/logout/">Logout</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav> -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">ft_transcendence</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <!-- Home -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/home">
+                    <i class="bi bi-house-door"></i> Home
+                    </a>
+                </li>
+                <!-- Profile -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/profil">
+                    <i class="bi bi-person"></i> Profile
+                    </a>
+                </li>
+                <!-- Game -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/game">
+                    <i class="bi bi-controller"></i> Game
+                    </a>
+                </li>
+                <!-- Logout -->
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="/profil/logout">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
