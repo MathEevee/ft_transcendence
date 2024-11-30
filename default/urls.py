@@ -10,7 +10,7 @@ urlpatterns = [
     path('authe/', include('apps.authe.urls')),
     path('', include('apps.home.urls')),
     path('profil/', include('apps.profil.urls')),
-    path('game/', include('apps.game.urls')),
+    path('games/', include('apps.games.urls')),
     # Redirect root URL to the home app
     path('', RedirectView.as_view(url='/home/', permanent=False)),
 ]

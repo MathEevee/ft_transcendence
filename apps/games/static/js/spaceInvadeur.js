@@ -389,6 +389,7 @@ function initvariables()
 
 function startGame()
 {
+	alert("HELLO")
 	if (start === 1)
 		return ;
 	countdown();
@@ -542,4 +543,4 @@ document.addEventListener('keyup', function(event)
 
 redButton.addEventListener('click', startGame);
 		
-};
+}
