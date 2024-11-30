@@ -5,6 +5,7 @@
     max-height: 5vh;
     height: 5vh;
 	font-family: "Kode Mono", monospace;
+    display: fixed;
 }
 
 #navbarBody .bord {

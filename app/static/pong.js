@@ -2,7 +2,7 @@ function loadPong(){
 	const canvas = document.getElementById('pong');
 	const context = canvas.getContext('2d');
 	const redbutton = document.getElementById('red');
-	// const bluebutton = document.getElementById('blue');
+	const bluebutton = document.getElementById('blue');
 	
 	// Joueurs
 	const paddleWidth = 10;
@@ -591,5 +591,5 @@ function loadPong(){
 	
 	wait();
 	redbutton.addEventListener("click", startPong);
-	// bluebutton.addEventListener("click", startOption);
+	bluebutton.addEventListener("click", startOption);
 }
