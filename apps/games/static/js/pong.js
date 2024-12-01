@@ -3,7 +3,7 @@ function loadPong(){
 	const canvas = document.getElementById('pong');
 	const context = canvas.getContext('2d');
 	const redbutton = document.getElementById('red');
-	// const bluebutton = document.getElementById('blue');
+	const bluebutton = document.getElementById('blue');
 	
 	// Joueurs
 	const paddleWidth = 10;
@@ -242,7 +242,7 @@ function loadPong(){
 			player2.down = 1;
 			player2.dy += speed;
 		}
-		else if (event.key === "z" && player1.up !== 1)
+		else if ((event.key === "z" || event.key === "w") && player1.up !== 1)
 		{
 			player1.up = 1;
 			player1.dy += -speed;
@@ -325,7 +325,7 @@ function loadPong(){
 			player2.down = 0;
 			player2.dy -= speed;
 		}
-		else if (event.key === "z" && player1.up === 1)
+		else if ((event.key === "z" || event.key === "w") && player1.up === 1)
 		{
 			player1.up = 0;
 			player1.dy -= -speed;
@@ -570,7 +570,11 @@ function loadPong(){
 		if (gamemode === "solo" && start === 1)
 		{
 			setTimeout(() => {
+<<<<<<< HEAD:apps/games/static/js/pong.js
 				interval = setInterval(updateAI, 20);
+=======
+				setInterval(updateAI, 1000);
+>>>>>>> matde-ol:app/static/pong.js
 			}, 5000);
 		}
 		setTimeout(loop, 5000);
@@ -603,5 +607,5 @@ function loadPong(){
 	
 	wait();
 	redbutton.addEventListener("click", startPong);
-	// bluebutton.addEventListener("click", startOption);
+	bluebutton.addEventListener("click", startOption);
 }

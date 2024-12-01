@@ -1,0 +1,169 @@
+#chatbox .ChatButton{
+    border-radius:5px;
+    white-space: nowrap;
+    list-style-type: none;
+    border: 0 #cd6aff;
+	font-family: "Kode Mono", monospace;
+    background-color: #17BEBB;
+    box-shadow: 0px 0px 5px #cd6aff;
+    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    position: fixed;
+    bottom: 5px;
+    right: 5px;
+    width: 100px;
+    height: 30px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#chatbox .bar {
+    position: absolute; /* Positionner la barre de manière absolue pour qu'elle ne déplace pas les autres éléments */
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #29c7c4; 
+    border-radius: 5px;
+    height: 35px; /* La hauteur de la barre, ajustée */
+    width: 95%;
+    box-shadow: 0px 0px 5px #cd6aff;
+    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
+    display:flex;
+    justify-content: center;
+    text-align: center;
+}
+
+#chatbox .minWin{
+    font-family: "Kode Mono", monospace;
+    font-weight: bold;
+    text-align: center;
+    background-color: #cd6aff5e;
+    margin-left: 94%;
+    width: 6%;
+    height: 12%;
+    font-size: 25px;
+    box-shadow: 0px 0px 5px #cd6aff;
+}
+
+#chatbox .ChatButton:hover {
+    background-color: #29c7c4; /* Changement de couleur de fond sur le survol */
+    border-color: #29c7c4; /* Changement de couleur de bordure sur le survol */
+    box-shadow: 0px 0px 10px #29c7c4; /* Changement de couleur de l'ombre sur le survol */
+}
+
+#chatbox .liveChat{
+    display: none;
+    border-radius:5px;
+    white-space: nowrap;
+    list-style-type: none;
+    border: 0 #cd6aff;
+	font-family: "Kode Mono", monospace;
+    background-color: #17BEBB;
+    box-shadow: 0px 0px 5px #cd6aff;
+    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    position: fixed;
+    bottom: 5px;
+    right: 5px;
+    width: 500px; /* La largeur de la case */
+    height: 300px; /* La hauteur de la case */
+    color: white; /* Texte en blanc */
+}
+
+#chatbox .friends{
+    background-color: #cd6aff;
+    box-shadow: 0px 0px 5px #ffffff;
+    border-radius: 5px;
+    width: 29%;
+    height: 82%;
+    margin-left: 70%;
+    margin-top: 2%;
+}
+
+#search input {
+    height: 10%;
+    border-radius: 5px;
+    box-shadow: 1px 1px 10px 0px #ff00ff88;
+}
+
+#chatbox input:focus {
+    outline: none;
+    box-shadow: 1px 1px 10px 2px #ff00ff62;
+}
+
+
+#chatbox .search {
+    width: 100%;
+    height: 10%;
+    border-radius: 5px;
+    box-shadow: 1px 1px 10px 0px #ff00ff;
+}
+
+#chatbox .chatMessages{
+    background-color: #29c7c467;
+    margin-top: -50%;
+    margin-left: 2%;
+    width: 66%;
+    height: 72%;
+    box-shadow: 1px 1px 10px 0px #ff00ff;
+    border-radius: 5px;
+}
+
+#chatbox .inputMessages {
+    width: 66%;
+    height: 90%;
+    margin-left: 2%;
+    margin-top: 1%;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px 0px #ff00ff;
+    display: fixed;
+}
+
+#chatbox button{
+    margin: 0;
+}
+
+#FriendList .friend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    width: 100%;
+    border-radius: 5px;
+    border:none;
+}
+
+#FriendList {
+    margin-top: 4%;
+    width: 100%;
+    height: 87%;
+    overflow-y: scroll;
+    border-radius: 5px;
+}
+
+#FriendList button.friend {
+    color: white;
+    overflow: hidden;
+    background-color: #ab39e4a2;
+    box-shadow: 1px 2px 0px 1px #e100ffa2;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    height: 40px;
+    width: 95%;
+    margin-left: 2%;
+}
+
+#FriendList button.friend:hover {
+    color: rgb(255, 255, 255);
+    overflow: hidden;
+    background-color: #f700ff67;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    text-shadow: 0px 0px 10px #ffffff, 0px 0px 20px #ffffff;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    height:40px;
+    width: 95%;
+    margin-left: 2%;
+}

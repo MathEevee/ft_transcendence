@@ -25,9 +25,8 @@ function loadGames(){};
 
 function loadPongMenu(){};
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("console : ",window.location.pathname);
     loadPage(window.location.pathname);
     document.addEventListener('click', (event) => {
         if (event.target.tagName === 'A' && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){

@@ -9,7 +9,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'pong.css' %}">
         <link rel="stylesheet" href="{% static 'welcome.css' %}">
-        <link rel="stylesheet" href="{% static 'navbar.css' %}">
+        <link rel="stylesheet" href="{% static 'navbar/navbar.css' %}">
         <link rel="stylesheet" href="{% static 'spaceInvadeur.css' %}">
         <link rel="stylesheet" href="{% static 'games.css' %}">
         <link rel="stylesheet" href="{% static 'pongMenu.css' %}">
@@ -18,13 +18,17 @@
 =======
         <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
         <link rel="stylesheet" href="{% static 'register.css' %}">
+<<<<<<< HEAD:app_bis/templates/index.html
         <link rel="stylesheet" href="{% static 'chatbox.css' %}">
 >>>>>>> main
+=======
+        <link rel="stylesheet" href="{% static 'chatbox/chatbox.css' %}">
+>>>>>>> matde-ol:app/templates/index.html
         <script src="{% static 'pong.js' %}"></script>
         <script src="{% static 'pongmulti.js' %}"></script>
         <script src="{% static 'spaceInvadeur.js' %}"></script>
         <script src="{% static 'index.js' %}"></script>
-        <script src="{% static 'chatbox.js' %}"></script>
+        <script src="{% static 'chatbox/chatbox.js' %}"></script>
         <!-- <script src="{% static 'navbar.js' %}"></script> -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,7 +44,7 @@
             {% endblock %}
         </div>
         <div>
-            {% include "chatbox.html" %}
+            {% include "chatbox/chatbox.html" %}
         </div>
     </body>
 </html>
