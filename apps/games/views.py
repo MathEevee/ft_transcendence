@@ -1,6 +1,13 @@
 from django.shortcuts import render
 
-def game_view(request):
+def games(request):
     return render(request, 'games.html')
-def space_invader_view(request):
+
+def pong_menu(request):
+    return render(request, 'pongMenu.html')
+
+def pong_local(request):
+    return render(request, 'pong.html')
+
+def space_invader(request):
     return render(request, 'spaceInvadeur.html')
