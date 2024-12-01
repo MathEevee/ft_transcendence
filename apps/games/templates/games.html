@@ -11,12 +11,18 @@ Game
 
 {% block content %}
 {% include "navbar.html" %}
-  <div id="games">
-        <a class="btn btn-primary" href="/games/spaceinvader">
-            Space-Invader
-        </a>
-        <a class="btn btn-primary" href="/games/pong">
-            Pong
-        </a>
-      </div>
-  {% endblock %}
+	<div id="games">
+		<a class="btn btn-primary" href="/games/spaceinvaders">
+			Space-Invader
+		</a>
+		<a class="btn btn-primary" href="/games/pong">
+			Pong
+		</a>
+	</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/games.js' %}"></script>
+<script src="{% static 'js/pong.js' %}"></script>
+<script src="{% static 'js/pongMulti.js' %}"></script>
+{% endblock %}

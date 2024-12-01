@@ -11,25 +11,25 @@ Pong
 
 {% block content %}
 {% include "navbar.html" %}
-  <div id="pongPage" class="body-container">
-    <!-- Borne d'arcade complète -->
-    <div class="arcade-machine">
-      <!-- Panneau supérieur avec titre -->
-      <div class="arcade-header">
-        <h1>Pong Arcade</h1>
-      </div>
-  
-      <!-- Écran de jeu intégré dans la borne -->
-      <div class="arcade-screen">
-        <canvas id="pong" width="700" height="700"></canvas>
-      </div>
-  
-      <!-- Console de commandes factice -->
-      <div class="arcade-console">
-        <div class="button red" id = "red" type="button"></div>
-        <div class="button blue" id = "blue" type="button"></div>
-        <div class="joystick"></div>
-      </div>
-    </div>
-  </div>
-  {% endblock %}
+	<div id="pongPage" class="body-container">
+		<!-- Borne d'arcade complète -->
+		<div class="arcade-machine">
+			<!-- Panneau supérieur avec titre -->
+			<div class="arcade-header">
+				<h1>Pong Arcade</h1>
+			</div>
+		
+			<!-- Écran de jeu intégré dans la borne -->
+			<div class="arcade-screen">
+				<canvas id="pong" width="700" height="700"></canvas>
+			</div>
+
+			<!-- Console de commandes factice -->
+			<div class="arcade-console">
+				<div class="button red" id="red" type="button"></div>
+				<div class="button blue" id="blue" type="button"></div>
+				<div class="joystick"></div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
