@@ -389,7 +389,7 @@ function initvariables()
 
 function startGame()
 {
-	alert("HELLO")
+	console.log("HELLO")
 	if (start === 1)
 		return ;
 	countdown();
@@ -542,5 +542,9 @@ document.addEventListener('keyup', function(event)
 });
 
 redButton.addEventListener('click', startGame);
-		
+
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+    loadSpaceInvadersGame();
+});
