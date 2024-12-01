@@ -28,16 +28,19 @@ def setup_database():
             username="ajas",
             email="ajas@example.com",
             password="SuperPower",
+            profil_picture=" /static/pictures/user-avatar-01.png"
         )
         CustomUser.objects.create_user(
             username="yoda",
             email="yoda@example.com",
             password="TheForce",
+            profil_picture=" /static/pictures/user-avatar-02.png"
         )
         CustomUser.objects.create_user(
             username="luke",
             email="luke@example.com",
             password="StarKiller",
+            profil_picture=" /static/pictures/user-avatar-03.png"
         )
     except IntegrityError:
         print("users already exist, skipping user creation.")
