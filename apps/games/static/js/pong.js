@@ -12,7 +12,7 @@ function loadPong(){
 	const player2 = { x: canvas.width - paddleWidth, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, dy: 0 , ismoving: false};
 	
 	// Gamemode
-	gamemode = "";
+	var gamemode = "";
 	if (window.location.pathname === "/games/pong/local/")
 		gamemode = "local";
 	else if (window.location.pathname === "/games/pong/solo/")
@@ -606,3 +606,5 @@ function loadPong(){
 	redbutton.addEventListener("click", startPong);
 	bluebutton.addEventListener("click", startOption);
 }
+
+export { loadPong }

@@ -1,10 +1,10 @@
 import { loadSpaceInvadersGame } from "/static/js/spaceInvadeur.js" 
-console.log("space fc", loadSpaceInvadersGame)
+import { loadPong } from "/static/js/pong.js"
+import { loadPongMulti } from "/static/js/pongMulti.js"
 
 const allPage = {
-    // "/games/pong/local": loadPong,
-    // "/games/pong/online": loadPongMulti,
-    // "/": loadWelcome,
+    "/games/pong/local/": loadPong,
+    "/games/pong/online/": loadPongMulti,
     "/games/spaceinvaders/" : loadSpaceInvadersGame,
     // "/games/": loadGames,
     // "/games/pong/": loadPongMenu,
@@ -18,10 +18,12 @@ function loadPage(path){
     console.log('Loading function:', allPage[path]);
     if (allPage[path])
         allPage[path]();
+    else if (allPage[path + '/'])
+        allPage[path + '/']();
+
 };
 
 
-function loadWelcome(){};
 
 function loadGames(){};
 

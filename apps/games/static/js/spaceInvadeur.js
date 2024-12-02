@@ -545,4 +545,4 @@ redButton.addEventListener('click', startGame);
 
 }
 
-export {loadSpaceInvadersGame}
+export { loadSpaceInvadersGame }

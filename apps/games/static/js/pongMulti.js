@@ -515,7 +515,7 @@ function loadPongMulti(){
 	}
 
 	/*t_game*/
-	t_game = {
+	var t_game = {
 		player1: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team1, 1),
 		player2: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team2, 2),
 		player3: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team1, 1),
@@ -696,3 +696,5 @@ function loadPongMulti(){
 	wait();
 	redbutton.addEventListener("click", startPong);
 }
+
+export { loadPongMulti }
