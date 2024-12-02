@@ -1,9 +1,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         liveChat();
     });
-
+    
     var tablist = ["alice", "bob", "salut"];
-
+    
     function liveChat() {
         const ChatButton = document.getElementById('chat');
         const liveChat = document.getElementById('box');
@@ -11,8 +11,8 @@
         const search = document.getElementById('addFriends');
         const elemcontainer = document.getElementById('FriendList');
         const selectFriend = document.getElementById('selectFriend');
-        const linkFriend = document.getElementById('infoFriend');
-
+        // const linkFriend = document.getElementById('infoFriend');
+        
         
         
         for (let i = 0; i < tablist.length; i++) {
@@ -42,18 +42,18 @@
         ChatButton.addEventListener('click', openChat);
         minWin.addEventListener('click', closeChat);
         selectFriend.addEventListener('click', loadBar);
-        linkFriend.addEventListener('click', function(event) { 
-            pageFriend(event); 
-        });
+        // linkFriend.addEventListener('click', function(event) { 
+        //     pageFriend(event); 
+        // });
         
         search.addEventListener('keydown', function(event) { 
-            addFriends(event); 
+            addFriends(event, elemcontainer); 
         });
     }
 
     function loadBar(event) {
         if (event.type === 'click') {  // Fix: change to check for 'click' event type
-            event.preventDefault();
+            // event.preventDefault();
             var link = document.createElement("a");
 
             var friendName = event.target.textContent;
@@ -78,7 +78,7 @@ function pageFriend(event) {
             window.location.href = url;  // Voir avec les urls et les views car ca marche pas
     }
 
-    function addFriends(event) {
+    function addFriends(event, elemcontainer) {
         if (event.key === 'Enter') {
             event.preventDefault();
             var inputValue = document.getElementById('addFriends').value;

@@ -570,11 +570,8 @@ function loadPong(){
 		if (gamemode === "solo" && start === 1)
 		{
 			setTimeout(() => {
-<<<<<<< HEAD:apps/games/static/js/pong.js
 				interval = setInterval(updateAI, 20);
-=======
 				setInterval(updateAI, 1000);
->>>>>>> matde-ol:app/static/pong.js
 			}, 5000);
 		}
 		setTimeout(loop, 5000);
