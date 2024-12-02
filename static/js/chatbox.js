@@ -59,7 +59,7 @@
             var friendName = event.target.textContent;
 
             // Correct the link, add http:// to make it a valid URL
-            link.href = "http://127.0.0.1:8000/account/" + friendName + "/";
+            link.href = "/account/" + friendName + "/";
             link.textContent = friendName;
 
             // Find the 'selectFriend' element and append the link

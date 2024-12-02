@@ -1,10 +1,11 @@
-// import { loadSpaceInvadersGame } from "../../apps/games/static/js/spaceInvadeur.js" 
+import { loadSpaceInvadersGame } from "/static/js/spaceInvadeur.js" 
+console.log("space fc", loadSpaceInvadersGame)
 
 const allPage = {
     // "/games/pong/local": loadPong,
     // "/games/pong/online": loadPongMulti,
     // "/": loadWelcome,
-    "/games/spaceinvaders" : loadSpaceInvadersGame,
+    "/games/spaceinvaders/" : loadSpaceInvadersGame,
     // "/games/": loadGames,
     // "/games/pong/": loadPongMenu,
 }
@@ -31,17 +32,20 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPage(window.location.pathname);
     document.addEventListener('click', (event) => {
         if (event.target.tagName === 'A' && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
-            fetchAndReplaceContent = async() => {
+            var fetchAndReplaceContent = async() => {
                 const response = await fetch(event.target.getAttribute('href'));
                 const content = await response.text();
                 history.pushState({}, '', response.url);
                 document.body.innerHTML = content;
-                liveChat();
-                loadPage(event.target.getAttribute('href'));
+                console.log(response)
+                if (response.ok) {
+                    liveChat();
+                    loadPage(event.target.getAttribute('href'));
+                }
                 return (content);
             }
-            event.preventDefault();
             fetchAndReplaceContent();
+            event.preventDefault();
             return;
         }
     });

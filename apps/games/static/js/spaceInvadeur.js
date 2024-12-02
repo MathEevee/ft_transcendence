@@ -68,7 +68,7 @@ class Bullet
 
 /*game*/
 
-t_game = {
+var t_game = {
 	player1: new Player(0, 0, 50, 50, 0, 0, 5, 37, 39, 3, [0, 0, 50, 50]),
 	player2: new Player(0, 0, 50, 50, 0, 0, 5, 65, 68, 3, [0, 0, 50, 50]),
 	bullets: [],
@@ -545,6 +545,4 @@ redButton.addEventListener('click', startGame);
 
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    loadSpaceInvadersGame();
-});
+export {loadSpaceInvadersGame}
