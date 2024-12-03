@@ -1,0 +1,43 @@
+body {
+    background-color: #120052;
+    font-family: "Kode Mono", monospace;
+    
+}
+
+h1, h2, h3, h4 {
+    color: #ff00ff;
+    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
+}
+
+h3.card-title {
+    color: #ff00ff;
+}
+
+.card-body {
+    background-color: #1a0033;
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px #5820a1, 0px 0px 50px #ff00ff;
+}
+
+.list-group {
+    background-color: #1a0033;
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px #5820a1, 0px 0px 50px #ff00ff;
+}
+
+.list-group-item {
+    background-color: #1a0033;
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid white;
+}
+
+.img-thumbnail {
+    border: 1px solid #5820a1;
+    background-color: #120052;
+}

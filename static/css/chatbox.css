@@ -33,6 +33,7 @@
     display:flex;
     justify-content: center;
     text-align: center;
+    padding-top: 5px;
 }
 
 #chatbox .minWin{
@@ -43,7 +44,8 @@
     margin-left: 94%;
     width: 6%;
     height: 12%;
-    font-size: 25px;
+    font-size: 27px;
+    padding-left: 5px;
     box-shadow: 0px 0px 5px #cd6aff;
 }
 
@@ -166,4 +168,22 @@
     height:40px;
     width: 95%;
     margin-left: 2%;
+}
+
+#selectFriend a, #selectFriend a:visited, #selectFriend a:link{
+    padding-left: 5px;
+    color: white;
+    text-decoration: none;
+}
+
+#selectFriend a:hover {
+    transition: 
+        color 0.15s ease-in-out, 
+        background-color 0.15s ease-in-out, 
+        border-color 0.15s ease-in-out,
+        box-shadow 0.15s ease-in-out,
+        text-decoration 0.15s ease-in-out;
+    color: #cd6aff;
+    text-shadow: 0px 0px 10px #bb01bb, 0px 0px 20px #bb01bb;
+    text-decoration: underline;
 }

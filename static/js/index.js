@@ -4,6 +4,7 @@ import { loadPongMulti } from "/static/js/pongMulti.js"
 
 const allPage = {
     "/games/pong/local/": loadPong,
+    "/games/pong/solo/": loadPong,
     "/games/pong/online/": loadPongMulti,
     "/games/spaceinvaders/" : loadSpaceInvadersGame,
     // "/games/": loadGames,

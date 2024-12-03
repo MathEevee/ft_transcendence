@@ -4,9 +4,14 @@
 Profil
 {% endblock %}
 
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/profil.css' %}">
+{% endblock %}
+
 {% block content %}
 {% include "navbar.html" %}
-<div class="row">
+<div class="row profil">
     <div class="col-md-8 offset-md-2">
         <h1 class="text-center">Profile</h1>
         <div class="card mt-4">
