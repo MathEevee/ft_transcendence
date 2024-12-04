@@ -1,49 +1,144 @@
+body {
+    background-color: #120052;
+}
+
 #register {
     padding-top: 10vh;
-	font-family: "Kode Mono", monospace;
-    color :aliceblue;
-    display:flex;
+    font-family: "Kode Mono", monospace;
+    display: flex;
     align-items: center;
     flex-direction: column;
 }
 
-#register input{
+#register input {
     background-color: rgb(255, 255, 255);
-    border-radius: 8px;
-	box-shadow: 0px 0px 10px #5d1cb3;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px #5d1cb3;
+    padding: 8px;
+    height: 30px;
+}
+
+#register h2 {
+    font-size: 24px;
+    margin-left: 35%;
+}
+
+#register a {
+    color:white;
+    margin-top: 25px;
 }
 
 #register .box {
-	box-shadow: 0px 0px 10px #5d1cb3;
+    border: 1px solid rgba(255, 255, 255, 0.616);
+    box-shadow: 0px 0px 25px #6e29c9;
     border-radius: 10px;
     background-color: #09002b;
-    display: flex;
-    align-items:center;
+    display: inline;
+    align-items: flex-start; /* Pour aligner les éléments vers le haut */
     flex-direction: column;
-    width: 55vh;
-    height: 40vh;
+    width: 70vh;
+    height: 55vh;
+    padding: 20px;
+}
+
+#register .form-group {
+    display: flex;
+    justify-content: flex-start; /* Pour aligner les éléments à gauche */
+    align-items: center;
+    margin-bottom: 20px; /* Pour ajouter un espace entre les lignes */
+    width: 100%;
+}
+
+#register label {
+    width: 30%;
+    margin-right: 10px;
+    text-align: left; /* Alignement du texte à gauche */
+    display: inline-block;
+}
+
+#register input {
+    padding: 8px;
+    margin-left: 10px;
+}
+
+#register .info {
+    color: white;
+    font-size: 18px;
+}
+
+#register h2 {
+    color: white;
 }
 
 #register ul {
     display: none;
 }
 
-#register p > span{
+#register p > span {
     display: none;
 }
 
-#register .info{
+#register .avatar-selection {
+    display: flex;
+    width: 100%;
+    margin-left: 30px;
+    margin-top: -10px;
+}
+
+#register .avatar {
+    border-radius: 50%;  /* Rend l'élément div rond */
+    width: 60px;  /*Ajuste la taille selon tes besoins*/
+    height: 60px; /* Ajuste la taille selon tes besoins */
+    background-color: #ccc; /* Ou une autre couleur de fond si besoin */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 25px;  /* Espacement entre les images */
+}
+
+button.registerAccount {
+    height: 30px;  /* Ajuste la hauteur du bouton */
+    width: 100px;  /* Largeur automatique pour ajuster au texte */
     color: white;
-    font-size: 18px;
+    border-radius: 8px;  /* Coins arrondis */
+    display: flex;  /* Utilisation de flexbox pour centrer le contenu */
+    justify-content: center;  /* Centre horizontalement */
+    align-items: center;  /* Centre verticalement */
+    padding: 10px 20px;  /* Padding pour espacer le texte du bord */
+    background-color: #6d00a3;
+    box-shadow: 0px 0px 3px #ffffff;
+    font-size: 14px;  /* Taille du texte du bouton */
+    border: 1px solid #ffffff;
+    cursor: pointer;  /* Change le curseur lorsque le bouton est survolé */
+    margin-top: 35px;
+    font-family: "Kode Mono", monospace;
 }
 
-#register label{
-    width: 30%;
-    margin-left: 10px;
+#register img.avatar {
+    border-radius: 50%;  /* Rend l'image ronde */
+    width: 60px;  /* Ajuste la taille selon tes besoins */
+    height: 60px; /* Ajuste la taille selon tes besoins */
+    object-fit: cover; /* Assure que l'image couvre toute la surface du cercle */
 }
 
-#register button {
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px #5d1cb3;
-    margin-left: 20px;
+/* .avatar-selection label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+} 
+
+.avatar-selection input[type="radio"] {
+    margin-top: 10px;
 }
+
+.avatar-selection img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid #000;
+}
+
+.avatar-selection input[type="radio"]:checked + img {
+    border-color: #007bff;
+} */

@@ -1,8 +1,21 @@
-<h2>Connexion</h2>
-<a href="{% url 'authe:oauth42' %}">Se connecter avec 42</a>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Se connecter</button>
-</form>
-<a href="{% url 'authe:register' %}">Pas encore inscrit ? Inscrivez-vous ici.</a>
+{% extends 'base.html' %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/authe.css' %}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&display=swap">
+
+{% block content %}
+<div id='login'>
+    <div class="card mt-4">
+        <div class="card-body">
+    <h2>Connexion</h2>
+    <a href="{% url 'authe:oauth42' %}">Se connecter avec 42</a>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Se connecter</button>
+    </form>
+    <a href="{% url 'authe:register' %}">Pas encore inscrit ? Inscrivez-vous ici.</a>
+    </div>
+</div>
+</div>
+{% endblock %}
