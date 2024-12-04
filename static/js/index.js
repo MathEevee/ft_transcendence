@@ -1,6 +1,6 @@
 import { loadSpaceInvadersGame } from "/static/js/spaceInvadeur.js" 
 import { loadPong } from "/static/js/pong.js"
-import { loadPongMulti } from "/static/js/pongMulti.js"
+import { loadPongMulti } from "/static/js/pongMulti/pongMulti.js"
 
 const allPage = {
     "/games/pong/local/": loadPong,
@@ -14,8 +14,8 @@ const allPage = {
 // import { update } from "/static/spaceupdate.js";
 
 function loadPage(path){
-    console.log('Loading page:', path);
-    console.log('Loading function:', allPage[path]);
+    // console.log('Loading page:', path);
+    // console.log('Loading function:', allPage[path]);
     if (allPage[path])
         allPage[path]();
     else if (allPage[path + '/'])
@@ -30,7 +30,7 @@ function loadGames(){};
 function loadPongMenu(){};
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("console : ",window.location.pathname);
+    // console.log("console : ",window.location.pathname);
     loadPage(window.location.pathname);
     document.addEventListener('click', (event) => {
         if (event.target.tagName === 'A' && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
