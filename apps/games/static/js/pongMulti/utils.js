@@ -44,27 +44,28 @@ function drawdiamondstroke(context, x, y, width, height, color)
 {
 	context.lineWidth = 5;
 	context.fillStyle = color;
+	var size = 50;
 
-	var A = new point(x + 50, y + 50);
-	var B = new point(x + 50, y + height / 2);
-	var C = new point(x + width / 2, y + 50);
+	var A = new point(x + size, y + size);
+	var B = new point(x + size, y + height / 2);
+	var C = new point(x + width / 2, y + size);
 
 	drawtriangle(context, A, B, C, color);
 
-	A.x = x - 50;
-	B.x = x - 50;
+	A.x = x - size;
+	B.x = x - size;
 	C.x = x - width / 2;
 
 	drawtriangle(context, A, B, C, color);
 
-	A.y = y - 50;
+	A.y = y - size;
 	B.y = y - height / 2;
-	C.y = y - 50;
+	C.y = y - size;
 
 	drawtriangle(context, A, B, C, color);
 
-	A.x = x + 50;
-	B.x = x + 50;
+	A.x = x + size;
+	B.x = x + size;
 	C.x = x + width / 2;
 
 	drawtriangle(context, A, B, C, color);
@@ -75,38 +76,33 @@ function sizeofstringdisplayed(context, string)
 	return (context.measureText(string));
 }
 
-function hitboxcollision(hitbox1, hitbox2)
+function ispointinrectangle(point, rectangle)
 {
-	if (hitbox1.length === 4 && hitbox2.length === 4)
+	if (point === undefined || rectangle === undefined)
 	{
-		const A1 = hitbox1[0], B1 = hitbox1[1], C1 = hitbox1[2], D1 = hitbox1[3];
-		const A2 = hitbox2[0], B2 = hitbox2[1], C2 = hitbox2[2], D2 = hitbox2[3];
-		var collisionpoint = new point(A2.x, A2.y);
-	
-		// Vérifier les collisions avec le système d'axes alignés (AABB)
-		if (A1.x < C2.x && C1.x > A2.x && A1.y < C2.y && C1.y > A2.y)
-		{
-			console.log(A1);
-			collisionpoint = new point(A1.x, A1.y);
-			return collisionpoint;
-		}
-		return collisionpoint;
+		console.log("Error: ispointinrectangle: point or rectangle is undefined");
+		return (false);
 	}
-	else if (hitbox1.length === 3 && hitbox2.length === 3)
-	{
-		const A1 = hitbox1[0], B1 = hitbox1[1], C1 = hitbox1[2];
-		const A2 = hitbox2[0], B2 = hitbox2[1], C2 = hitbox2[2];
-		var collisionpoint = new point(A2.x, A2.y);
-	
-		// Vérifier les collisions avec le système d'axes alignés (AABB)
-		if (A1.x < C2.x && C1.x > A2.x && A1.y < C2.y && C1.y > A2.y)
-		{
-			console.log(A1);
-			collisionpoint = new point(A1.x, A1.y);
-			return collisionpoint;
-		}
-		return collisionpoint;
-	}
+	const [A, B, C, D] = rectangle;
+	if (point.x >= A.x && point.x <= B.x && point.y >= A.y && point.y <= D.y)
+		return (true);
+	return (false);
 }
 
-export {drawRect, drawCircle, drawdiamond, drawdiamondstroke, sizeofstringdisplayed, hitboxcollision};
+function ispointintriangle(point, triangle)
+{
+	if (point === undefined || triangle === undefined)
+	{
+		console.log("Error: ispointintriangle: point or triangle is undefined");
+		return (false);
+	}
+	const [A, B, C] = triangle;
+	const AB = (A.x - point.x) * (B.y - A.y) - (B.x - A.x) * (A.y - point.y);
+	const BC = (B.x - point.x) * (C.y - B.y) - (C.x - B.x) * (B.y - point.y);
+	const CA = (C.x - point.x) * (A.y - C.y) - (A.x - C.x) * (C.y - point.y);
+	if ((AB > 0 && BC > 0 && CA > 0) || (AB < 0 && BC < 0 && CA < 0))
+		return (true);
+	return (false);
+}
+
+export {drawRect, drawCircle, drawdiamond, drawdiamondstroke, sizeofstringdisplayed, ispointintriangle, ispointinrectangle};

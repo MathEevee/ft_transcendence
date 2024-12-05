@@ -19,6 +19,17 @@ class Player
 		drawRect(context, this.x, this.y, this.width, this.height, this.color);
 	}
 
+	getHitbox()
+	{
+		const hitbox = [
+			new point(this.x, this.y),
+			new point(this.x + this.width, this.y),
+			new point(this.x + this.width, this.y + this.height),
+			new point(this.x, this.y + this.height),
+		];
+		return (hitbox);
+	}
+
 	constructor(x, y, width, height, color, team, speed) {
 		this.x = x;
 		this.y = y;

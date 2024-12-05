@@ -74,6 +74,7 @@ function loadPongMulti(){
 		t_game.player3.draw(context);
 		t_game.player4.draw(context);
 		t_game.ball.draw(context);
+		t_game.ball.drawhitbox(context);
 	}
 
 	function update()
@@ -82,7 +83,7 @@ function loadPongMulti(){
 		t_game.player2.update();
 		t_game.player3.update();
 		t_game.player4.update();
-		t_game.ball.update(t_game.background, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball);
+		t_game.ball.update(canvas, t_game.background, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball);
 	}
 	
 	function keyhookdownforgame(event)
@@ -170,13 +171,13 @@ function loadPongMulti(){
 			ballplassement.x = -50;
 		t_game.ball = new Ball(canvas.width / 2 + ballplassement.x, canvas.height / 2 + ballplassement.y, 0, 0, 5, colorset.ballcolor, speed / 4);
 		if (ballplassement.x === 0)
-			t_game.ball.dx = Math.random();
+			t_game.ball.dx = Math.random() * 0.5;
 		else if (ballplassement.x === 50)
 			t_game.ball.dx = 1;
 		else
 			t_game.ball.dx = -1;
 		if (ballplassement.y === 0)
-			t_game.ball.dy = Math.random();
+			t_game.ball.dy = Math.random() * 0.5;
 		else if (ballplassement.y === 50)
 			t_game.ball.dy = 1;
 		else

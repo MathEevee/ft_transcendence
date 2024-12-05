@@ -490,7 +490,6 @@ function loadPong(){
 
 	function updateAI()
 	{
-		console.log("fdsfdsfdsdf");
 		if (gamemode !== "solo" || start === 0)
 		{
 			if (interval)
@@ -570,8 +569,7 @@ function loadPong(){
 		if (gamemode === "solo" && start === 1)
 		{
 			setTimeout(() => {
-				interval = setInterval(updateAI, 20);
-				setInterval(updateAI, 1000);
+				interval = setInterval(updateAI, 1000);
 			}, 5000);
 		}
 		setTimeout(loop, 5000);

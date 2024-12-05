@@ -57,8 +57,8 @@ class background
 		context.beginPath();
 		context.moveTo(A.x, A.y);
 		context.lineTo(B.x, B.y);
-		context.lineTo(C.x, C.y);
 		context.lineTo(D.x, D.y);
+		context.lineTo(C.x, C.y);
 		context.closePath();
 		context.stroke();
 	}
@@ -101,6 +101,26 @@ class background
 		this.drawtrianglehitbox(context, this.centraldiamondstroke.bottomright[0], this.centraldiamondstroke.bottomright[1], this.centraldiamondstroke.bottomright[2], "red");
 	}
 
+	getHitbox()
+	{
+		const hitbox = [
+			this.exteriorwall.walltop,
+			this.exteriorwall.wallbottom,
+			this.exteriorwall.wallleft,
+			this.exteriorwall.wallright,
+			this.exteriorwall.walltopleft,
+			this.exteriorwall.walltopright,
+			this.exteriorwall.wallbottomleft,
+			this.exteriorwall.wallbottomright,
+			this.centraldiamondstroke.topleft,
+			this.centraldiamondstroke.topright,
+			this.centraldiamondstroke.bottomleft,
+			this.centraldiamondstroke.bottomright,
+			this.diamondcentral,
+		];
+		return (hitbox);
+	}
+
 	constructor(x, y, width, height, color, canvas)
 	{
 		const borderThickness = canvas.width * 0.5;
@@ -114,59 +134,61 @@ class background
 		{
 			walltop: [
 				new point(canvas.width / 2 - borderThickness / 2, 0),
+				new point(canvas.width / 2 + borderThickness / 2, 0),
 				new point(canvas.width / 2 - borderThickness / 2, 5),
 				new point(canvas.width / 2 + borderThickness / 2, 5),
-				new point(canvas.width / 2 + borderThickness / 2, 0),
 			],
 			wallbottom: [
-				new point(canvas.width / 2 - borderThickness / 2, canvas.height),
 				new point(canvas.width / 2 - borderThickness / 2, canvas.height - 5),
 				new point(canvas.width / 2 + borderThickness / 2, canvas.height - 5),
+				new point(canvas.width / 2 - borderThickness / 2, canvas.height),
 				new point(canvas.width / 2 + borderThickness / 2, canvas.height),
 			],
 			wallleft: [
 				new point(0, canvas.height / 2 - borderThickness / 2),
 				new point(5, canvas.height / 2 - borderThickness / 2),
-				new point(5, canvas.height / 2 + borderThickness / 2),
 				new point(0, canvas.height / 2 + borderThickness / 2),
+				new point(5, canvas.height / 2 + borderThickness / 2),
 			],
 			wallright: [
-				new point(canvas.width, canvas.height / 2 - borderThickness / 2),
 				new point(canvas.width - 5, canvas.height / 2 - borderThickness / 2),
+				new point(canvas.width, canvas.height / 2 - borderThickness / 2),
 				new point(canvas.width - 5, canvas.height / 2 + borderThickness / 2),
 				new point(canvas.width, canvas.height / 2 + borderThickness / 2),
 			],
 			walltopleft: [
 				new point(0, 0),
 				new point(canvas.width / 2 - borderThickness / 2, 0),
-				new point(canvas.width / 2 - borderThickness / 2, borderThickness / 2),
 				new point(0, borderThickness / 2),
+				new point(canvas.width / 2 - borderThickness / 2, borderThickness / 2),
 			],
 			walltopright: [
 				new point(canvas.width / 2 + borderThickness / 2, 0),
 				new point(canvas.width, 0),
-				new point(canvas.width, borderThickness / 2),
 				new point(canvas.width / 2 + borderThickness / 2, borderThickness / 2),
+				new point(canvas.width, borderThickness / 2),
 			],
 			wallbottomleft: [
+				new point(0, canvas.height - borderThickness / 2),
+				new point(canvas.width / 2 - borderThickness / 2, canvas.height - borderThickness / 2),
 				new point(0, canvas.height),
 				new point(canvas.width / 2 - borderThickness / 2, canvas.height),
-				new point(canvas.width / 2 - borderThickness / 2, canvas.height - borderThickness / 2),
-				new point(0, canvas.height - borderThickness / 2),
 			],
 			wallbottomright: [
+				new point(canvas.width / 2 + borderThickness / 2, canvas.height - borderThickness / 2),
+				new point(canvas.width, canvas.height - borderThickness / 2),
 				new point(canvas.width / 2 + borderThickness / 2, canvas.height),
 				new point(canvas.width, canvas.height),
-				new point(canvas.width, canvas.height - borderThickness / 2),
-				new point(canvas.width / 2 + borderThickness / 2, canvas.height - borderThickness / 2),
 			],
 		};
+		
 		this.diamondcentral =
 		[
 			new point(canvas.width / 2 + 25, canvas.height / 2),
+			new point(canvas.width / 2, canvas.height / 2 + 25),
 			new point(canvas.width / 2, canvas.height / 2 - 25),
 			new point(canvas.width / 2 - 25, canvas.height / 2),
-			new point(canvas.width / 2, canvas.height / 2 + 25),
+			new point(canvas.width / 2, canvas.height / 2),
 		];
 
 		this.centraldiamondstroke =
