@@ -1,10 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/authe.css' %}">
+{% block css %}
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% endblock %}
+{% comment %} <link rel="stylesheet" href="{% static 'css/authe.css' %}"> {% endcomment %}
 
 {% block content %}
-<div id='login'>
+{% comment %} <div id='login'> {% endcomment %}
     <div class="card mt-4">
         <div class="card-body">
     <h2>Connexion</h2>
@@ -17,5 +20,7 @@
     <a href="{% url 'authe:register' %}">Pas encore inscrit ? Inscrivez-vous ici.</a>
     </div>
 </div>
-</div>
+{% comment %} </div> {% endcomment %}
+{% endblock %}
+{% block js %}
 {% endblock %}

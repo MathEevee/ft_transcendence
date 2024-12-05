@@ -31,6 +31,7 @@ function loadGames(){};
 function loadPongMenu(){};
 
 document.addEventListener('DOMContentLoaded', () => {
+    //add a condition to check if is log, with var can't open auth42
     console.log("console : ",window.location.pathname);
     loadPage(window.location.pathname);
     document.addEventListener('click', (event) => {

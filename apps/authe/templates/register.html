@@ -26,31 +26,37 @@
                         <a href="{% url 'authe:login' %}">Déjà inscrit ? Connectez-vous ici.</a>
                         </div>
                         {% endblock %} {% endcomment %}
-                        
+
 {% load static %}
+{% block css %}
 <link rel="stylesheet" href="{% static 'css/register.css' %}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% endblock %}                        
+
 
 {% block content %}
-
 <div id="register">
     <div class='box'>
         <h2>Inscription</h2>
             <form method="post" class='info'>
                 {% csrf_token %}
                 {{ form.as_p }}
-                <div class="avatar-selection">
+                <div id="avatar-selection" class="avatar-selection">
                     {% for avatar in avatars %}
                     <label>
                         <input type="radio" name="profil_picture" value="{{ avatar }}"></input>
-                            <img src="{{ avatar }}" class="avatar" alt="Avatar"></img>
+                        <img src="{{ avatar }}" class="avatar" alt="Avatar"></img>
                     </label>
-
+                    
                     {% endfor %}
                 </div>
                 <button class='registerAccount' type="submit">S'inscrire</button>
             </form>
+        </div>
+        <a href="{% url 'authe:login' %}">Déjà inscrit ? Connectez-vous ici.</a>
     </div>
-    <a href="{% url 'authe:login' %}">Déjà inscrit ? Connectez-vous ici.</a>
-</div>
+{% endblock %}
+{% block js %}
+<script src="{% static 'js/register.js' %}"></script>
 {% endblock %}
