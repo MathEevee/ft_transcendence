@@ -21,7 +21,7 @@ function loadPongMulti(){
 	{
 		fontcolor: colorpalette.white,
 		backgroundcolor: colorpalette.black,
-		ballcolor: colorpalette.white,
+		ballcolor: colorpalette.cyan,
 		team1: colorpalette.red,
 		team2: colorpalette.blue,
 		netcolor: colorpalette.white,
@@ -74,7 +74,7 @@ function loadPongMulti(){
 		t_game.player3.draw(context);
 		t_game.player4.draw(context);
 		t_game.ball.draw(context);
-		t_game.ball.drawhitbox(context);
+		// t_game.ball.drawhitbox(context);
 	}
 
 	function update()

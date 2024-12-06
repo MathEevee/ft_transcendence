@@ -1,5 +1,5 @@
 import { point } from "./point.js";
-import { drawdiamond, drawdiamondstroke } from "./utils.js";
+import { drawdiamond, drawdiamondstroke, drawCircle } from "./utils.js";
 
 class background
 {
@@ -76,6 +76,16 @@ class background
 		context.stroke();
 	}
 
+	drawfourpoint(context, point1, point2, point3, point4, color)
+	{
+		context.strokeStyle = color;
+
+		drawCircle(context, point1.x, point1.y, 5, color);
+		drawCircle(context, point2.x, point2.y, 5, color);
+		drawCircle(context, point3.x, point3.y, 5, color);
+		drawCircle(context, point4.x, point4.y, 5, color);
+	}
+
 	drawhitbox(context, colorset)
 	{
 		context.strokeStyle = "red";
@@ -99,6 +109,9 @@ class background
 		this.drawtrianglehitbox(context, this.centraldiamondstroke.topright[0], this.centraldiamondstroke.topright[1], this.centraldiamondstroke.topright[2], "red");
 		this.drawtrianglehitbox(context, this.centraldiamondstroke.bottomleft[0], this.centraldiamondstroke.bottomleft[1], this.centraldiamondstroke.bottomleft[2], "red");
 		this.drawtrianglehitbox(context, this.centraldiamondstroke.bottomright[0], this.centraldiamondstroke.bottomright[1], this.centraldiamondstroke.bottomright[2], "red");
+
+		// draw four point
+		this.drawfourpoint(context, this.centraldiamondstroke.topleft[2], this.centraldiamondstroke.topright[2], this.centraldiamondstroke.bottomleft[2], this.centraldiamondstroke.bottomright[2], "red");
 	}
 
 	getHitbox()
