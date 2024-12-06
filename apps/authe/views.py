@@ -76,6 +76,9 @@ def auth_callback(request):
     login(request, user)
     messages.success(request, f"Bienvenue, {user.username}!")
     return redirect(reverse('profil:profil'))
+    # return render(request, 'profil.html')
+
+
 
 def save_user(user_info):
     try:
@@ -113,6 +116,7 @@ def register_view(request):
             user.save()
             messages.success(request, "Inscription réussie ! Connectez-vous.")
             return redirect(reverse('authe:login'))
+            # return render(request, 'login.html')
     else:
         form = RegistrationForm()
     
