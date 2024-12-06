@@ -1,49 +1,141 @@
-#register {
-    padding-top: 10vh;
-	font-family: "Kode Mono", monospace;
-    color :aliceblue;
-    display:flex;
-    align-items: center;
-    flex-direction: column;
-}
-
-#register input{
-    background-color: rgb(255, 255, 255);
-    border-radius: 8px;
-	box-shadow: 0px 0px 10px #5d1cb3;
-}
-
-#register .box {
-	box-shadow: 0px 0px 10px #5d1cb3;
-    border-radius: 10px;
-    background-color: #09002b;
+body {
+    background-color: #120052;
+    color: #ffffff;
+    font-family: "Kode Mono", monospace;
     display: flex;
-    align-items:center;
     flex-direction: column;
-    width: 55vh;
-    height: 40vh;
+    align-items: center;
+    padding: 2rem;
+    margin: 0;
 }
 
-#register ul {
+p > span{
     display: none;
 }
 
-#register p > span{
+ul {
     display: none;
 }
 
-#register .info{
-    color: white;
-    font-size: 18px;
+h2, h3 {
+    color: #ffffff;
+    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
+    margin-bottom: 1rem;
 }
 
-#register label{
-    width: 30%;
-    margin-left: 10px;
+form {
+    background-color: #1a0033;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px #cd6aff;
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 2rem;
 }
 
-#register button {
+form input[type="text"],
+form input[type="password"],
+form input[type="email"],
+form input[type="radio"] {
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #cd6aff;
+    border-radius: 5px;
+    background-color: #120052;
+    color: #ffffff;
+    outline: none;
+    font-size: 1rem;
+    box-shadow: 0px 2px 5px #cd6aff;
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+form input[type="radio"] {
+    width: auto;
+}
+
+form input[type="text"]:focus,
+form input[type="password"]:focus,
+form input[type="email"]:focus {
+    border-color: #29c7c4;
+    box-shadow: 0px 2px 10px #29c7c4;
+}
+
+button {
+    background-color: #17BEBB;
+    color: #ffffff;
+    border: none;
     border-radius: 8px;
-    box-shadow: 0px 0px 10px #5d1cb3;
-    margin-left: 20px;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0px 2px 5px #29c7c4;
+    margin-top: 1rem;
+}
+
+button:hover {
+    background-color: #29c7c4;
+    transform: scale(1);
+    box-shadow: 0px 4px 10px #29c7c4;
+}
+
+button:active {
+    background-color: #17BEBB;
+    transform: scale(1);
+    box-shadow: 0px 2px 5px #29c7c4;
+}
+
+.avatar-selection {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.avatar-selection label {
+    display: block;
+    cursor: pointer;
+    border: 2px solid #cd6aff;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0px 2px 5px #29c7c4;
+}
+
+.avatar-selection input[type="radio"] {
+    display: none;
+}
+
+.avatar-selection img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+    transition: transform 0.3s;
+}
+
+.avatar-selection input[type="radio"]:checked + img {
+    border: 4px solid #29c7c4;
+    transform: scale(1.05);
+}
+
+.avatar-selection label:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 10px #29c7c4;
+}
+
+
+a {
+    color: #29c7c4;
+    font-size: 1rem;
+    text-decoration: none;
+    margin-top: 1rem;
+}
+
+a:hover {
+    text-decoration: underline;
 }

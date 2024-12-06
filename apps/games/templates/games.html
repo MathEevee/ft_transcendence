@@ -11,14 +11,28 @@ Game
 
 {% block content %}
 {% include "navbar.html" %}
-	<div id="games">
-		<a class="btn btn-primary" href="/games/spaceinvaders">
-			Space-Invader
-		</a>
-		<a class="btn btn-primary" href="/games/pong">
-			Pong
-		</a>
-	</div>
+<div id="games-container">
+    <div class="column">
+        <h2>Space-Battle</h2>
+        <a class="btn" href="/games/spaceinvaders">
+            Play Space-Battle
+        </a>
+        <div class="tournament-options">
+            <label for="space-battle-tournament">Tournament Mode:</label>
+            <input type="radio" id="space-battle-tournament" name="space-battle" value="tournament" onclick="window.location.href='/games/spaceinvaders/tournament'">
+        </div>
+    </div>
+    <div class="column">
+        <h2>Pong</h2>
+        <a class="btn" href="/games/pong">
+            Play Pong
+        </a>
+        <div class="tournament-options">
+            <label for="pong-tournament">Tournament Mode:</label>
+            <input type="radio" id="pong-tournament" name="pong" value="tournament" onclick="window.location.href='/games/pong/tournament'">
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% comment %} {% block js %}

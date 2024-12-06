@@ -1,139 +1,89 @@
-#navbarBody {
-    background-color: #8A2BE2;
-    width: 100vw;
-    border-radius: 0px 0px 10px 10px;
-    max-height: 5vh;
-    height: 5vh;
-	font-family: "Kode Mono", monospace;
-    display: fixed;
-}
-
-#navbarBody .bord {
-    background-color: #8A2BE2;
+/* Navbar styles */
+.navbar {
+    background-color: #1a0033;
+    border-radius: 0 0 10px 10px;
     box-shadow: 0px 4px 3px #9846e4;
-    width: 100vw;
-    border-radius: 0px 0px 10px 10px;
-    max-height: 5vh;
+    font-family: "Kode Mono", monospace;
     height: 5vh;
+    position: fixed;
+    width: 100%;
+    z-index: 1030;
 }
 
-#navbarBody .menu-games:hover{
-    font-family: "Kode Mono", monospace;
+.navbar-brand {
+    color: white;
+    font-weight: bold;
+    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
+}
+
+.navbar-brand:hover {
+    color: #29c7c4;
+    text-shadow: 0px 0px 10px #29c7c4, 0px 0px 20px #29c7c4;
+}
+
+.navbar-nav .nav-link {
+    color: white;
+    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.navbar-nav .nav-link:hover {
     background-color: #29c7c4;
     color: #ffffff;
     box-shadow: 0px 0px 10px #29c7c4;
+    border-radius: 5px;
 }
 
-
-#navbarBody .menu-games{
-    border: 0 #cd6aff;
-	font-family: "Kode Mono", monospace;
-    background-color: #17BEBB;
-    box-shadow: 0px 0px 5px #120052;
-    min-width: 15vh;
-    position:relative;
-    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+.navbar-toggler {
+    border-color: #29c7c4;
 }
 
-#navbarBody .games{
-    border: 0 #cd6aff;
-	font-family: "Kode Mono", monospace;
-    background-color: #17BEBB;
-    box-shadow: 0px 0px 5px #120052;
-    min-width: 18vh;
-    position: relative;
-    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%28255, 255, 255, 0.7%29' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
 }
 
-
-#navbarBody .games:hover{
-    font-family: "Kode Mono", monospace;
-    background-color: #29c7c4;
-    color: #ffffff;
-    /* transform: scale(1.2); */
-    box-shadow: 0px 0px 10px #29c7c4;
-}
-
-#navbarBody li.games:hover{
-    transform: scale(1.2);
-}
-
-#navbarBody nav > ul{
-    margin: 0vh;
-    display: flex;
-    justify-content: center;
-}
-
-#navbarBody nav > ul > li > a{
-    display: flex;
-    color:aliceblue;
-}
-
-
-#navbarBody nav > ul > li {
-    float: left;
+/* Adjustments for dropdowns */
+.nav-item {
     position: relative;
     margin: 0 20px;
+    list-style: none;
 }
 
-#navbarBody .submenu{
+.nav-item .submenu {
     display: none;
-    flex-direction: column;
     position: absolute;
-    width: auto;
-    border-radius: 10px;
-}
-
-
-#navbarBody nav a{
-    display:flex;
-    width: 100%;
-    height: 100%;
-    justify-content: center;
-    align-items: center;
-    padding: 0.25rem;
-    border-radius: 10px;
-    text-decoration: none;
-    color:rgb(255, 255, 255);
-}
-
-#navbarBody .menu-pong .submenupong{
-    position: absolute;
-    display: none;
-    padding: 0;
-}
-
-#navbarBody .menu-pong:hover .submenupong{
-    display: flex;
-    left:-40%;
-}
-
-
-#navbarBody li{
-    border-radius:5px;
-    white-space: nowrap;
-    list-style-type: none;
-    border: 0 #cd6aff;
-	font-family: "Kode Mono", monospace;
+    top: 100%;
+    left: 0;
     background-color: #17BEBB;
-    box-shadow: 0px 0px 5px #120052;
-    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px #120052;
+    padding: 0.5rem;
+    z-index: 1020;
 }
 
-#navbarBody li:hover{
-    font-family: "Kode Mono", monospace;
+.nav-item:hover .submenu {
+    display: flex;
+    flex-direction: column;
+    padding-left: 3%;
+}
+
+.submenu a {
+    color: white;
+    padding: 0.25rem 1rem;
+    text-decoration: none;
+    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
+}
+
+.submenu a:hover {
     background-color: #29c7c4;
     color: #ffffff;
     box-shadow: 0px 0px 10px #29c7c4;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    border-radius: 5px;
 }
 
-#navbarBody li:hover .submenu{
-    display: flex;
-    top: 100%;
-    line-height: 5vh;
-    padding-left: 3%;
+/* Icon styles */
+.nav-link i {
+    margin-right: 8px;
+    font-size: 1rem;
+    vertical-align: middle;
 }

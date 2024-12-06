@@ -19,14 +19,16 @@
             var newFriend = document.createElement("button");
             newFriend.textContent = tablist[i];
             newFriend.classList.add("friend");
+			if (elemcontainer == null)
+				return;
             elemcontainer.appendChild(newFriend);
-            
             newFriend.addEventListener('click', function(event) {
                 loadBar(event);
             });
         }
         
-        search.value = "";
+		if (search)
+        	search.value = "";
         
         function openChat() {
             ChatButton.style.display = "none";

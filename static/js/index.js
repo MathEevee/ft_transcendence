@@ -21,10 +21,7 @@ function loadPage(path){
         allPage[path]();
     else if (allPage[path + '/'])
         allPage[path + '/']();
-
 };
-
-
 
 function loadGames(){};
 
@@ -35,8 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPage(window.location.pathname);
     document.addEventListener('click', (event) => {
         if (event.target.tagName === 'A' && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
-            var fetchAndReplaceContent = async() => {
-                const response = await fetch(event.target.getAttribute('href'));
+            fetchAndReplaceContent = async() => {
+                const response = await fetch(event.target.getAttribute('href'),{mode: 'no-cors'});
                 const content = await response.text();
                 history.pushState({}, '', response.url);
                 document.body.innerHTML = content;

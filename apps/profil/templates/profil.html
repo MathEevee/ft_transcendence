@@ -4,9 +4,14 @@
 Profil
 {% endblock %}
 
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/profil.css' %}">
+{% endblock %}
+
 {% block content %}
 {% include "navbar.html" %}
-<div class="row">
+<div class="row" style="margin:0;padding:0">
     <div class="col-md-8 offset-md-2">
         <h1 class="text-center">Profile</h1>
         <div class="card mt-4">
@@ -17,7 +22,7 @@ Profil
                 <img    src="{{ user.profil_picture }}"
                         alt="Photo de profil"
                         class="img-thumbnail mx-auto d-block"
-                        style="width: 150px; height: 150px; border-radius: 50%;">
+                        style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
             </div>
         </div>
         <div class="mt-4">
@@ -28,8 +33,8 @@ Profil
             </ul>
         </div>
     </div>
-    <div class="logout-link text-center mt-4">
+    <!-- <div class="logout-link text-center mt-4">
         <a class="nav-link text-danger" href="/profil/logout/">Logout</a>
-    </div>
+    </div> -->
 </div>
 {% endblock %}

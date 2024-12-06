@@ -1,3 +1,14 @@
+body {
+    background-color: #120052;
+    font-family: "Kode Mono", monospace;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}
+
 /* Centrage de la borne */
 #space {
 	display: flex;
