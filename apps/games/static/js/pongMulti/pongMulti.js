@@ -10,7 +10,7 @@ function loadPongMulti(){
 	const context = canvas.getContext('2d');
 	const redbutton = document.getElementById('red');
 	
-	let speed = 10;
+	let speed = 12;
 	let start = 0;
 	const paddleHeight = 50;
 	const paddleWidth = 5;
@@ -171,13 +171,13 @@ function loadPongMulti(){
 			ballplassement.x = -50;
 		t_game.ball = new Ball(canvas.width / 2 + ballplassement.x, canvas.height / 2 + ballplassement.y, 0, 0, 5, colorset.ballcolor, speed / 4);
 		if (ballplassement.x === 0)
-			t_game.ball.dx = Math.random() * 0.5;
+			t_game.ball.dx = -1;//Math.random() * 0.5;
 		else if (ballplassement.x === 50)
-			t_game.ball.dx = 1;
+			t_game.ball.dx = -1;
 		else
 			t_game.ball.dx = -1;
 		if (ballplassement.y === 0)
-			t_game.ball.dy = Math.random() * 0.5;
+			t_game.ball.dy = 1;//Math.random() * 0.5;
 		else if (ballplassement.y === 50)
 			t_game.ball.dy = 1;
 		else

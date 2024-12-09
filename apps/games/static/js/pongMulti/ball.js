@@ -35,37 +35,63 @@ class Ball
 		else if (ispointinrectangle(point, backgroundhitbox[4]))
 		{
 			console.log("walltopleft collision");
-			if (ball.dx < 0 && point.y > backgroundhitbox[4][3].y)
-				ball.dx = -ball.dx;
-			else if (ball.dy < 0 && point.x > backgroundhitbox[4][3].x)
+			if (point.y > point.x)
 				ball.dy = -ball.dy;
-			return (true);
-		} // walltopright
-		else if (ispointinrectangle(point, backgroundhitbox[5]))
-		{
+			else 
+			ball.dx = -ball.dx;
+		return (true);
+	} // walltopright
+	else if (ispointinrectangle(point, backgroundhitbox[5]))
+	{
 			console.log("walltopright collision");
-			if (ball.dx > 0 && point.y < backgroundhitbox[5][2].y)
-				ball.dx = -ball.dx;
-			else if (ball.dy < 0 && point.x > backgroundhitbox[5][2].x)
+			if (point.y > point.x)
 				ball.dy = -ball.dy;
-			return (true);
-		} // wallbottomleft
-		else if (ispointinrectangle(point, backgroundhitbox[6]))
+			else 
+				ball.dx = -ball.dx;
+		// if (point.x > backgroundhitbox[5][2].x)
+		// 	ball.dy = -ball.dy;
+		// else if (point.y > backgroundhitbox[5][2].y)
+		// 	ball.dx = -ball.dx;
+		return (true);
+	} // wallbottomleft
+	else if (ispointinrectangle(point, backgroundhitbox[6]))
 		{
+			//ntm fucking conditions de con
 			console.log("wallbottomleft collision");
-			if (ball.dx < 0 && point.y < backgroundhitbox[6][1].y)
-				ball.dx = -ball.dx;
-			else if (ball.dy > 0 && point.x > backgroundhitbox[6][1].x)
+			console.log(ball.dy, ball.dx, point.y, backgroundhitbox[6][1].y, point.x, backgroundhitbox[6][1].x);
+			
+			// 1 -1 527 525 123 175
+			if (ball.dy > 0 && ball.dx < 0 && point.y > backgroundhitbox[6][1].y && point.x < backgroundhitbox[6][1].x)
+			{
+				console.log("gauche a droite en tapant le mur top");
 				ball.dy = -ball.dy;
+			}
+			// 1 -1 578 525 172 175 ball.js:60:12
+			// gauche a droite en tapant le mur top
+			else if (ball.dy > 0 && ball.dx < 0 && point.y > backgroundhitbox[6][1].y && point.x < backgroundhitbox[6][1].x)
+			{
+				console.log("haut en bas tapant le mur droit");
+				ball.dx = -ball.dx;
+			}
+			else if (ball.dy < 0 && ball.dx < 0 && point.y < backgroundhitbox[6][1].y && point.x > backgroundhitbox[6][1].x)
+			{
+				console.log("bas en haut tapant le mur droit");
+				ball.dx = -ball.dx;
+			}
+			else if (ball.dy > 0 && ball.dx > 0 && point.y < backgroundhitbox[6][1].y && point.x < backgroundhitbox[6][1].x)
+			{
+				console.log("gauche a droite en tapant le mur top");
+				ball.dy = -ball.dy;
+			}
 			return (true);
 		} // wallbottomright
 		else if (ispointinrectangle(point, backgroundhitbox[7]))
 		{
 			console.log("wallbottomright collision");
-			if (ball.dx > 0 && point.y < backgroundhitbox[7][0].y)
-				ball.dx = -ball.dx;
-			else if (ball.dy > 0 && point.x < backgroundhitbox[7][0].x)
+			if (point.y < point.x)
 				ball.dy = -ball.dy;
+			else 
+				ball.dx = -ball.dx;
 			return (true);
 		} // diamondcentral
 		else if (ispointintriangle(point, segdiamondtriangle.topleft) || ispointintriangle(point, segdiamondtriangle.topright) || ispointintriangle(point, segdiamondtriangle.bottomleft) || ispointintriangle(point, segdiamondtriangle.bottomright))
@@ -108,6 +134,8 @@ class Ball
 			topright: [backgroundhitbox[12][1], backgroundhitbox[12][2], backgroundhitbox[12][4]],
 			bottomleft: [backgroundhitbox[12][0], backgroundhitbox[12][3], backgroundhitbox[12][4]],
 			bottomright: [backgroundhitbox[12][2], backgroundhitbox[12][3], backgroundhitbox[12][4]],
+			center: [backgroundhitbox[12][4], backgroundhitbox[12][5], backgroundhitbox[12][6]],
+			radius: 5,
 		};
 		var trajectory = new point(ball.x, ball.y);
 		trajectory.x += ball.dx * ball.speed;

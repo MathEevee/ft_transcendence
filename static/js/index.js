@@ -30,13 +30,27 @@ function loadGames(){};
 
 function loadPongMenu(){};
 
+async function fetchAndReplaceContent(event)
+{
+    const response = await fetch(event.target.getAttribute('href'));
+    const content = await response.text();
+    history.pushState({}, '', response.url);
+    document.body.innerHTML = content;
+    console.log(response)
+    if (response.ok) {
+        liveChat();
+        loadPage(event.target.getAttribute('href'));
+    }
+    return (content);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     //add a condition to check if is log, with var can't open auth42
     console.log("console : ",window.location.pathname);
     loadPage(window.location.pathname);
     document.addEventListener('click', (event) => {
         if (event.target.tagName === 'A' && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
-            var fetchAndReplaceContent = async() => {
+    /*         var fetchAndReplaceContent = async() => {
                 const response = await fetch(event.target.getAttribute('href'));
                 const content = await response.text();
                 history.pushState({}, '', response.url);
@@ -47,8 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     loadPage(event.target.getAttribute('href'));
                 }
                 return (content);
-            }
-            fetchAndReplaceContent();
+            } */
+            fetchAndReplaceContent(event);
             event.preventDefault();
             return;
         }
