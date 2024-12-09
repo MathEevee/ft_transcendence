@@ -10,9 +10,11 @@ from django.conf import settings
 from django.db.utils import IntegrityError
 from .models import CustomUser
 from .forms import RegistrationForm, LoginForm
+from apps.authe.decorators import logout_required
 
 logger = logging.getLogger(__name__)
 
+@logout_required
 def auth_with_42(request):
     client_id = settings.OAUTH_UID
     # redirect_uri = '<VOTRE_REDIRECT_URI>'
@@ -21,6 +23,7 @@ def auth_with_42(request):
     auth_url = f'https://api.intra.42.fr/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}'
     return redirect(auth_url)
 
+@logout_required
 def auth_callback(request):
     # Récupérer le code renvoyé par l'intra
     code = request.GET.get('code')
@@ -104,6 +107,7 @@ def save_user(user_info):
         logger.error(f"Error creating or updating user: {e}")
         return None
 
+@logout_required
 def register_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -121,6 +125,7 @@ def register_view(request):
     
     return render(request, 'register.html', {'form': form, 'avatars': avatars})
 
+@logout_required
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
