@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.oauth2',
+    'channels',
     'apps.authe',
     'apps.home',
     'apps.profil',
@@ -80,6 +81,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'default.wsgi.application'
+ASGI_APPLICATION = 'default.asgi.application'
 
 
 # Database
