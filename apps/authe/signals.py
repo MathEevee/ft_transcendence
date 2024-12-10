@@ -1,4 +1,4 @@
-from django.db.models.signals import user_logged_in, user_logged_out
+from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver
 from django.utils.timezone import now
 from .models import CustomUser
