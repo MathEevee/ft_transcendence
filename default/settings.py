@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'apps.authe',
     'apps.home',
     'apps.profil',
-    'apps.games'
+    'apps.games',
+    'apps.chat'
 ]
 
 LOGIN_URL = reverse_lazy('authe:login')
