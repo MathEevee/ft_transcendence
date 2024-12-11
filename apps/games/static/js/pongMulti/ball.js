@@ -35,12 +35,6 @@ class Ball
 		else if (ispointinrectangle(point, backgroundhitbox[4]))
 		{
 			console.log("walltopleft collision");
-			if (point.x - ball.speed == backgroundhitbox[4][3].x && point.y - ball.speed == backgroundhitbox[4][3].y)
-			{
-				ball.dy = -ball.dy;
-				ball.dx = -ball.dx;
-				return (true);
-			}
 			if (point.y > point.x)
 				ball.dy = -ball.dy;
 			else 
@@ -50,12 +44,6 @@ class Ball
 		else if (ispointinrectangle(point, backgroundhitbox[5]))
 		{
 			console.log("walltopright collision");
-			if (point.x + ball.speed == backgroundhitbox[5][2].x && point.y + ball.speed == backgroundhitbox[5][2].y)
-			{
-				ball.dy = -ball.dy;
-				ball.dx = -ball.dx;
-				return (true);
-			}
 			if (point.x - ball.speed > backgroundhitbox[5][2].x)
 				ball.dy = -ball.dy;
 			else
@@ -66,31 +54,19 @@ class Ball
 		else if (ispointinrectangle(point, backgroundhitbox[6]))
 		{
 			console.log("wallbottomleft collision");
-			if (point.x - ball.speed == backgroundhitbox[6][1].x && point.y - ball.speed == backgroundhitbox[6][1].y)
-				{
-					ball.dy = -ball.dy;
-					ball.dx = -ball.dx;
-					return (true);
-				}
-				if (point.y - ball.speed > backgroundhitbox[6][1].y)
-					ball.dx = -ball.dx;
-				else
-					ball.dy = -ball.dy;
+			if (point.y - ball.speed > backgroundhitbox[6][1].y)
+				ball.dx = -ball.dx;
+			else
+				ball.dy = -ball.dy;
 			
 			return (true);
 		} // wallbottomright
 		else if (ispointinrectangle(point, backgroundhitbox[7]))
 		{
 			console.log("wallbottomright collision");
-			if (point.x - ball.speed == backgroundhitbox[7][0].x && point.y - ball.speed == backgroundhitbox[7][0].y)
-				{
+			if (point.y < point.x)
 					ball.dy = -ball.dy;
-					ball.dx = -ball.dx;
-					return (true);
-				}
-				if (point.y < point.x)
-					ball.dy = -ball.dy;
-				else 
+			else 
 					ball.dx = -ball.dx;
 			return (true);
 		} // diamondcentral
@@ -120,12 +96,12 @@ class Ball
 			console.log("[0] = ", segdiamondtriangle.bottomright[0].x, segdiamondtriangle.bottomright[0].y);
 			console.log("[1] = ", segdiamondtriangle.bottomright[1].x, segdiamondtriangle.bottomright[1].y);
 			console.log("[2] = ", segdiamondtriangle.bottomright[2].x, segdiamondtriangle.bottomright[2].y);
-			if (ispointintriangle(point + ball.speed, segdiamondtriangle.topright))
+			if (ispointintriangle(point, segdiamondtriangle.topright))
 			{
 				console.log("check : segdiamondtriangle.topright");
 				let tmp = ball.dx;
                 ball.dx = -ball.dy;
-                ball.dy = -tmp;
+                ball.dy = tmp;
 			}
 			else if (ispointintriangle(point, segdiamondtriangle.topleft))
 			{
@@ -138,7 +114,7 @@ class Ball
 			{
 				console.log("check : segdiamondtriangle.bottomright");
 				let tmp = ball.dx;
-                ball.dx = ball.dy;
+                ball.dx = -ball.dy;
                 ball.dy = -tmp;
 			}
 			else
@@ -146,7 +122,7 @@ class Ball
 				console.log("check : segdiamondtriangle.bottomleft");
 
 				let tmp = ball.dy;
-				ball.dy = ball.dx;
+				ball.dy = -ball.dx;
 				ball.dx = tmp;
 			}
 		} // centraldiamondstrokeleft
