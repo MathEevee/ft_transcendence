@@ -104,6 +104,8 @@ function loadPongMulti(){
 	{
 		if (event.key === "r" || event.key === "R")
 			startPong();
+		else if (event.key === "p")
+			start = 0;
 		else if (event.key === "o" || event.key === "O")
 			toggleFullscreen(canvas);
 		if (start === 1)
