@@ -8,26 +8,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // send message
-document.getElementById('send-btn').addEventListener('click', function() {
-    const recipientId = document.getElementById('recipient-id').value;
-    const content = document.getElementById('message-input').value;
+document.getElementById('send-message').addEventListener('click', function () {
+    const messageInput = document.getElementById('message-input');
+    const message = messageInput.value;
 
-    fetch(`/chat/send_message/${recipientId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken'),
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `content=${encodeURIComponent(content)}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'Message sent') {
-            const chatbox = document.getElementById('chatbox-messages');
-            chatbox.innerHTML += `<p><strong>You:</strong> ${content}</p>`;
-            document.getElementById('message-input').value = '';
-        } else {
-            alert(data.error);
-        }
-    });
+    if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+        chatSocket.send(JSON.stringify({
+            'message': message
+        }));
+        messageInput.value = ''; // Réinitialise le champ d'entrée
+    } else {
+        console.error("WebSocket is not connected");
+    }
 });
