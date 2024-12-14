@@ -1,12 +1,14 @@
 from django.contrib import admin
 from .models import Friend, Channel, Message
 
+@admin.register(Friend)
 class FriendAdmin(admin.ModelAdmin):
     model = Friend
     list_display = ['user', 'friend', 'status', 'created_at']
     list_filter = ['status']
     search_fields = ['user__username', 'friend__username']
 
+@admin.register(Channel)
 class ChannelAdmin(admin.ModelAdmin):
     model = Channel
     list_display = ['name', 'created_at', 'get_members']
@@ -17,6 +19,7 @@ class ChannelAdmin(admin.ModelAdmin):
         return ", ".join([user.username for user in obj.members.all()])
     get_members.short_description = 'Members'
 
+@admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
     model = Message
     list_display = ('sender', 'recipient', 'channel', 'content', 'timestamp')
