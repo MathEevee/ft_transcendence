@@ -3,21 +3,59 @@
 <script src="{% static 'js/index.js' %}" type="module"></script>
 <link rel="shortcut icon" href="{% static 'pictures/favicon.ico' %}" type="image/x-icon">
 
-<h2>Inscription</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+{% block content %}
+<div id="register">
+    <div class='box'>
+        <h2>Inscription</h2>
+        <form method="post" class='info'>
+                {% csrf_token %}
+                {{ form.as_p }}
+                {% comment %} {% comment %} <h3>Choisissez un avatar</h3>
+                <div class="avatar-selection">
+                    {% for avatar in avatars %}
+                    <label>
+                        <input type="radio" name="profil_picture" value="{{ avatar }}">
+                        <img src="{{ avatar }}" alt="Avatar">
+                        </label>
+                        {% endfor %}
+                        </div>
+                        {% comment %} <button type="submit">S'inscrire</button>
+                        </form>
+                        </div>
+                        <a href="{% url 'authe:login' %}">Déjà inscrit ? Connectez-vous ici.</a>
+                        </div>
+                        {% endblock %} {% endcomment %}
 
-    <h3>Choisissez un avatar</h3>
-    <div class="avatar-selection">
-        {% for avatar in avatars %}
-            <label>
-                <input type="radio" name="profil_picture" value="{{ avatar }}">
-                <img src="{{ avatar }}" alt="Avatar">
-            </label>
-        {% endfor %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/register.css' %}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% endblock %}                        
+
+
+{% block content %}
+<div id="register">
+    <div class='box'>
+        <h2>Inscription</h2>
+            <form method="post" class='info'>
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div id="avatar-selection" class="avatar-selection">
+                    {% for avatar in avatars %}
+                    <label>
+                        <input type="radio" name="profil_picture" value="{{ avatar }}"></input>
+                        <img src="{{ avatar }}" class="avatar" alt="Avatar"></img>
+                    </label>
+                    
+                    {% endfor %}
+                </div>
+                <button class='registerAccount' type="submit">S'inscrire</button>
+            </form>
+        </div>
+        <a href="{% url 'authe:login' %}">Déjà inscrit ? Connectez-vous ici.</a>
     </div>
-
-    <button type="submit">S'inscrire</button>
-</form>
-<a href="{% url 'authe:login' %}">Déjà inscrit ? Connectez-vous ici.</a>
+{% endblock %}
+{% block js %}
+<script src="{% static 'js/register.js' %}"></script>
+{% endblock %}

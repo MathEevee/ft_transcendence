@@ -1,4 +1,4 @@
-import { drawRect } from './utils.js';
+import { drawdiamond, drawRect } from './utils.js';
 import { point } from './point.js';
 
 class Player

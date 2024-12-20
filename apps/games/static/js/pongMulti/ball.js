@@ -4,10 +4,13 @@ import { point } from "./point.js";
 class Ball
 {
 	//cette fonction est à refaire
-	ispointinbackground(point, backgroundhitbox, segdiamondtriangle, ball)
+	ispointinbackground(point, backgroundhitbox, segdiamondtriangle, ball, canvas)
 	{
-		// console.log("ball dx: ", ball.dx , " ball dy: ", ball.dy);
 		// walltop
+		if (point.y < 0 || point.y > canvas.height)
+			ball.dy = -ball.dy;
+		if (point.x < 0 || point.x > canvas.width)
+			ball.dx = -ball.dx;
 		if (ispointinrectangle(point, backgroundhitbox[0]) && ball.dy < 0)
 		{
 			console.log("walltop collision");
@@ -17,6 +20,11 @@ class Ball
 		else if (ispointinrectangle(point, backgroundhitbox[1]) && ball.dy > 0)
 		{
 			console.log("wallbottom collision");
+			if (point.x > point.y)
+			{
+				ball.dy = -ball.dy;
+                ball.dx = -ball.dx;
+			}
 			ball.dy = -ball.dy;
 			return (true);
 		} // wallleft
@@ -35,65 +43,132 @@ class Ball
 		else if (ispointinrectangle(point, backgroundhitbox[4]))
 		{
 			console.log("walltopleft collision");
-			if (ball.dx < 0 && point.y > backgroundhitbox[4][3].y)
-				ball.dx = -ball.dx;
-			else if (ball.dy < 0 && point.x > backgroundhitbox[4][3].x)
+			if (point.y > point.x)
 				ball.dy = -ball.dy;
-			return (true);
+			else 
+				ball.dx = -ball.dx;
+		return (true);
 		} // walltopright
 		else if (ispointinrectangle(point, backgroundhitbox[5]))
 		{
 			console.log("walltopright collision");
-			if (ball.dx > 0 && point.y < backgroundhitbox[5][2].y)
-				ball.dx = -ball.dx;
-			else if (ball.dy < 0 && point.x > backgroundhitbox[5][2].x)
+			if (point.x - ball.speed > backgroundhitbox[5][2].x)
 				ball.dy = -ball.dy;
+			else
+				ball.dx = -ball.dx;
+
 			return (true);
 		} // wallbottomleft
 		else if (ispointinrectangle(point, backgroundhitbox[6]))
 		{
 			console.log("wallbottomleft collision");
-			if (ball.dx < 0 && point.y < backgroundhitbox[6][1].y)
+			if (point.y - ball.speed > backgroundhitbox[6][1].y)
 				ball.dx = -ball.dx;
-			else if (ball.dy > 0 && point.x > backgroundhitbox[6][1].x)
+			else
 				ball.dy = -ball.dy;
+			
 			return (true);
 		} // wallbottomright
 		else if (ispointinrectangle(point, backgroundhitbox[7]))
 		{
 			console.log("wallbottomright collision");
-			if (ball.dx > 0 && point.y < backgroundhitbox[7][0].y)
-				ball.dx = -ball.dx;
-			else if (ball.dy > 0 && point.x < backgroundhitbox[7][0].x)
-				ball.dy = -ball.dy;
+			if (point.y < point.x)
+					ball.dy = -ball.dy;
+			else 
+					ball.dx = -ball.dx;
 			return (true);
 		} // diamondcentral
 		else if (ispointintriangle(point, segdiamondtriangle.topleft) || ispointintriangle(point, segdiamondtriangle.topright) || ispointintriangle(point, segdiamondtriangle.bottomleft) || ispointintriangle(point, segdiamondtriangle.bottomright))
 		{
 			console.log("diamondcentral collision");
-			if (ball.dx > 0)
-				ball.dx = -ball.dx;
-			else if (ball.dy > 0)
-				ball.dy = -ball.dy;
+			if (ispointintriangle(point, segdiamondtriangle.topright))
+			{
+				console.log("check : segdiamondtriangle.topright");
+				let tmp = ball.dx;
+                ball.dx = -ball.dy;
+                ball.dy = tmp;
+			}
+			else if (ispointintriangle(point, segdiamondtriangle.topleft))
+			{
+				console.log("check : segdiamondtriangle.topleft");
+				let tmp = ball.dy;
+				ball.dy = -ball.dx;
+				ball.dx = -tmp;
+			}
+			else if (ispointintriangle(point, segdiamondtriangle.bottomright))
+			{
+				console.log("check : segdiamondtriangle.bottomright");
+				let tmp = ball.dx;
+                ball.dx = -ball.dy;
+                ball.dy = -tmp;
+			}
+			else
+			{
+				console.log("check : segdiamondtriangle.bottomleft");
+
+				let tmp = ball.dy;
+				ball.dy = -ball.dx;
+				ball.dx = tmp;
+			}
 		} // centraldiamondstrokeleft
 		else if (ispointintriangle(point, backgroundhitbox[8]))
 		{
 			console.log("diamondcentral collision strokeleft");
+			if ((point.x + ball.speed < backgroundhitbox[8][0].x && point.y + ball.speed > backgroundhitbox[8][0].y))
+				ball.dy = -ball.dy;
+			else if ((point.x + ball.speed > backgroundhitbox[8][0].x && point.y + ball.speed < backgroundhitbox[8][0].y))
+				ball.dx = -ball.dx;
+			else
+			{
+				let tmp = ball.dy;
+				ball.dy = -ball.dx;
+				ball.dx = -tmp;
+			}
 			return (true);
 		} // centraldiamondstrokeright
 		else if (ispointintriangle(point, backgroundhitbox[9]))
 		{
 			console.log("diamondcentral collision strokeright");
+			if ((point.x + ball.speed > backgroundhitbox[9][0].x) && point.y + ball.speed > backgroundhitbox[9][2].y)
+				ball.dy = -ball.dy;
+			else if (point.x - ball.speed < backgroundhitbox[9][0].x)
+				ball.dx = -ball.dx;
+			else
+			{
+				let tmp = ball.dy;
+				ball.dy = ball.dx;
+				ball.dx = tmp;
+			}
 			return (true);
 		} // centraldiamondstrokebottom
 		else if (ispointintriangle(point, backgroundhitbox[10]))
 		{
 			console.log("diamondcentral collision strokebottom");
+			if (point.x- ball.speed < backgroundhitbox[10][0].x && point.y - ball.speed < backgroundhitbox[10][0].y)
+				ball.dy = -ball.dy;
+			else if (point.x + ball.speed > backgroundhitbox[10][0].x)
+				ball.dx = -ball.dx;
+			else
+			{
+				let tmp = ball.dy;
+				ball.dy = ball.dx;
+				ball.dx = tmp;
+			}
 			return (true);
 		} // centraldiamondstroketop
 		else if (ispointintriangle(point, backgroundhitbox[11]))
 		{
 			console.log("diamondcentral collision stroketop");
+			if (point.x - ball.speed > backgroundhitbox[11][0].x && point.y - ball.speed < backgroundhitbox[11][0].y)
+				ball.dy = -ball.dy;
+			else if (point.x - ball.speed < backgroundhitbox[11][0].x && point.y > backgroundhitbox[11][0].y)
+				ball.dx = -ball.dx;
+			else
+			{
+                let tmp = ball.dx;
+                ball.dx = -ball.dy;
+                ball.dy = -tmp;
+            }
 			return (true);
 		}
 		return (false);
@@ -104,38 +179,39 @@ class Ball
 	{
 		const backgroundhitbox = background.getHitbox();
 		const segdiamondtriangle = {
-			topleft: [backgroundhitbox[12][0], backgroundhitbox[12][1], backgroundhitbox[12][4]],
-			topright: [backgroundhitbox[12][1], backgroundhitbox[12][2], backgroundhitbox[12][4]],
-			bottomleft: [backgroundhitbox[12][0], backgroundhitbox[12][3], backgroundhitbox[12][4]],
-			bottomright: [backgroundhitbox[12][2], backgroundhitbox[12][3], backgroundhitbox[12][4]],
+			topright: [backgroundhitbox[12][4], backgroundhitbox[12][0], backgroundhitbox[12][2]],
+			topleft: [backgroundhitbox[12][4], backgroundhitbox[12][3], backgroundhitbox[12][2]],
+			bottomleft: [backgroundhitbox[12][4], backgroundhitbox[12][3], backgroundhitbox[12][1]],
+			bottomright: [backgroundhitbox[12][4], backgroundhitbox[12][0], backgroundhitbox[12][1]],
 		};
 		var trajectory = new point(ball.x, ball.y);
 		trajectory.x += ball.dx * ball.speed;
 		trajectory.y += ball.dy * ball.speed;
-		if (this.ispointinbackground(trajectory, backgroundhitbox, segdiamondtriangle, ball))
+
+		if (this.ispointinbackground(trajectory, backgroundhitbox, segdiamondtriangle, ball,canvas))
 		{
 			return (0);
 		} // player1
-		else if (trajectory.x - ball.radius <= player1.x + player1.width && trajectory.y >= player1.y && trajectory.y <= player1.y + player1.height)
+		else if (ispointinrectangle(trajectory, player1.hitbox))
 		{
 			console.log("player1 collision");
 			ball.dx = -ball.dx;
 			return (1);
 		} // player2
-		else if (trajectory.x + ball.radius >= player2.x && trajectory.y >= player2.y && trajectory.y <= player2.y + player2.height)
+		else if (ispointinrectangle(trajectory, player2.hitbox))
 		{
 			console.log("player2 collision");
 			ball.dx = -ball.dx;
 			return (1);
 		} // player3
-		else if (trajectory.y - ball.radius <= player3.y + player3.height && trajectory.x >= player3.x && trajectory.x <= player3.x + player3.width)
+		else if (ispointinrectangle(trajectory, player3.hitbox))
 		{
 			console.log("player3 collision");
 			ball.dy = -ball.dy;
 			return (1);
 
 		} // player4
-		else if (trajectory.y + ball.radius >= player4.y && trajectory.x >= player4.x && trajectory.x <= player4.x + player4.width)
+		else if (ispointinrectangle(trajectory, player4.hitbox))
 		{
 			console.log("player4 collision");
 			ball.dy = -ball.dy;
