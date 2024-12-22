@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Game
+{% endblock %}
+
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/games.css' %}">
+{% endblock %}
+
+{% block content %}
+{% include "navbar.html" %}
+<div id="games-container">
+    <div>tournament</div>
+</div>
+{% endblock %}

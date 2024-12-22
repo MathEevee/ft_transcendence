@@ -9,6 +9,10 @@ body {
     height: 100vh;
 }
 
+.tournament-link {
+    display: none;
+}
+
 #games-container {
     display: flex;
     justify-content: center;

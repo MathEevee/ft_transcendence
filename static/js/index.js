@@ -1,12 +1,16 @@
 import { loadSpaceInvadersGame } from "/static/js/spaceInvadeur.js" 
 import { loadPong } from "/static/js/pong.js"
 import { loadPongMulti } from "/static/js/pongMulti/pongMulti.js"
+import { PongTournament } from "/static/js/pongMulti/PongTournament.js"
+import { loadBtn } from "/static/js/tournament.js"
 
 const allPage = {
     "/games/pong/local/": loadPong,
     "/games/pong/solo/": loadPong,
     "/games/pong/online/": loadPongMulti,
     "/games/spaceinvaders/" : loadSpaceInvadersGame,
+    "/games/pong/tournament/" : PongTournament,
+    "/games/" : loadBtn,
     // "/games/": loadGames,
     // "/games/pong/": loadPongMenu,
 }
@@ -43,8 +47,8 @@ async function fetchAndReplaceContent(event)
 
 document.addEventListener('DOMContentLoaded', () => {
     //add a condition to check if is log, with var can't open auth42
-    console.log("console : ",window.location.pathname);
-    loadPage(window.location.pathname);
+    // console.log("console : ",window.location.pathname);
+    // loadPage(window.location.pathname);
     document.addEventListener('click', (event) => {
         if (event.target.tagName === 'A' && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
             fetchAndReplaceContent = async() => {

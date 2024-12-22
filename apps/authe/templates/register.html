@@ -3,13 +3,13 @@
 <script src="{% static 'js/index.js' %}" type="module"></script>
 <link rel="shortcut icon" href="{% static 'pictures/favicon.ico' %}" type="image/x-icon">
 
-{% block content %}
+{% comment %} {% block content %}
 <div id="register">
     <div class='box'>
         <h2>Inscription</h2>
         <form method="post" class='info'>
                 {% csrf_token %}
-                {{ form.as_p }}
+                {{ form.as_p }} {% endcomment %}
                 {% comment %} {% comment %} <h3>Choisissez un avatar</h3>
                 <div class="avatar-selection">
                     {% for avatar in avatars %}
@@ -26,12 +26,12 @@
                         </div>
                         {% endblock %} {% endcomment %}
 
-{% load static %}
+{% comment %} {% load static %}
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/register.css' %}">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&display=swap">
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-{% endblock %}                        
+{% endblock %}                         {% endcomment %}
 
 
 {% block content %}
