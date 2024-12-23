@@ -33,7 +33,7 @@ function changeToTournament() {
         spacebtn.textContent = "Play Space Battle Tournament";
     } else {
         var spacebtn = elemcontainerspace.querySelector('a');
-        spacebtn.setAttribute("href", "/games/space/");
+        spacebtn.setAttribute("href", "/games/spaceinvaders/");
         spacebtn.textContent = "Play Space Battle";
     }
 }
@@ -70,7 +70,7 @@ function loadBtnSpace() {
     spaceBtn.textContent = "Play Space Battle";
     spaceBtn.classList.add("btn-tournament");
     spaceBtn.classList.add("btn");
-    spaceBtn.setAttribute("href", "/games/space/");
+    spaceBtn.setAttribute("href", "/games/spaceinvaders/");
 
     const elemcontainer = document.getElementById('btn-tournament-space');
     elemcontainer.appendChild(spaceBtn);
