@@ -1,7 +1,3 @@
-document.addEventListener('DOMContentLoaded', () => {
-    loadBtn();
-});
-
 function loadBtn()
 {
     loadBtnPong();

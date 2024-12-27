@@ -47,16 +47,16 @@ async function fetchAndReplaceContent(event)
 
 document.addEventListener('DOMContentLoaded', () => {
     //add a condition to check if is log, with var can't open auth42
-    // console.log("console : ",window.location.pathname);
-    // loadPage(window.location.pathname);
+    loadPage(window.location.pathname);
     document.addEventListener('click', (event) => {
+        console.log("console : ",window.location.pathname);
         if (event.target.tagName === 'A' && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
             fetchAndReplaceContent = async() => {
                 const response = await fetch(event.target.getAttribute('href'),{mode: 'no-cors'});
                 const content = await response.text();
                 history.pushState({}, '', response.url);
                 document.body.innerHTML = content;
-                console.log(response)
+                // console.log(response)
                 if (response.ok) {
                     liveChat();
                     loadPage(event.target.getAttribute('href'));
