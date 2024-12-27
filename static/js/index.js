@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPage(window.location.pathname);
     document.addEventListener('click', (event) => {
         console.log("console : ",window.location.pathname);
-        if (event.target.tagName === 'A' && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
+        if ((event.target.tagName === 'A' || event.target.tagName === 'I') && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
             fetchAndReplaceContent = async() => {
                 const response = await fetch(event.target.getAttribute('href'),{mode: 'no-cors'});
                 const content = await response.text();
