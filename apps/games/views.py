@@ -14,3 +14,6 @@ def space_invader(request):
 
 def pong_tournament(request):
     return render(request, 'pongtournament.html')
+
+def space_tournament(request):
+    return render(request, 'spacetournament.html')

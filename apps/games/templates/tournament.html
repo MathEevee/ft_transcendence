@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Tournament
+{% endblock %}
+
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/tournament.css' %}">
+{% endblock %}
+
+{% block content %}
+{% include "navbar.html" %}
+{% endblock %}
+
+{% comment %} {% block js %}
+<script src="{% static 'js/tournament.js' %}"></script>
+{% endblock %} {% endcomment %}
