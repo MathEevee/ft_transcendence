@@ -26,16 +26,16 @@ function loadPongMenu(){};
 
 async function fetchAndReplaceContent(event)
 {
-    const response = await fetch(event.target.getAttribute('href'));
-    const content = await response.text();
-    history.pushState({}, '', response.url);
-    document.body.innerHTML = content;
-    console.log(response)
-    if (response.ok) {
-        liveChat();
-        loadPage(event.target.getAttribute('href'));
-    }
-    return (content);
+	const response = await fetch(event.target.getAttribute('href'));
+	const content = await response.text();
+	history.pushState({}, '', response.url);
+	document.body.innerHTML = content;
+	console.log(response)
+	if (response.ok) {
+		liveChat();
+		loadPage(event.target.getAttribute('href'));
+	}
+	return (content);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
