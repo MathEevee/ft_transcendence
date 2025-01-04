@@ -13,7 +13,7 @@ class RegistrationForm(UserCreationForm):
             'email'     : 'Email',
             'password1' : 'Password',
             'password2' : 'Confirm Password',
-                }
+        }
 
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=150)
