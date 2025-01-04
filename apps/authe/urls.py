@@ -10,4 +10,7 @@ urlpatterns = [
     # for authentification 42
     path('oauth42/', views.auth_with_42, name='oauth42'),
     path('oauth42/callback/', views.auth_callback, name='auth_callback'),
+
+    # for API CustomUsers
+    path('api/users/', views.CustomUserAPIView.as_view(), name='api-users'),
 ]

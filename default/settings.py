@@ -40,10 +40,13 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.oauth2',
+    'channels',
+    'rest_framework',
     'apps.authe',
     'apps.home',
     'apps.profil',
-    'apps.games'
+    'apps.games',
+    'apps.chat'
 ]
 
 LOGIN_URL = reverse_lazy('authe:login')
@@ -74,12 +77,14 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.authe.context_processors.staff_status',
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = 'default.wsgi.application'
+ASGI_APPLICATION = 'default.asgi.application'
 
 
 # Database
@@ -122,8 +127,9 @@ AUTH_USER_MODEL = 'authe.CustomUser'
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Paris'
 USE_I18N = True
+USE_L10N = True
 USE_TZ = True
 
 
@@ -165,4 +171,9 @@ MESSAGE_TAGS = {
     message_constants.SUCCESS: 'success',
     message_constants.WARNING: 'warning',
     message_constants.ERROR: 'error',
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
 }

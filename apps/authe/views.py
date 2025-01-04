@@ -7,10 +7,14 @@ from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.urls import reverse
 from django.conf import settings
+from django.utils.timezone import now
 from django.db.utils import IntegrityError
 from .models import CustomUser
 from .forms import RegistrationForm, LoginForm
+from .serializer import CustomUserSerializer
 from apps.authe.decorators import logout_required
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 logger = logging.getLogger(__name__)
 
@@ -73,42 +77,42 @@ def auth_callback(request):
     #     pass
 
     # Sauvegarder ou connecter l'utilisateur ici
-    user = save_user(user_info)
+    try:
+        user = save_user(user_info)
+    except IntegrityError:
+        messages.error(request, "Impossible de créer ou éditer l'utilisateur.")
+        return redirect('/')
 
     # Connecter l'utilisateur
     login(request, user)
+    user.last_login = now()
+    user.save()
     messages.success(request, f"Bienvenue, {user.username}!")
     return redirect(reverse('profil:profil'))
-    # return render(request, 'profil.html')
-
-
 
 def save_user(user_info):
-    try:
-        picture_url = user_info.get('image', {}).get('versions', {}).get('medium', '/static/pictures/user-avatar-01.png')
-        user, created = CustomUser.objects.get_or_create(
-            intra_id=user_info['id'],
-            defaults={
-                'username': user_info['login'],
-                'email': user_info['email'],
-                'profil_picture': picture_url,
-            }
-        )
-        
-        if created:
-            logger.info(f"Created new user: {user.username}")
-        else:
-            logger.info(f"Existing user logged in: {user.username}")
-            # Mise à jour des informations si nécessaire
-            user.email = user_info['email']
-            user.profil_picture = picture_url
-            user.save()
+    picture_url = user_info.get('image', {}).get('versions', {}).get('medium', '/static/pictures/user-avatar-01.png')
 
-        return user
+    # Vérifier si un utilisateur existe déjà par `intra_id`
+    user, created = CustomUser.objects.get_or_create(
+        intra_id=user_info['id'],
+        defaults={
+            'username': user_info['login'],
+            'email': user_info['email'],
+            'profil_picture': picture_url,
+        }
+    )
     
-    except IntegrityError as e:
-        logger.error(f"Error creating or updating user: {e}")
-        return None
+    if created:
+        logger.info(f"Created new user: {user.username}")
+    else:
+        logger.info(f"Existing user logged in: {user.username}")
+        # Mise à jour des informations si nécessaire
+        user.email = user_info['email']
+        user.profil_picture = picture_url
+        user.save()
+
+    return user
 
 @logout_required
 def register_view(request):
@@ -120,7 +124,12 @@ def register_view(request):
             user.save()
             messages.success(request, "Inscription réussie ! Connectez-vous.")
             return redirect(reverse('authe:login'))
-            # return render(request, 'login.html')
+        else:
+            # Ajouter un message avec les erreurs du formulaire
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.info(request, f"{field.capitalize()}: {error}")
+
     else:
         form = RegistrationForm()
     
@@ -147,3 +156,9 @@ def login_view(request):
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
 
+
+class CustomUserAPIView(APIView):
+    def get(self, request):
+        users = CustomUser.objects.all()
+        serializer = CustomUserSerializer(users, many=True)
+        return Response(serializer.data)
