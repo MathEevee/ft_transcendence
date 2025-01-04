@@ -11,16 +11,9 @@ const allPage = {
     "/games/spaceinvaders/" : loadSpaceInvadersGame,
     "/games/pong/tournament/" : PongTournament,
     "/games/" : loadBtn,
-    // "/games/": loadGames,
-    // "/games/pong/": loadPongMenu,
 }
 
-// import { draw } from "/static/spacedraw.js";
-// import { update } from "/static/spaceupdate.js";
-
 function loadPage(path){
-    // console.log('Loading page:', path);
-    // console.log('Loading function:', allPage[path]);
     if (allPage[path])
         allPage[path]();
     else if (allPage[path + '/'])
@@ -46,17 +39,17 @@ async function fetchAndReplaceContent(event)
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    //add a condition to check if is log, with var can't open auth42
     loadPage(window.location.pathname);
     document.addEventListener('click', (event) => {
-        console.log("console : ",window.location.pathname);
+        const href = event.target.getAttribute('href');
+        if (href && href.includes('/authe/oauth42/'))
+            return;
         if ((event.target.tagName === 'A' || event.target.tagName === 'I') && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
             fetchAndReplaceContent = async() => {
                 const response = await fetch(event.target.getAttribute('href'),{mode: 'no-cors'});
                 const content = await response.text();
                 history.pushState({}, '', response.url);
                 document.body.innerHTML = content;
-                // console.log(response)
                 if (response.ok) {
                     liveChat();
                     loadPage(event.target.getAttribute('href'));
