@@ -65,12 +65,12 @@ def auth_callback(request):
     pprint.pprint(user_info)
 
     # # check if not used email in database
-    try:
-        user = CustomUser.objects.get(email=user_info['email'])
-        if user.intra_id != user_info['id']:
-            raise Exception("email conflict.")
-    except CustomUser.DoesNotExist:
-        pass
+    # try:
+    #     user = CustomUser.objects.get(email=user_info['email'])
+    #     if user.intra_id != user_info['id']:
+    #         raise Exception("email conflict.")
+    # except CustomUser.DoesNotExist:
+    #     pass
 
     # Sauvegarder ou connecter l'utilisateur ici
     user = save_user(user_info)
