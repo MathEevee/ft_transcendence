@@ -67,5 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const content = await response.text();
         document.body.innerHTML = content;
         loadPage(window.location.pathname);
+        liveChat();
     });
 });
