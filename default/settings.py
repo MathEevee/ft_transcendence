@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.oauth2',
     'channels',
+    'rest_framework',
     'apps.authe',
     'apps.home',
     'apps.profil',
