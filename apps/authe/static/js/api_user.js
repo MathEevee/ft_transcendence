@@ -1,6 +1,6 @@
 async function getUsers() {
     try {
-        const response = await fetch('/api/users/');
+        const response = await fetch('/authe/api/users/');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
