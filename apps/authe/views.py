@@ -11,7 +11,10 @@ from django.utils.timezone import now
 from django.db.utils import IntegrityError
 from .models import CustomUser
 from .forms import RegistrationForm, LoginForm
+from .serializer import CustomUserSerializer
 from apps.authe.decorators import logout_required
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 logger = logging.getLogger(__name__)
 
@@ -145,3 +148,9 @@ def login_view(request):
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
 
+
+class CustomUserAPIView(APIView):
+    def get(self, request):
+        users = CustomUser.objects.all()
+        serializer = CustomUserSerializer(users, many=True)
+        return Response(serializer.data)
