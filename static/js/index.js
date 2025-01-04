@@ -5,26 +5,19 @@ import { PongTournament } from "/static/js/pongMulti/PongTournament.js"
 import { loadBtn } from "/static/js/tournament.js"
 
 const allPage = {
-	"/games/pong/local/": loadPong,
-	"/games/pong/solo/": loadPong,
-	"/games/pong/online/": loadPongMulti,
-	"/games/spaceinvaders/" : loadSpaceInvadersGame,
-	"/games/pong/tournament/" : PongTournament,
-	"/games/" : loadBtn,
-	// "/games/": loadGames,
-	// "/games/pong/": loadPongMenu,
+    "/games/pong/local/": loadPong,
+    "/games/pong/solo/": loadPong,
+    "/games/pong/online/": loadPongMulti,
+    "/games/spaceinvaders/" : loadSpaceInvadersGame,
+    "/games/pong/tournament/" : PongTournament,
+    "/games/" : loadBtn,
 }
 
-// import { draw } from "/static/spacedraw.js";
-// import { update } from "/static/spaceupdate.js";
-
 function loadPage(path){
-	// console.log('Loading page:', path);
-	// console.log('Loading function:', allPage[path]);
-	if (allPage[path])
-		allPage[path]();
-	else if (allPage[path + '/'])
-		allPage[path + '/']();
+    if (allPage[path])
+        allPage[path]();
+    else if (allPage[path + '/'])
+        allPage[path + '/']();
 };
 
 function loadGames(){};
@@ -46,33 +39,33 @@ async function fetchAndReplaceContent(event)
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-	//add a condition to check if is log, with var can't open auth42
-	loadPage(window.location.pathname);
-	document.addEventListener('click', (event) => {
-		console.log("console : ",window.location.pathname);
-		if ((event.target.tagName === 'A') && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
-			fetchAndReplaceContent = async() => {
-				const response = await fetch(event.target.getAttribute('href'),{mode: 'no-cors'});
-				const content = await response.text();
-				history.pushState({}, '', response.url);
-				document.body.innerHTML = content;
-				// console.log(response)
-				if (response.ok) {
-					liveChat();
-					loadPage(event.target.getAttribute('href'));
-				}
-				return (content);
-			}
-			fetchAndReplaceContent(event);
-			event.preventDefault();
-			return;
-		}
-	});
-	window.addEventListener('popstate', async (event) => {
-		event.preventDefault();
-		const response = await fetch(window.location.pathname);
-		const content = await response.text();
-		document.body.innerHTML = content;
-		loadPage(window.location.pathname);
-	});
+    loadPage(window.location.pathname);
+    document.addEventListener('click', (event) => {
+        const href = event.target.getAttribute('href');
+        if (href && href.includes('/authe/oauth42/'))
+            return;
+        if ((event.target.tagName === 'A' || event.target.tagName === 'I') && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
+            fetchAndReplaceContent = async() => {
+                const response = await fetch(event.target.getAttribute('href'),{mode: 'no-cors'});
+                const content = await response.text();
+                history.pushState({}, '', response.url);
+                document.body.innerHTML = content;
+                if (response.ok) {
+                    liveChat();
+                    loadPage(event.target.getAttribute('href'));
+                }
+                return (content);
+            }
+            fetchAndReplaceContent(event);
+            event.preventDefault();
+            return;
+        }
+    });
+    window.addEventListener('popstate', async (event) => {
+        event.preventDefault();
+        const response = await fetch(window.location.pathname);
+        const content = await response.text();
+        document.body.innerHTML = content;
+        loadPage(window.location.pathname);
+    });
 });

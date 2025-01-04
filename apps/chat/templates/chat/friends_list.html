@@ -1,0 +1,12 @@
+<ul>
+	{% for friend in friends %}
+		<li>
+			{{ friend.friend.username }} - 
+			{% if friend.friend.is_online %}
+				<span style="color: green;">Online</span>
+			{% else %}
+				<span style="color: red;">Offline</span>
+			{% endif %}
+		</li>
+	{% endfor %}
+</ul>
