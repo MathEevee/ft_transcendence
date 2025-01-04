@@ -111,7 +111,11 @@ class background
 		this.drawtrianglehitbox(context, this.centraldiamondstroke.bottomright[0], this.centraldiamondstroke.bottomright[1], this.centraldiamondstroke.bottomright[2], "red");
 
 		// draw four point
-		this.drawfourpoint(context, this.centraldiamondstroke.topleft[2], this.centraldiamondstroke.topright[2], this.centraldiamondstroke.bottomleft[2], this.centraldiamondstroke.bottomright[2], "red");
+
+		drawCircle(context, this.centraldiamondstroke.topleft[0].x,this.centraldiamondstroke.topleft[0].y, 10 ,"red");
+		drawCircle(context, this.centraldiamondstroke.topright[0].x,this.centraldiamondstroke.topright[0].y, 10 ,"red");
+		drawCircle(context, this.centraldiamondstroke.bottomleft[0].x,this.centraldiamondstroke.bottomleft[0].y, 10 ,"red");
+		drawCircle(context, this.centraldiamondstroke.bottomright[0].x,this.centraldiamondstroke.bottomright[0].y, 10 ,"red");
 	}
 
 	getHitbox()

@@ -65,12 +65,12 @@ def auth_callback(request):
     pprint.pprint(user_info)
 
     # # check if not used email in database
-    # try:
-    #     user = CustomUser.objects.get(email=user_info['email'])
-    #     if user.intra_id != user_info['id']:
-    #         raise Exception("email conflict.")
-    # except CustomUser.DoesNotExist:
-    #     pass
+    try:
+        user = CustomUser.objects.get(email=user_info['email'])
+        if user.intra_id != user_info['id']:
+            raise Exception("email conflict.")
+    except CustomUser.DoesNotExist:
+        pass
 
     # Sauvegarder ou connecter l'utilisateur ici
     user = save_user(user_info)
@@ -79,6 +79,9 @@ def auth_callback(request):
     login(request, user)
     messages.success(request, f"Bienvenue, {user.username}!")
     return redirect(reverse('profil:profil'))
+    # return render(request, 'profil.html')
+
+
 
 def save_user(user_info):
     try:
@@ -117,6 +120,7 @@ def register_view(request):
             user.save()
             messages.success(request, "Inscription réussie ! Connectez-vous.")
             return redirect(reverse('authe:login'))
+            # return render(request, 'login.html')
     else:
         form = RegistrationForm()
     

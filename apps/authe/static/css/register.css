@@ -112,6 +112,7 @@ button:active {
 .avatar-selection img {
     width: 100px;
     height: 100px;
+<<<<<<< HEAD
     object-fit: cover;
     border-radius: 50%;
     display: block;
@@ -139,3 +140,12 @@ a {
 a:hover {
     text-decoration: underline;
 }
+=======
+    border-radius: 50%;
+    border: 2px solid #000;
+}
+
+.avatar-selection input[type="radio"]:checked + img {
+    border-color: #007bff;
+} */
+>>>>>>> matde-ol

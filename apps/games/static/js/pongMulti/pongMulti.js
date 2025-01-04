@@ -10,7 +10,7 @@ function loadPongMulti(){
 	const context = canvas.getContext('2d');
 	const redbutton = document.getElementById('red');
 	
-	let speed = 10;
+	let speed = 14;
 	let start = 0;
 	const paddleHeight = 50;
 	const paddleWidth = 5;
@@ -104,6 +104,8 @@ function loadPongMulti(){
 	{
 		if (event.key === "r" || event.key === "R")
 			startPong();
+		else if (event.key === "p")
+			start = 0;
 		else if (event.key === "o" || event.key === "O")
 			toggleFullscreen(canvas);
 		if (start === 1)
@@ -173,7 +175,7 @@ function loadPongMulti(){
 		if (ballplassement.x === 0)
 			t_game.ball.dx = Math.random() * 0.5;
 		else if (ballplassement.x === 50)
-			t_game.ball.dx = 1;
+			t_game.ball.dx = -1;
 		else
 			t_game.ball.dx = -1;
 		if (ballplassement.y === 0)
