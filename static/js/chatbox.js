@@ -2,26 +2,34 @@ document.addEventListener('DOMContentLoaded', () => {
 	liveChat();
 });
 
-const friendlist = [];
+var friendlist = [];
 
 function fetchFriendList() {
-	friendlist = fetch('/authe/api/users/')
+	fetch('/authe/api/users/')
 		.then(response => response.json())
 		.then(data => {
+			const elemcontainer = document.getElementById('FriendList');
 			for (let i = 0; i < data.length; i++) {
 				friendlist.push(data[i].username);
-				console.log("friendlist[i]:", friendlist[i]);
-				console.log("i:", i);
 			}
-			return (friendlist);
+
+			for (let i = 0; i < friendlist.length; i++) {
+				var newFriend = document.createElement("button");
+				newFriend.textContent = friendlist[i];
+				newFriend.classList.add("friend");
+				if (elemcontainer == null)
+					return;
+				elemcontainer.appendChild(newFriend);
+				newFriend.addEventListener('click', function(event) {
+					loadBar(event);
+				});
+			}
 		})
 		.catch((error) => {
 			console.error('Error:', error);
 		});
-	return (friendlist);
 }
 
-fetchFriendList();
 
 
 function liveChat() {
@@ -32,20 +40,8 @@ function liveChat() {
 	const elemcontainer = document.getElementById('FriendList');
 	const selectFriend = document.getElementById('selectFriend');
 	// const linkFriend = document.getElementById('infoFriend');
-	
-	for (let i = 0; i < friendlist.length; i++) {
-		console.log(friendlist[i]);
-		var newFriend = document.createElement("button");
-		newFriend.textContent = friendlist[i];
-		newFriend.classList.add("friend");
-		if (elemcontainer == null)
-			return;
-		elemcontainer.appendChild(newFriend);
-		newFriend.addEventListener('click', function(event) {
-			loadBar(event);
-		});
-	}
-	
+	fetchFriendList();
+
 	if (search)
 		search.value = "";
 	
@@ -99,11 +95,39 @@ function pageFriend(event) {
 		window.location.href = url;  // Voir avec les urls et les views car ca marche pas
 }
 
+function alreadyfriend(inputValue) {
+	for (let i = 0; i < friendlist.length; i++) {
+		if (friendlist[i] === inputValue) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function notindatabase(inputValue) {
+	for (let i = 0; i < friendlist.length; i++) {
+		if (friendlist[i] === inputValue) {
+			return false;
+		}
+	}
+	return true;
+}
+
 function addFriends(event, elemcontainer) {
 	if (event.key === 'Enter') {
 		event.preventDefault();
 		var inputValue = document.getElementById('addFriends').value;
-		tablist.push(inputValue);
+		if (alreadyfriend(inputValue)) {
+			document.getElementById('addFriends').value = '';
+			document.getElementById('addFriends').placeholder = "Already a friend";
+			return;
+		}
+		if (notindatabase(inputValue)) {
+			document.getElementById('addFriends').value = '';
+			document.getElementById('addFriends').placeholder = "User not found";
+			return;
+		}
+		friendlist.push(inputValue);
 		document.getElementById('addFriends').value = '';
 
 		var newFriend = document.createElement("button");
