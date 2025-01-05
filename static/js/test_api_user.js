@@ -5,7 +5,7 @@ document.getElementById('loadDataButton').addEventListener('click', async () => 
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(data); // Affiche les données dans la console
+        console.log('here = ', data); // Affiche les données dans la console
     } catch (error) {
         console.error('Erreur lors du chargement des données :', error);
     }
