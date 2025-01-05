@@ -10,3 +10,12 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+
+class Message(models.Model):
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    recipient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='recipient')
+
+    def __str__(self):
+        return f"Message from {self.author.username}"

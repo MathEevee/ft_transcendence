@@ -1,169 +1,213 @@
 #chatbox .ChatButton{
-    border-radius:5px;
-    white-space: nowrap;
-    list-style-type: none;
-    border: 0 #cd6aff;
-    font-family: "Kode Mono", monospace;
-    background-color: #17BEBB;
-    box-shadow: 0px 0px 5px #128c8b;
-    text-shadow: 0px 0px 5px #17BEBB;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    position: fixed;
-    bottom: 5px;
-    right: 5px;
-    width: 100px;
-    height: 30px;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+	border-radius:5px;
+	white-space: nowrap;
+	list-style-type: none;
+	border: 0 #cd6aff;
+	font-family: "Kode Mono", monospace;
+	background-color: #17BEBB;
+	box-shadow: 0px 0px 5px #128c8b;
+	text-shadow: 0px 0px 5px #17BEBB;
+	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+	position: fixed;
+	bottom: 5px;
+	right: 5px;
+	width: 100px;
+	height: 30px;
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 #chatbox .bar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    background-color: #076463; 
-    border-radius: 5px;
-    height: 35px;
-    width: 95%;
-    box-shadow: 0px 0px 5px #064d4c;
-    text-shadow: 0px 0px 5px #17BEBB;
-    display:flex;
-    justify-content: center;
-    text-align: center;
-    padding-top: 5px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	background-color: #076463; 
+	border-radius: 5px;
+	height: 35px;
+	width: 95%;
+	box-shadow: 0px 0px 5px #064d4c;
+	text-shadow: 0px 0px 5px #17BEBB;
+	display:flex;
+	justify-content: center;
+	text-align: center;
+	padding-top: 5px;
 }
 
 #chatbox .minWin{
-    font-family: "Kode Mono", monospace;
-    font-weight: bold;
-    text-align: center;
-    background-color: #cd6aff5e;
-    margin-left: 94%;
-    width: 6%;
-    height: 12%;
-    font-size: 25px;
-    box-shadow: 0px 0px 5px #9a4bb7;
+	font-family: "Kode Mono", monospace;
+	font-weight: bold;
+	text-align: center;
+	background-color: #cd6aff5e;
+	margin-left: 94%;
+	width: 6%;
+	height: 12%;
+	font-size: 25px;
+	box-shadow: 0px 0px 5px #9a4bb7;
 }
 
 #chatbox .ChatButton:hover {
-    background-color: #076463;
-    border-color: #064d4c;
-    box-shadow: 0px 0px 10px #064d4c;
+	background-color: #076463;
+	border-color: #064d4c;
+	box-shadow: 0px 0px 10px #064d4c;
 }
 
 #chatbox .liveChat{
-    display: none;
-    border-radius:5px;
-    white-space: nowrap;
-    list-style-type: none;
-    border: 0 #cd6aff;
-    font-family: "Kode Mono", monospace;
-    background-color: #076463;
-    box-shadow: 0px 0px 5px #064d4c;
-    text-shadow: 0px 0px 5px #17BEBB;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    position: fixed;
-    bottom: 5px;
-    right: 5px;
-    width: 500px;
-    height: 300px;
-    color: white;
+	display: none;
+	border-radius:5px;
+	white-space: nowrap;
+	list-style-type: none;
+	border: 0 #cd6aff;
+	font-family: "Kode Mono", monospace;
+	background-color: #076463;
+	box-shadow: 0px 0px 5px #064d4c;
+	text-shadow: 0px 0px 5px #17BEBB;
+	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+	position: fixed;
+	bottom: 5px;
+	right: 5px;
+	width: 500px;
+	height: 300px;
+	color: white;
 }
 
 #chatbox .friends{
-    background-color: #260346;
-    box-shadow: 0px 0px 5px #6a3d8f;
-    border-radius: 5px;
-    width: 29%;
-    height: 82%;
-    margin-left: 70%;
-    margin-top: 2%;
+	background-color: #260346;
+	box-shadow: 0px 0px 5px #6a3d8f;
+	border-radius: 5px;
+	width: 29%;
+	height: 82%;
+	margin-left: 70%;
+	margin-top: 2%;
 }
 
 #search input {
-    height: 10%;
-    border-radius: 5px;
-    box-shadow: 1px 1px 10px 0px #6a3d8f;
+	height: 10%;
+	border-radius: 5px;
+	box-shadow: 1px 1px 10px 0px #6a3d8f;
 }
 
 #chatbox input:focus {
-    outline: none;
-    box-shadow: 1px 1px 10px 2px #8a54a7;
+	outline: none;
+	box-shadow: 1px 1px 10px 2px #8a54a7;
 }
 
 #chatbox .search {
-    width: 100%;
-    height: 10%;
-    border-radius: 5px;
-    box-shadow: 1px 1px 10px 0px #6a3d8f;
+	width: 100%;
+	height: 10%;
+	border-radius: 5px;
+	box-shadow: 1px 1px 10px 0px #6a3d8f;
 }
 
 #chatbox .chatMessages{
-    background-color: #29c7c467;
-    margin-top: -50%;
-    margin-left: 2%;
-    width: 66%;
-    height: 72%;
-    box-shadow: 1px 1px 10px 0px #128c8b;
-    border-radius: 5px;
+	background-color: #29c7c467;
+	margin-top: -50%;
+	margin-left: 2%;
+	width: 66%;
+	height: 72%;
+	box-shadow: 1px 1px 10px 0px #128c8b;
+	border-radius: 5px;
+	overflow-y: scroll;
+	overflow-x: none;
+	scroll-behavior: smooth;
+	scrollbar-width: none;
+	scale: 1;
 }
 
 #chatbox .inputMessages {
-    width: 66%;
-    height: 90%;
-    margin-left: 2%;
-    margin-top: 1%;
-    border-radius: 5px;
-    box-shadow: 1px 1px 5px 0px #128c8b;
-    display: fixed;
+	width: 66%;
+	height: 90%;
+	margin-left: 2%;
+	margin-top: 1%;
+	border-radius: 5px;
+	box-shadow: 1px 1px 5px 0px #128c8b;
+	display: fixed;
 }
 
 #chatbox button{
-    margin: 0;
+	margin: 0;
 }
 
 #FriendList .friend {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    width: 100%;
-    border-radius: 5px;
-    border:none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+	width: 100%;
+	border-radius: 5px;
+	border:none;
 }
 
 #FriendList {
-    margin-top: 4%;
-    width: 100%;
-    height: 87%;
-    overflow-y: scroll;
-    border-radius: 5px;
+	margin-top: 4%;
+	width: 100%;
+	height: 87%;
+	overflow-y: scroll;
+	border-radius: 5px;
 }
 
 #FriendList button.friend {
-    color: white;
-    overflow: hidden;
-    background-color: #3f0a70;
-    box-shadow: 1px 2px 0px 1px #6a3d8f;
-    margin-bottom: 5px;
-    border-radius: 5px;
-    height: 40px;
-    width: 95%;
-    margin-left: 2%;
+	color: white;
+	overflow: hidden;
+	background-color: #3f0a70;
+	box-shadow: 1px 2px 0px 1px #6a3d8f;
+	margin-bottom: 5px;
+	border-radius: 5px;
+	height: 40px;
+	width: 95%;
+	margin-left: 2%;
 }
 
 #FriendList button.friend:hover {
-    color: white;
-    overflow: hidden;
-    background-color: #1a0033;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    text-shadow: 0px 0px 5px #6a3d8f;
-    margin-bottom: 5px;
-    border-radius: 5px;
-    height:40px;
-    width: 95%;
-    margin-left: 2%;
+	color: white;
+	overflow: hidden;
+	background-color: #1a0033;
+	transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+	text-shadow: 0px 0px 5px #6a3d8f;
+	margin-bottom: 5px;
+	border-radius: 5px;
+	height:40px;
+	width: 95%;
+	margin-left: 2%;
 }
+
+
+#chatbox .inputMessages input {
+	width: 100%;
+	height: 100%;
+	border-radius: 5px;
+	box-shadow: 1px 1px 10px 0px #6a3d8f;
+}
+
+#chatbox .inputMessages button {
+	width: 30%;
+	height: 100%;
+	border-radius: 5px;
+	box-shadow: 1px 1px 10px 0px #6a3d8f;
+}
+
+div.message {
+    background-color: #3f0a70;
+    color: white;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px 0px #6a3d8f;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 2%;
+    width: 95%;
+    max-width: 95%;
+    height: auto;
+    overflow-wrap: break-word;
+    white-space: normal;
+	word-wrap: break-word;
+    justify-content: initial;
+    content-visibility: auto;
+    align-content: space-evenly;
+    padding: 5px;
+}
+
+
+
+

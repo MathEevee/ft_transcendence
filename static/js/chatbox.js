@@ -1,6 +1,107 @@
+
+
 document.addEventListener('DOMContentLoaded', () => {
 	liveChat();
+
+	document.body.addEventListener('keyup', function(event) {
+		if (event.key === 'Enter' && document.getElementById('selectFriend').textContent !== '') {
+			sendMessage();
+		}
+	});
 });
+
+function getlogin() {
+	fetch('/authe/api/users/')
+		.then(response => response.json())
+		.then(data => {
+			return data[0].username;
+
+		})
+		.catch((error) => {
+			console.error('Error:', error);
+		});
+}
+
+
+function addMessageTobdd(message) {
+	fetch('/authe/api/messages/', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			message: message,
+			recipient: document.getElementById('selectFriend').textContent,
+			sender: getlogin(),
+		}),
+	})
+		.then(response => {
+			if (!response.ok) {
+				console.error('Error:', response);
+			}
+		})
+		.catch((error) => {
+			console.error('Error:', error);
+		});
+}
+
+// function sendMessageToTarget(message, recipient) {
+// 	fetch('/authe/api/send-message/', {
+// 		method: 'POST',
+// 		headers: {
+// 			'Content-Type': 'application/json',
+// 		},
+// 		body: JSON.stringify({
+// 			message: message,
+// 			recipient: recipient,
+// 		}),
+// 	})
+// 		.then(response => {
+// 			if (!response.ok) {
+// 				console.error('Error:', response);
+// 			}
+// 		})
+// 		.catch((error) => {
+// 			console.error('Error:', error);
+// 		});
+// }
+
+// function receiveMessage() {
+// 	fetch('/authe/api/messages/')
+// 		.then(response => response.json())
+// 		.then(data => {
+// 			const chat = document.getElementById('chatMessages');
+// 			for (let i = 0; i < data.length; i++) {
+// 				const newMessage = document.createElement('div');
+// 				newMessage.classList.add('message');
+// 				newMessage.textContent = data[i].sender + ": " + data[i].message;
+// 				chat.appendChild(newMessage);
+// 			}
+// 			chat.scrollTop = chat.scrollHeight;
+// 		})
+// 		.catch((error) => {
+// 			console.error('Error:', error);
+// 		});
+// }
+
+function sendMessage() {
+	const chat = document.getElementById('chatMessages');
+	const newMessage = document.createElement('div');
+	newMessage.classList.add('message');
+	const message = document.getElementById('inputMessages').value;
+	if (message === '') {
+		return;
+	}
+
+	addMessageTobdd(message);
+	newMessage.textContent = "You: " + message;
+	// sendMessageToTarget(message, document.getElementById('selectFriend').textContent);
+
+	chat.appendChild(newMessage);
+	chat.scrollTop = chat.scrollHeight;
+	document.getElementById('inputMessages').value = '';
+}
+
 
 var friendlist = [];
 
@@ -9,8 +110,9 @@ function fetchFriendList() {
 		.then(response => response.json())
 		.then(data => {
 			const elemcontainer = document.getElementById('FriendList');
+
 			for (let i = 0; i < data.length; i++) {
-				friendlist.push(data[i].username);
+				friendlist[i] = data[i].username;
 			}
 
 			for (let i = 0; i < friendlist.length; i++) {
@@ -66,6 +168,8 @@ function liveChat() {
 	search.addEventListener('keydown', function(event) {
 		addFriends(event, elemcontainer);
 	});
+
+	// receiveMessage();
 }
 
 function loadBar(event) {
