@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Game
+Tournament
 {% endblock %}
 
 {% load static %}
@@ -16,7 +16,7 @@ Game
 {% block content %}
 {% include "navbar.html" %}
 <div id="games-container">
-	<h1>Space battle Tournament</h1>
+    <h1>{% block heading %}Default Heading{% endblock %}</h1>
 	<table id="games-table">
 		<tr>
 			<th>Player</th>

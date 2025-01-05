@@ -19,7 +19,8 @@ def space_invader(request):
 
 @login_required
 def pong_tournament(request):
-    return render(request, 'pongtournament.html')
+    return render(request, 'pongTournament.html')
 
+@login_required
 def space_tournament(request):
-    return render(request, 'spacetournament.html')
+    return render(request, 'spaceTournament.html')
