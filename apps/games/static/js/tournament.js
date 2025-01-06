@@ -9,7 +9,10 @@ function loadBtn()
 
 function changeToTournament() {
 	const elemcontainerpong = document.getElementById('btn-tournament-pong');
-	var checkpong = elemcontainerpong.querySelector('input[type="checkbox"]');
+	var checkpong = elemcontainerpong?.querySelector('input[type="checkbox"]');
+	if (checkpong == null) {
+		return;
+	}
 	const elemcontainerspace = document.getElementById('btn-tournament-space');
 	var checkspace = elemcontainerspace.querySelector('input[type="checkbox"]');
 

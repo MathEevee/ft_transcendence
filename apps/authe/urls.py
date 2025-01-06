@@ -13,4 +13,5 @@ urlpatterns = [
 
     # for API CustomUsers
     path('api/users/', views.CustomUserAPIView.as_view(), name='api-users'),
+	path('api/messages/', views.MessageAPIView.as_view(), name='api-message'),
 ]
