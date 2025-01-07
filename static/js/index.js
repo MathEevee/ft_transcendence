@@ -1,67 +1,58 @@
-import { loadSpaceInvadersGame } from "/static/js/spaceInvadeur.js" 
-import { loadPong } from "/static/js/pong.js"
-import { loadPongMulti } from "/static/js/pongMulti/pongMulti.js"
-import { PongTournament } from "/static/js/pongMulti/PongTournament.js"
-import { loadBtn } from "/static/js/games.js"
-
 const allPage = {
-    "/games/pong/local/": loadPong,
-    "/games/pong/solo/": loadPong,
-    "/games/pong/online/": loadPongMulti,
-    "/games/spaceinvaders/" : loadSpaceInvadersGame,
-    "/games/pong/tournament/" : PongTournament,
-    "/games/" : loadBtn,
-}
-
-function loadPage(path){
-    if (allPage[path])
-        allPage[path]();
-    else if (allPage[path + '/'])
-        allPage[path + '/']();
+    "/games/pong/local/": () => import("/static/js/pong.js").then(module => module.loadPong()),
+    "/games/pong/solo/": () => import("/static/js/pong.js").then(module => module.loadPong()),
+    "/games/pong/online/": () => import("/static/js/pongMulti/pongMulti.js").then(module => module.loadPongMulti()),
+    "/games/spaceinvaders/": () => import("/static/js/spaceInvadeur.js").then(module => module.loadSpaceInvadersGame()),
+    "/games/pong/tournament/": async () => {
+        const { PongTournament } = await import("/static/js/pongMulti/PongTournament.js");
+        const { setupPlayerList } = await import("/static/js/tournament.js");
+        PongTournament();
+        setupPlayerList();
+    },
+    "/games/spaceinvaders/tournament/": () => import("/static/js/tournament.js").then(module => module.setupPlayerList()),
+    "/games/": () => import("/static/js/games.js").then(module => module.loadBtn()),
 };
 
-async function fetchAndReplaceContent(event)
-{
-	const response = await fetch(event.target.getAttribute('href'));
-	const content = await response.text();
-	history.pushState({}, '', response.url);
-	document.body.innerHTML = content;
-	console.log(response)
-	if (response.ok) {
-		liveChat();
-		loadPage(event.target.getAttribute('href'));
-	}
-	return (content);
+function loadPage(path) {
+    if (allPage[path]) {
+        allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
+    } else if (allPage[path + '/']) {
+        allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
+    }
 }
 
+async function fetchAndReplaceContent(event) {
+    try {
+        const response = await fetch(event.target.getAttribute('href'));
+        if (response.ok) {
+            const content = await response.text();
+            history.pushState({}, '', response.url);
+            document.body.innerHTML = content;
+            loadPage(event.target.getAttribute('href'));
+        }
+    } catch (err) {
+        console.error(`Error fetching content: ${err}`);
+    }
+}
 document.addEventListener('DOMContentLoaded', () => {
     loadPage(window.location.pathname);
+
     document.addEventListener('click', (event) => {
         const href = event.target.getAttribute('href');
-        if (href && href.includes('/authe/oauth42/'))
-            return;
-        if ((event.target.tagName === 'A' || event.target.tagName === 'I') && event.target.getAttribute('href') && event.target.getAttribute('href').startsWith('/' )){
-            fetchAndReplaceContent = async() => {
-                const response = await fetch(event.target.getAttribute('href'),{mode: 'no-cors'});
-                const content = await response.text();
-                history.pushState({}, '', response.url);
-                document.body.innerHTML = content;
-                if (response.ok) {
-                    liveChat();
-                    loadPage(event.target.getAttribute('href'));
-                }
-                return (content);
-            }
-            fetchAndReplaceContent(event);
+        if (href && href.includes('/authe/oauth42/')) return;
+
+        if ((event.target.tagName === 'A' || event.target.tagName === 'I') && href && href.startsWith('/' )){
             event.preventDefault();
-            return;
+            fetchAndReplaceContent(event);
         }
     });
-    window.addEventListener('popstate', async (event) => {
-        event.preventDefault();
+
+    window.addEventListener('popstate', async () => {
         const response = await fetch(window.location.pathname);
-        const content = await response.text();
-        document.body.innerHTML = content;
-        loadPage(window.location.pathname);
+        if (response.ok) {
+            const content = await response.text();
+            document.body.innerHTML = content;
+            loadPage(window.location.pathname);
+        }
     });
 });

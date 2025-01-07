@@ -1,8 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
-	setupPlayerList();
-});
-
-function setupPlayerList() {
+export function setupPlayerList(username) {
     const joinButton = document.getElementById('add-player');
 
     const playersListContainer = document.createElement('div');
@@ -17,19 +13,19 @@ function setupPlayerList() {
     playersListContainer.appendChild(playersListHeading);
     playersListContainer.appendChild(playersList);
 
+    const gamesButtons = document.getElementById('games-buttons');
     gamesButtons.appendChild(joinButton);
     gamesButtons.parentNode.appendChild(playersListContainer);
 
-    handleJoinButtonClick();
+    handleJoinButtonClick(username, playersList);
 }
 
-function handleJoinButtonClick() {
+function handleJoinButtonClick(username, playersList) {
     const joinButton = document.getElementById('add-player');
-    const playersList = document.getElementById('players-list');
     const players = new Set();
 
     joinButton.addEventListener('click', () => {
-        const playerName = prompt("Enter your name:");
+        const playerName = username;
 
         if (playerName && !players.has(playerName)) {
             players.add(playerName);
