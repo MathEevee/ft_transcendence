@@ -1,4 +1,4 @@
-
+var g_socket;
 
 document.addEventListener('DOMContentLoaded', () => {
 	liveChat();
@@ -10,95 +10,19 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 });
 
-function getlogin() {
-	fetch('/authe/api/users/')
-		.then(response => response.json())
-		.then(data => {
-			return data[0].username;
-
-		})
-		.catch((error) => {
-			console.error('Error:', error);
-		});
-}
-
-
-function addMessageTobdd(message) {
-	fetch('/authe/api/messages/', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({
-			message: message,
-			recipient: document.getElementById('selectFriend').textContent,
-			sender: getlogin(),
-		}),
-	})
-		.then(response => {
-			if (!response.ok) {
-				console.error('Error:', response);
-			}
-		})
-		.catch((error) => {
-			console.error('Error:', error);
-		});
-}
-
-// function sendMessageToTarget(message, recipient) {
-// 	fetch('/authe/api/send-message/', {
-// 		method: 'POST',
-// 		headers: {
-// 			'Content-Type': 'application/json',
-// 		},
-// 		body: JSON.stringify({
-// 			message: message,
-// 			recipient: recipient,
-// 		}),
-// 	})
-// 		.then(response => {
-// 			if (!response.ok) {
-// 				console.error('Error:', response);
-// 			}
-// 		})
-// 		.catch((error) => {
-// 			console.error('Error:', error);
-// 		});
-// }
-
-// function receiveMessage() {
-// 	fetch('/authe/api/messages/')
-// 		.then(response => response.json())
-// 		.then(data => {
-// 			const chat = document.getElementById('chatMessages');
-// 			for (let i = 0; i < data.length; i++) {
-// 				const newMessage = document.createElement('div');
-// 				newMessage.classList.add('message');
-// 				newMessage.textContent = data[i].sender + ": " + data[i].message;
-// 				chat.appendChild(newMessage);
-// 			}
-// 			chat.scrollTop = chat.scrollHeight;
-// 		})
-// 		.catch((error) => {
-// 			console.error('Error:', error);
-// 		});
-// }
-
 function sendMessage() {
-	const chat = document.getElementById('chatMessages');
-	const newMessage = document.createElement('div');
-	newMessage.classList.add('message');
 	const message = document.getElementById('inputMessages').value;
 	if (message === '') {
 		return;
 	}
+	if (g_socket) {
+		g_socket.send(JSON.stringify({
+            'to': document.getElementById('selectFriend').textContent,
+			'from' : 
+            'message': message,
+        }));
+    }
 
-	addMessageTobdd(message);
-	newMessage.textContent = "You: " + message;
-	// sendMessageToTarget(message, document.getElementById('selectFriend').textContent);
-
-	chat.appendChild(newMessage);
-	chat.scrollTop = chat.scrollHeight;
 	document.getElementById('inputMessages').value = '';
 }
 
@@ -143,6 +67,26 @@ function liveChat() {
 	const selectFriend = document.getElementById('selectFriend');
 	// const linkFriend = document.getElementById('infoFriend');
 	fetchFriendList();
+
+    g_socket = new WebSocket('ws://localhost:8000/ws/');
+	g_socket.onmessage = function(event) {
+		const data = JSON.parse(event.data);
+        const chat = document.getElementById('chatMessages');
+        const newMessage = document.createElement('div');
+        newMessage.classList.add('message');
+		newMessage.textContent = `${data.from}: ${data.message}`;
+
+        chat.appendChild(newMessage);
+        chat.scrollTop = chat.scrollHeight;
+    };
+
+    g_socket.onclose = function(event) {
+        console.log('WebSocket connection closed');
+    };
+
+	g_socket.onerror = function(error) {
+        console.error('WebSocket error:', error);
+    };
 
 	if (search)
 		search.value = "";

@@ -8,8 +8,8 @@ document.querySelector('#chatbox-btn').onclick = function () {
 
         // Initialise la connexion WebSocket si elle n'existe pas encore
         if (!chatSocket || chatSocket.readyState === WebSocket.CLOSED) {
-            const groupName = 'group0'; // À remplacer par une variable dynamique
-            chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/' + groupName + '/');
+            // const groupName = 'group0'; // À remplacer par une variable dynamique
+            chatSocket = new WebSocket('ws://');
 
             chatSocket.onopen = function () {
                 console.log("WebSocket connection established");

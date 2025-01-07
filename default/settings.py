@@ -28,6 +28,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,13 +41,13 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.oauth2',
-    'channels',
     'rest_framework',
+    'channels',
     'apps.authe',
     'apps.home',
     'apps.profil',
     'apps.games',
-    'apps.chat'
+    'apps.chat',
 ]
 
 LOGIN_URL = reverse_lazy('authe:login')
