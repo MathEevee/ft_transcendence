@@ -2,7 +2,7 @@ import { loadSpaceInvadersGame } from "/static/js/spaceInvadeur.js"
 import { loadPong } from "/static/js/pong.js"
 import { loadPongMulti } from "/static/js/pongMulti/pongMulti.js"
 import { PongTournament } from "/static/js/pongMulti/PongTournament.js"
-import { loadBtn } from "/static/js/tournament.js"
+import { loadBtn } from "/static/js/games.js"
 
 const allPage = {
     "/games/pong/local/": loadPong,
@@ -19,10 +19,6 @@ function loadPage(path){
     else if (allPage[path + '/'])
         allPage[path + '/']();
 };
-
-function loadGames(){};
-
-function loadPongMenu(){};
 
 async function fetchAndReplaceContent(event)
 {

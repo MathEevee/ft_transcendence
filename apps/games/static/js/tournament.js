@@ -1,78 +1,43 @@
-function loadBtn()
-{
-	loadBtnPong();
-	loadBtnSpace();
-	document.addEventListener('click', () => {
-		changeToTournament();
-	});
+document.addEventListener('DOMContentLoaded', () => {
+	setupPlayerList();
+});
+
+function setupPlayerList() {
+    const joinButton = document.getElementById('add-player');
+
+    const playersListContainer = document.createElement('div');
+    playersListContainer.id = 'players-list-container';
+
+    const playersListHeading = document.createElement('h2');
+    playersListHeading.textContent = 'Players in the Tournament:';
+
+    const playersList = document.createElement('ul');
+    playersList.id = 'players-list';
+
+    playersListContainer.appendChild(playersListHeading);
+    playersListContainer.appendChild(playersList);
+
+    gamesButtons.appendChild(joinButton);
+    gamesButtons.parentNode.appendChild(playersListContainer);
+
+    handleJoinButtonClick();
 }
 
-function changeToTournament() {
-	const elemcontainerpong = document.getElementById('btn-tournament-pong');
-	var checkpong = elemcontainerpong?.querySelector('input[type="checkbox"]');
-	if (checkpong == null) {
-		return;
-	}
-	const elemcontainerspace = document.getElementById('btn-tournament-space');
-	var checkspace = elemcontainerspace.querySelector('input[type="checkbox"]');
+function handleJoinButtonClick() {
+    const joinButton = document.getElementById('add-player');
+    const playersList = document.getElementById('players-list');
+    const players = new Set();
 
-	if (checkpong.checked) {
-		var pongbtn = elemcontainerpong.querySelector('a');
-		pongbtn.setAttribute("href", "/games/pong/tournament/");
-		pongbtn.textContent = "Play Pong Tournament";
-	} else {
-		var pongbtn = elemcontainerpong.querySelector('a');
-		pongbtn.setAttribute("href", "/games/pong/");
-		pongbtn.textContent = "Play Pong";
-	}
+    joinButton.addEventListener('click', () => {
+        const playerName = prompt("Enter your name:");
 
-	if (checkspace.checked) {
-		var spacebtn = elemcontainerspace.querySelector('a');
-		spacebtn.setAttribute("href", "/games/spaceinvaders/tournament/");
-		spacebtn.textContent = "Play Space Battle Tournament";
-	} else {
-		var spacebtn = elemcontainerspace.querySelector('a');
-		spacebtn.setAttribute("href", "/games/spaceinvaders/");
-		spacebtn.textContent = "Play Space Battle";
-	}
+        if (playerName && !players.has(playerName)) {
+            players.add(playerName);
+            const playerItem = document.createElement('li');
+            playerItem.textContent = playerName;
+            playersList.appendChild(playerItem);
+        } else if (players.has(playerName)) {
+            alert(`${playerName} is already in the tournament!`);
+        }
+    });
 }
-
-function loadBtnPong() {
-	var label = document.createElement("label");
-	label.textContent = "Mode Tournament : ";
-
-	var checkbox = document.createElement("input");
-	checkbox.type = "checkbox";
-
-	var pongbtn = document.createElement("a");
-	pongbtn.textContent = "Play Pong";
-	pongbtn.classList.add("btn-tournament");
-	pongbtn.classList.add("btn");
-	pongbtn.setAttribute("href", "/games/pong/");
-
-	const elemcontainer = document.getElementById('btn-tournament-pong');
-	elemcontainer.appendChild(pongbtn);
-	elemcontainer.appendChild(label);
-	elemcontainer.appendChild(checkbox);
-}
-
-function loadBtnSpace() {
-	var label = document.createElement("label");
-	label.textContent = "Mode Tournament : ";
-
-	var checkbox = document.createElement("input");
-	checkbox.type = "checkbox";
-
-	var spaceBtn = document.createElement("a");
-	spaceBtn.textContent = "Play Space Battle";
-	spaceBtn.classList.add("btn-tournament");
-	spaceBtn.classList.add("btn");
-	spaceBtn.setAttribute("href", "/games/spaceinvaders/");
-
-	const elemcontainer = document.getElementById('btn-tournament-space');
-	elemcontainer.appendChild(spaceBtn);
-	elemcontainer.appendChild(label);
-	elemcontainer.appendChild(checkbox);
-}
-
-export { loadBtn };
