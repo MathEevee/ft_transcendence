@@ -11,4 +11,5 @@ urlpatterns = [
     path('chat/', include('apps.chat.urls')),
     # Redirect root URL to the home app
     path('', RedirectView.as_view(url='/home/', permanent=False)),
+	path('api/', include('apps.authe.urls')),
 ]
