@@ -19,11 +19,28 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
 	async def receive(self, text_data):
 		text_data_json = json.loads(text_data)
+		print(text_data)
 		message = text_data_json['message']
-		print(f'Received message: {message}')
+		to = text_data_json['to']
 		await self.send(text_data=json.dumps({
 			'message': message,
+			'from': self.scope["user"].username,
+			'to': to
 		}))
 
 	async def send(self, text_data=None, bytes_data=None, close=False):
 		return await super().send(text_data, bytes_data, close)
+	
+	async def send_message(self, event):
+		message = event['message']
+		from_user = event['from']
+		to_user = event['to']
+		await self.send(text_data=json.dumps({
+			'message': message,
+			'from': from_user,
+			'to': to_user
+		}))
+
+
+
+

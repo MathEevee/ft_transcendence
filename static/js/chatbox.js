@@ -1,14 +1,17 @@
 var g_socket;
 
-document.addEventListener('DOMContentLoaded', () => {
-	liveChat();
+function getLogin() {
+	fetch('/authe/api/me/')
+		.then(response => response.json())
+		.then(data => {
+			return (data.username);
+		})
+		.catch((error) => {
+			console.error('Error:', error);
+		});
+}
 
-	document.body.addEventListener('keyup', function(event) {
-		if (event.key === 'Enter' && document.getElementById('selectFriend').textContent !== '') {
-			sendMessage();
-		}
-	});
-});
+let username = getLogin();
 
 function sendMessage() {
 	const message = document.getElementById('inputMessages').value;
@@ -18,7 +21,7 @@ function sendMessage() {
 	if (g_socket) {
 		g_socket.send(JSON.stringify({
             'to': document.getElementById('selectFriend').textContent,
-			'from' : 
+			'from' : username,
             'message': message,
         }));
     }
@@ -74,7 +77,7 @@ function liveChat() {
         const chat = document.getElementById('chatMessages');
         const newMessage = document.createElement('div');
         newMessage.classList.add('message');
-		newMessage.textContent = `${data.from}: ${data.message}`;
+		newMessage.textContent = data.from + ': ' + data.message;
 
         chat.appendChild(newMessage);
         chat.scrollTop = chat.scrollHeight;
@@ -193,3 +196,13 @@ function addFriends(event, elemcontainer) {
 		elemcontainer.scrollTop = elemcontainer.scrollHeight;
 	}
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+	liveChat();
+
+	document.body.addEventListener('keyup', function(event) {
+		if (event.key === 'Enter' && document.getElementById('selectFriend').textContent !== '') {
+			sendMessage();
+		}
+	});
+});

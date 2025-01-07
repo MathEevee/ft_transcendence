@@ -161,3 +161,12 @@ class MessageAPIView(APIView):
 		# Récupérer les messages
 		messages = Message.objects.all()
 		return Response({'messages': messages})
+	
+class MeAPIView(APIView):
+	def get(self, request):
+		# Récupérer les informations de l'utilisateur connecté
+		if request.user.is_authenticated:
+			serializer = CustomUserSerializer(request.user)
+			return Response(serializer.data)
+		else:
+			return Response({'error': 'Vous n\'êtes pas connecté.'}, status=401)
