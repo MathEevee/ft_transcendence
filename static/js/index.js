@@ -7,7 +7,7 @@ const allPage = {
         const { PongTournament } = await import("/static/js/pongMulti/PongTournament.js");
         const { setupPlayerList } = await import("/static/js/tournament.js");
         PongTournament();
-        setupPlayerList();
+        setupPlayerList('ajas');
     },
     "/games/spaceinvaders/tournament/": () => import("/static/js/tournament.js").then(module => module.setupPlayerList()),
     "/games/": () => import("/static/js/games.js").then(module => module.loadBtn()),
