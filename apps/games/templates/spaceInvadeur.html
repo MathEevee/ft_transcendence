@@ -1,5 +1,33 @@
-{% extends 'abstractTournament.html' %}
+{% extends 'base.html' %}
 
-{% block heading %}
-Space Tournament
+{% block title %}
+SpaceInvader
+{% endblock %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/spaceInvadeur.css' %}">
+{% endblock %}
+{% block content %}
+{% include "navbar.html" %}
+	<div id="space" class="body-container">
+		<!-- Borne d'arcade complète -->
+		<div class="arcade-machine">
+			<!-- Panneau supérieur avec titre -->
+			<div class="arcade-header">
+	 			<h1>Space Battle</h1>
+			</div>
+			<!-- Écran de jeu intégré dans la borne -->
+			<div class="arcade-screen">
+				<canvas id="space-invadeur" width="1000" height="1000"></canvas>
+			</div>
+			<!-- Console de commandes factice -->
+			<div class="arcade-console">
+				<div class="button red" id="redButton" type="button"></div>
+				<div class="button blue" id ="blueButton" type="button"></div>
+				<div class="joystick"></div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block js %}
 {% endblock %}

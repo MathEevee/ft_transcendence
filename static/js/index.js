@@ -9,6 +9,7 @@ const allPage = {
     "/games/pong/solo/": loadPong,
     "/games/pong/online/": loadPongMulti,
     "/games/spaceinvaders/" : loadSpaceInvadersGame,
+    // "/games/spaceinvaders/tournament" : SpaceTournament,
     "/games/pong/tournament/" : PongTournament,
     "/games/" : loadBtn,
 }

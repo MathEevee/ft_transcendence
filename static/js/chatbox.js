@@ -1,17 +1,18 @@
 var g_socket;
 
-function getLogin() {
-	fetch('/authe/api/me/')
-		.then(response => response.json())
-		.then(data => {
-			return (data.username);
-		})
-		.catch((error) => {
-			console.error('Error:', error);
-		});
-}
+// function getLogin() {
+// 	fetch('/authe/api/me/')
+// 		.then(response => response.json())
+// 		.then(data => {
+// 			return (data['username']);
+// 		})
+// 		.catch((error) => {
+// 			console.error('Error:', error);
+// 		});
+// }
 
-let username = getLogin();
+// let username = getLogin();
+// console.log(username)
 
 function sendMessage() {
 	const message = document.getElementById('inputMessages').value;
@@ -21,7 +22,6 @@ function sendMessage() {
 	if (g_socket) {
 		g_socket.send(JSON.stringify({
             'to': document.getElementById('selectFriend').textContent,
-			'from' : username,
             'message': message,
         }));
     }
@@ -62,6 +62,7 @@ function fetchFriendList() {
 
 
 function liveChat() {
+
 	const ChatButton = document.getElementById('chat');
 	const liveChat = document.getElementById('box');
 	const minWin = document.getElementById('closeChat');
@@ -70,6 +71,7 @@ function liveChat() {
 	const selectFriend = document.getElementById('selectFriend');
 	// const linkFriend = document.getElementById('infoFriend');
 	fetchFriendList();
+	// console.log('chat',username);
 
     g_socket = new WebSocket('ws://localhost:8000/ws/');
 	g_socket.onmessage = function(event) {

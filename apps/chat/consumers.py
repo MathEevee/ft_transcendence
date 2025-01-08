@@ -11,7 +11,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		await self.accept()
 		print('new socket')
-		print(f'User {self.scope["user"].username} connected')
 
 	async def disconnect(self, close_code):
 		await self.close()
