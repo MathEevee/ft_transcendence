@@ -13,7 +13,6 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/home/', permanent=False)),
     # Voir pour changer authe et api/ qui correspond a l'authe
     path('authe/', include('apps.authe.urls')),
-	path('api/', include('apps.authe.urls')),
     # path('ws/', include(apps.chat.routing.websocket_urlpatterns)),  # pour websockets
 	# path('ws/', include('apps.chat.routing')),
 ]
