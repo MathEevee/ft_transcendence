@@ -1,5 +1,4 @@
 var g_socket = new WebSocket('ws://localhost:8000/ws/');
-let chatopen = 0;
 
 function sendMessage() {
 	const message = document.getElementById('inputMessages').value;
@@ -15,7 +14,6 @@ function sendMessage() {
 
 	document.getElementById('inputMessages').value = '';
 }
-
 
 var friendlist = [];
 
@@ -82,14 +80,13 @@ function liveChat() {
 		search.value = "";
 	
 	function openChat() {
-		chatopen = 1;
+		console.log('openChat');
 		ChatButton.style.display = "none";
 		liveChat.style.display = "block";
 		elemcontainer.scrollTop = elemcontainer.scrollHeight;
 	}
 	
 	function closeChat() {
-		chatopen = 0;
 		liveChat.style.display = "none";
 		ChatButton.style.display = "flex";
 	}

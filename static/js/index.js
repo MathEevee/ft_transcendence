@@ -13,12 +13,15 @@ const allPage = {
     "/games/": () => import("/static/js/games.js").then(module => module.loadBtn()),
 };
 
+
 function loadPage(path) {
     if (allPage[path]) {
         allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
     } else if (allPage[path + '/']) {
         allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
     }
+    if (window.location.pathname === '/authe/login/')
+        document.getElementById('chat').style.display = 'none';
 }
 
 async function fetchAndReplaceContent(event) {
@@ -28,6 +31,7 @@ async function fetchAndReplaceContent(event) {
             const content = await response.text();
             history.pushState({}, '', response.url);
             document.body.innerHTML = content;
+            liveChat();
             loadPage(event.target.getAttribute('href'));
         }
     } catch (err) {
@@ -39,8 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('click', (event) => {
         const href = event.target.getAttribute('href');
-        if (href && href.includes('/authe/oauth42/')) return;
-
+        if (href && href.includes('/authe/oauth42/'))
+            return;
         if ((event.target.tagName === 'A' || event.target.tagName === 'I') && href && href.startsWith('/' )){
             event.preventDefault();
             fetchAndReplaceContent(event);
