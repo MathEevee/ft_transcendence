@@ -9,10 +9,6 @@ Tournament
 <link rel="stylesheet" href="{% static 'css/tournament.css' %}">
 {% endblock %}
 
-{% block js %}
-<script type="module" src="{% static 'js/tournament.js' %}"></script>
-{% endblock %}
-
 {% block content %}
 {% include "navbar.html" %}
 <div id="games-container">
@@ -27,5 +23,15 @@ Tournament
 		<button id="add-player">Join</button>
 		<button id="start-tournament">Start Tournament</button>
 	</div>
+	<div id="players-list-container">
+        <h2>Players in the Tournament:</h2>
+        <ul id="players-list">
+            <!-- dynamic via js -->
+        </ul>
+    </div>
 </div>
+{% endblock %}
+
+{% block js %}
+<script type="module" src="{% static 'js/tournament.js' %}"></script>
 {% endblock %}

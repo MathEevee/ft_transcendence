@@ -1,31 +1,5 @@
-{% extends 'base.html' %}
+{% extends 'abstractTournament.html' %}
 
-{% block title %}
-Tournament
-{% endblock %}
-
-{% load static %}
-{% block css %}
-<link rel="stylesheet" href="{% static 'css/tournament.css' %}">
-{% endblock %}
-
-{% block js %}
-<script src="{% static 'js/tournament.js' %}"></script>
-{% endblock %}
-
-{% block content %}
-{% include "navbar.html" %}
-<div id="games-container">
-	<h1>Space battle Tournament</h1>
-	<table id="games-table">
-		<tr>
-			<th>Player</th>
-			<th>Team</th>
-		</tr>
-	</table>
-	<div id="games-buttons">
-		<button id="add-player">Join</button>
-		<button id="start-tournament">Start Tournament</button>
-	</div>
-</div>
+{% block heading %}
+Space Battle Tournament
 {% endblock %}

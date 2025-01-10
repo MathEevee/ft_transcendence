@@ -15,15 +15,27 @@ Game
     <div class="column">
         <h2>Space-Battle</h2>
         <!-- Lien pour Space-Battle -->
-        <div id="btn-tournament-space"></div>
+        <div id="btn-tournament-space">
+            <a href="/games/spaceinvaders/" class="btn-tournament btn">Play Space Battle</a>
+            <label>
+                Mode Tournament: 
+                <input type="checkbox">
+            </label>
+        </div>
     </div>
     <div class="column">
         <h2>Pong</h2>
-        <div id="btn-tournament-pong"></div>
+        <div id="btn-tournament-pong">
+            <a href="/games/pong/" class="btn-tournament btn">Play Pong</a>
+            <label>
+                Mode Tournament: 
+                <input type="checkbox">
+            </label>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block js %}
-<script type="module" src="{% static 'js/tournament.js' %}"></script>
+<script src="{% static 'js/games.js' %}"></script>
 {% endblock %}
