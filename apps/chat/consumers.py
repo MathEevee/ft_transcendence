@@ -1,6 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from apps.chat.globals import user_sockets, conversations
+from apps.chat.globals import user_sockets, conversations, online_users, conv_rooms
 # from django.contrib.auth import get_user_model
 # from asgiref.sync import sync_to_async
 
@@ -18,14 +18,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
 		if self.user.is_authenticated:
 			user_sockets[self.user.username] = self
 			print(f'{self.user.username} connected')
+			online_users.add(self.user.username)
 			await self.accept()
-
 		else:
 			await self.close()
 
 	async def disconnect(self, close_code):
 		if self.user.username in user_sockets:
 			del user_sockets[self.user.username]
+			online_users.remove(self.user.username)
 			print(f'{self.user.username} disconnected')
 
 	async def receive(self, text_data):
@@ -47,7 +48,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 				await recipient_socket.send(text_data=json.dumps({
 					'message': message,
 					'from': self.user.username,
-					'to': to_user
+					'to': to_user,
+					'all_messages': list(conversations[conversation_key])
 				}))
 
 				await self.send(text_data=json.dumps({
@@ -66,6 +68,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 				'from': 'admin',
 				'to': self.user.username
 			}))
+
+
+
 
 
 

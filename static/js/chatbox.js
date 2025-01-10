@@ -1,4 +1,5 @@
-var g_socket = new WebSocket('ws://localhost:8000/ws/');
+var g_socket = new WebSocket('ws://localhost:8000/ws/chat/');
+var allconversations = [];
 
 function sendMessage() {
 	const message = document.getElementById('inputMessages').value;
@@ -8,16 +9,24 @@ function sendMessage() {
 	if (message === '') {
 		return;
 	}
-	newMessage.textContent = 'You: ' + message;
-	chat.appendChild(newMessage);
 	if (g_socket)
 	{
+		newMessage.textContent = 'You: ' + message;
+		chat.appendChild(newMessage);
+		chat.scrollTop = chat.scrollHeight;
+		if (allconversations[document.getElementById('selectFriend').textContent] === undefined)
+		{
+			allconversations[document.getElementById('selectFriend').textContent] = [];
+		}
+		allconversations[document.getElementById('selectFriend').textContent].push({
+			'from': 'You',
+			'message': message,
+		});
 		g_socket.send(JSON.stringify({
             'to': document.getElementById('selectFriend').textContent,
             'message': message,
         }));
     }
-
 	document.getElementById('inputMessages').value = '';
 }
 
@@ -55,6 +64,41 @@ function fetchFriendList() {
 		});
 }
 
+function retrieveConversations(data) {
+	if (allconversations[data.from] === undefined)
+	{
+		allconversations[data.from] = [];
+	}
+	allconversations[data.from].push({
+		'from': data.from,
+		'message': data.message,
+	});
+}
+
+function printallConversations(of) {
+	
+	const chat = document.getElementById('chatMessages');
+	chat.textContent = '';
+	if (allconversations[of] === undefined)
+	{
+		allconversations[of] = [];
+	}
+	for (let i = 0; i < allconversations[of].length; i++) {
+		const newMessage = document.createElement('div');
+		newMessage.classList.add('message');
+		newMessage.textContent = allconversations[of][i].from + ': ' + allconversations[of][i].message;
+		chat.appendChild(newMessage);
+	}
+	chat.scrollTop = chat.scrollHeight;
+}
+
+function delprevconversation() {
+	const chat = document.getElementById('chatMessages');
+	while (chat.firstChild) {
+		chat.removeChild(chat.firstChild);
+	}
+}
+
 function liveChat() {
 
 	if (window.location.pathname === "/authe/login/" || window.location.pathname === "/authe/register/")
@@ -66,20 +110,24 @@ function liveChat() {
 	const search = document.getElementById('addFriends');
 	const elemcontainer = document.getElementById('FriendList');
 	const selectFriend = document.getElementById('selectFriend');
+
 	fetchFriendList();
 
 	g_socket.onmessage = function(event) {
 		const data = JSON.parse(event.data);
 		if (data.from === undefined || data.message === undefined)
 			return;
+		retrieveConversations(data);
 		console.log('WebSocket message received:', data);
-        const chat = document.getElementById('chatMessages');
-        const newMessage = document.createElement('div');
-        newMessage.classList.add('message');
-		newMessage.textContent = data.from + ': ' + data.message;
-
-        chat.appendChild(newMessage);
-        chat.scrollTop = chat.scrollHeight;
+		if (document.getElementById('selectFriend').textContent === data.from)
+		{
+        	const chat = document.getElementById('chatMessages');
+			const newMessage = document.createElement('div');
+			newMessage.classList.add('message');
+			newMessage.textContent = data.from + ': ' + data.message;
+			chat.appendChild(newMessage);
+			chat.scrollTop = chat.scrollHeight;
+		}
     };
 
     g_socket.onclose = function(event) {
@@ -89,6 +137,10 @@ function liveChat() {
 	g_socket.onerror = function(error) {
         console.error('WebSocket error:', error);
     };
+
+	g_socket.onopen = function() {
+		console.log('WebSocket connection opened');
+	}
 
 	if (search)
 		search.value = "";
@@ -132,6 +184,8 @@ function loadBar(event) {
 		// Find the 'selectFriend' element and append the link
 		var selectFriendElement = document.getElementById('selectFriend'); // Assuming you're using the ID
 		if (selectFriendElement) {
+			delprevconversation();
+			printallConversations(friendName);
 			selectFriendElement.textContent = ''; // Clear previous content
 			selectFriendElement.appendChild(link); // Append the new link
 		} else {
