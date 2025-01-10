@@ -19,6 +19,8 @@ function loadPage(path){
         allPage[path]();
     else if (allPage[path + '/'])
         allPage[path + '/']();
+    if (window.location.pathname === "/authe/login/")
+        document.getElementById("chat").style.display = "none";
 };
 
 function loadGames(){};
@@ -35,6 +37,7 @@ async function fetchAndReplaceContent(event)
 	if (response.ok) {
 		liveChat();
 		loadPage(event.target.getAttribute('href'));
+
 	}
 	return (content);
 }

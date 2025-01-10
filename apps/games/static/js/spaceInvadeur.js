@@ -6,6 +6,8 @@ function loadSpaceInvadersGame(){
 const canvas = document.getElementById('space-invadeur');
 const context = canvas.getContext('2d');
 const redButton = document.getElementById('redButton');
+const chatbox = document.getElementById('box');
+chatbox.style.display = "none";
 
 /*player*/
 
@@ -389,7 +391,6 @@ function initvariables()
 
 function startGame()
 {
-	console.log("HELLO")
 	if (start === 1)
 		return ;
 	countdown();
@@ -478,7 +479,9 @@ function keyhookdownforgame(event)
 					
 document.addEventListener('keydown', function(event)
 {
-	if (start === 1 && forcountdown === 0)
+	if (chatbox.style.display !== "none")
+		;
+	else if (start === 1 && forcountdown === 0)
 		keyhookdownforgame(event);
 });
 
@@ -533,6 +536,8 @@ function keyhookupforgame(event)
 
 document.addEventListener('keyup', function(event)
 {
+	if (chatbox.style.display !== "none")
+		return;
 	if (event.key === "r")
 		startGame();
 	else if (event.key === "o" || event.key === "O")

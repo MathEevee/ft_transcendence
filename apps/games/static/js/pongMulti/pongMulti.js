@@ -9,6 +9,8 @@ function loadPongMulti(){
 	const canvas = document.getElementById('pong');
 	const context = canvas.getContext('2d');
 	const redbutton = document.getElementById('red');
+	const chatbox = document.getElementById('box');
+	chatbox.style.display = "none";
 	
 	let speed = 14;
 	let start = 0;
@@ -98,10 +100,13 @@ function loadPongMulti(){
 	
 	function keyhookupforgame(event)
 	{
+
 	}
 	
 	document.body.addEventListener("keyup", (event) =>
 	{
+		if (chatbox.style.display === "block")
+			return ;
 		if (event.key === "r" || event.key === "R")
 			startPong();
 		else if (event.key === "p")

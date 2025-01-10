@@ -1,9 +1,11 @@
-function loadPong(){
+function loadPong() {
 	let interval = null;
 	const canvas = document.getElementById('pong');
 	const context = canvas.getContext('2d');
 	const redbutton = document.getElementById('red');
 	const bluebutton = document.getElementById('blue');
+	const chatbox = document.getElementById('box');
+	chatbox.style.display = "none";
 	
 	// Joueurs
 	const paddleWidth = 10;
@@ -261,12 +263,14 @@ function loadPong(){
 	
 	/* Mouvement des raquettes */
 	document.addEventListener("keydown", (event) =>
-		{
-			if (start === 1)
-				keyhookdownforgame(event);
-			else if (option === 1)
-				keyhookdownforoption(event);
-		});
+	{
+		if (chatbox.style.display !== "none")
+			return ;
+		else if (start === 1)
+			keyhookdownforgame(event);
+		else if (option === 1)
+			keyhookdownforoption(event);
+	});
 		
 	function keyhookupforoption(event)
 	{
@@ -339,6 +343,8 @@ function loadPong(){
 	
 	document.body.addEventListener("keyup", (event) =>
 	{
+		if (chatbox.style.display !== "none")
+			return ;
 		if (event.key === "r")
 			startPong();
 		else if (event.key === "b")

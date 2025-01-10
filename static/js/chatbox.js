@@ -1,18 +1,5 @@
-var g_socket;
-
-// function getLogin() {
-// 	fetch('/authe/api/me/')
-// 		.then(response => response.json())
-// 		.then(data => {
-// 			return (data['username']);
-// 		})
-// 		.catch((error) => {
-// 			console.error('Error:', error);
-// 		});
-// }
-
-// let username = getLogin();
-// console.log(username)
+var g_socket = new WebSocket('ws://localhost:8000/ws/');
+let chatopen = 0;
 
 function sendMessage() {
 	const message = document.getElementById('inputMessages').value;
@@ -59,9 +46,10 @@ function fetchFriendList() {
 		});
 }
 
-
-
 function liveChat() {
+
+	if (window.location.pathname === "/authe/login/" || window.location.pathname === "/authe/register/")
+		return;
 
 	const ChatButton = document.getElementById('chat');
 	const liveChat = document.getElementById('box');
@@ -69,11 +57,8 @@ function liveChat() {
 	const search = document.getElementById('addFriends');
 	const elemcontainer = document.getElementById('FriendList');
 	const selectFriend = document.getElementById('selectFriend');
-	// const linkFriend = document.getElementById('infoFriend');
 	fetchFriendList();
-	// console.log('chat',username);
 
-    g_socket = new WebSocket('ws://localhost:8000/ws/');
 	g_socket.onmessage = function(event) {
 		const data = JSON.parse(event.data);
         const chat = document.getElementById('chatMessages');
@@ -97,12 +82,14 @@ function liveChat() {
 		search.value = "";
 	
 	function openChat() {
+		chatopen = 1;
 		ChatButton.style.display = "none";
 		liveChat.style.display = "block";
 		elemcontainer.scrollTop = elemcontainer.scrollHeight;
 	}
 	
 	function closeChat() {
+		chatopen = 0;
 		liveChat.style.display = "none";
 		ChatButton.style.display = "flex";
 	}
