@@ -2,10 +2,16 @@ var g_socket = new WebSocket('ws://localhost:8000/ws/');
 
 function sendMessage() {
 	const message = document.getElementById('inputMessages').value;
+	const chat = document.getElementById('chatMessages');
+	const newMessage = document.createElement('div');
+	newMessage.classList.add('message');
 	if (message === '') {
 		return;
 	}
-	if (g_socket) {
+	newMessage.textContent = 'You: ' + message;
+	chat.appendChild(newMessage);
+	if (g_socket)
+	{
 		g_socket.send(JSON.stringify({
             'to': document.getElementById('selectFriend').textContent,
             'message': message,
@@ -30,6 +36,11 @@ function fetchFriendList() {
 			for (let i = 0; i < friendlist.length; i++) {
 				var newFriend = document.createElement("button");
 				newFriend.textContent = friendlist[i];
+				if (data[i].is_online)
+				{
+					newFriend.style.color = "lime";
+					newFriend.style.fontWeight = "bold";
+				}
 				newFriend.classList.add("friend");
 				if (elemcontainer == null)
 					return;
@@ -59,6 +70,9 @@ function liveChat() {
 
 	g_socket.onmessage = function(event) {
 		const data = JSON.parse(event.data);
+		if (data.from === undefined || data.message === undefined)
+			return;
+		console.log('WebSocket message received:', data);
         const chat = document.getElementById('chatMessages');
         const newMessage = document.createElement('div');
         newMessage.classList.add('message');
@@ -80,7 +94,6 @@ function liveChat() {
 		search.value = "";
 	
 	function openChat() {
-		console.log('openChat');
 		ChatButton.style.display = "none";
 		liveChat.style.display = "block";
 		elemcontainer.scrollTop = elemcontainer.scrollHeight;

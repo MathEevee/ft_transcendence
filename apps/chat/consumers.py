@@ -1,44 +1,72 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from apps.chat.globals import user_sockets, conversations
 # from django.contrib.auth import get_user_model
 # from asgiref.sync import sync_to_async
 
 # CustomUser = get_user_model()
 
+import json
+from channels.generic.websocket import AsyncWebsocketConsumer
 
+# Dictionnaire global pour stocker les connexions WebSocket par utilisateur
+user_sockets = {}
 
 class ChatConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
-		await self.accept()
-		print('new socket')
+		self.user = self.scope['user']
+		if self.user.is_authenticated:
+			user_sockets[self.user.username] = self
+			print(f'{self.user.username} connected')
+			await self.accept()
+
+		else:
+			await self.close()
 
 	async def disconnect(self, close_code):
-		await self.close()
-		print('close socket')
+		if self.user.username in user_sockets:
+			del user_sockets[self.user.username]
+			print(f'{self.user.username} disconnected')
 
 	async def receive(self, text_data):
-		text_data_json = json.loads(text_data)
-		print(text_data)
-		message = text_data_json['message']
-		to = text_data_json['to']
-		await self.send(text_data=json.dumps({
-			'message': message,
-			'from': self.scope["user"].username,
-			'to': to
-		}))
+		try:
+			data = json.loads(text_data)
+			message = data['message']
+			to_user = data['to']
 
-	async def send(self, text_data=None, bytes_data=None, close=False):
-		return await super().send(text_data, bytes_data, close)
-	
-	async def send_message(self, event):
-		message = event['message']
-		from_user = event['from']
-		to_user = event['to']
-		await self.send(text_data=json.dumps({
-			'message': message,
-			'from': from_user,
-			'to': to_user
-		}))
+			if to_user in user_sockets:
+				conversation_key = tuple(sorted([self.user.username, to_user]))
+
+				conversations[conversation_key].append({
+					'from': self.user.username,
+					'to': to_user,
+					'message': message
+				})
+
+				recipient_socket = user_sockets[to_user]
+				await recipient_socket.send(text_data=json.dumps({
+					'message': message,
+					'from': self.user.username,
+					'to': to_user
+				}))
+
+				await self.send(text_data=json.dumps({
+					'conversation': list(conversations[conversation_key])
+				}))
+			else:
+				await self.send(text_data=json.dumps({
+					'message': to_user + ' is not connected',
+					'from': 'admin',
+					'to': self.user.username
+				}))
+		except Exception as e:
+			print(f"Error in receive: {e}")
+			await self.send(text_data=json.dumps({
+				'message': 'An error occurred',
+				'from': 'admin',
+				'to': self.user.username
+			}))
+
 
 
 
