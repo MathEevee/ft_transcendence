@@ -15,4 +15,5 @@ urlpatterns = [
     path('authe/', include('apps.authe.urls')),
     # path('ws/', include(apps.chat.routing.websocket_urlpatterns)),  # pour websockets
 	# path('ws/', include('apps.chat.routing')),
+	path('account/<str:friendname>/', apps.profil.views.AccountView, name='account'),
 ]

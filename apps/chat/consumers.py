@@ -1,22 +1,17 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from apps.chat.globals import user_sockets, conversations, online_users, conv_rooms
+from apps.authe.models import CustomUser
+from asgiref.sync import sync_to_async
 # from django.contrib.auth import get_user_model
 # from asgiref.sync import sync_to_async
-
-# CustomUser = get_user_model()
-
-import json
-from channels.generic.websocket import AsyncWebsocketConsumer
-
-# Dictionnaire global pour stocker les connexions WebSocket par utilisateur
-user_sockets = {}
 
 class ChatConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.user = self.scope['user']
 		if self.user.is_authenticated:
 			user_sockets[self.user.username] = self
+			await sync_to_async(CustomUser.objects.filter(username=self.user.username).update)(is_online=True)
 			print(f'{self.user.username} connected')
 			online_users.add(self.user.username)
 			await self.accept()
@@ -27,6 +22,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 		if self.user.username in user_sockets:
 			del user_sockets[self.user.username]
 			online_users.remove(self.user.username)
+			await sync_to_async(CustomUser.objects.filter(username=self.user.username).update)(is_online=False)
 			print(f'{self.user.username} disconnected')
 
 	async def receive(self, text_data):
@@ -68,11 +64,3 @@ class ChatConsumer(AsyncWebsocketConsumer):
 				'from': 'admin',
 				'to': self.user.username
 			}))
-
-
-
-
-
-
-
-

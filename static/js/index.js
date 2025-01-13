@@ -1,3 +1,7 @@
+import { loadAccount } from "/static/js/account.js";
+import { liveChat } from "/static/js/chatbox.js";
+import { link } from "/static/js/chatbox.js";
+
 const allPage = {
     "/games/pong/local/": () => import("/static/js/pong.js").then(module => module.loadPong()),
     "/games/pong/solo/": () => import("/static/js/pong.js").then(module => module.loadPong()),
@@ -15,7 +19,9 @@ const allPage = {
 
 
 function loadPage(path) {
-    if (allPage[path]) {
+    if (window.location.pathname.includes('account/'))
+        loadAccount();
+    else if (allPage[path]) {
         allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
     } else if (allPage[path + '/']) {
         allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));

@@ -17,3 +17,6 @@ def profil_view(request):
         'games_won': 5,
     }
     return render(request, 'profil.html', {'user': request.user, 'stats': stats})
+
+def AccountView(request, friendname):
+    return render(request, 'account.html', {'friendname': friendname})

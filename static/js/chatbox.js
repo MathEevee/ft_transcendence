@@ -1,5 +1,6 @@
 var g_socket = new WebSocket('ws://localhost:8000/ws/chat/');
 var allconversations = [];
+let link;
 
 function sendMessage() {
 	const message = document.getElementById('inputMessages').value;
@@ -49,6 +50,11 @@ function fetchFriendList() {
 				{
 					newFriend.style.color = "lime";
 					newFriend.style.fontWeight = "bold";
+				}
+				else
+				{
+					newFriend.style.color = "red";
+					newFriend.style.fontWeight = "normal";
 				}
 				newFriend.classList.add("friend");
 				if (elemcontainer == null)
@@ -119,7 +125,26 @@ function liveChat() {
 			return;
 		retrieveConversations(data);
 		console.log('WebSocket message received:', data);
-		if (document.getElementById('selectFriend').textContent === data.from)
+		if (data.message.includes('not connected'))
+		{
+			let name = data.message.split(' ')[0];
+			elemcontainer.childNodes.forEach((element) => {
+				if (element.textContent === name)
+				{
+					element.style.color = "red";
+					element.style.fontWeight = "normal";
+				}
+			});
+
+			const chat = document.getElementById('chatMessages');
+			const newMessage = document.createElement('div');
+			newMessage.classList.add('message');
+			newMessage.textContent = data.from + ': ' + data.message;
+			chat.appendChild(newMessage);
+			chat.scrollTop = chat.scrollHeight;
+
+		}
+		else if (document.getElementById('selectFriend').textContent === data.from)
 		{
         	const chat = document.getElementById('chatMessages');
 			const newMessage = document.createElement('div');
@@ -127,6 +152,15 @@ function liveChat() {
 			newMessage.textContent = data.from + ': ' + data.message;
 			chat.appendChild(newMessage);
 			chat.scrollTop = chat.scrollHeight;
+
+			elemcontainer.childNodes.forEach((element) => {
+				console.log(data.from);
+				if (element.textContent === data.from)
+				{
+					element.style.color = "lime";
+					element.style.fontWeight = "bold";
+				}
+			});
 		}
     };
 
@@ -173,7 +207,7 @@ function liveChat() {
 function loadBar(event) {
 	if (event.type === 'click') {  // Fix: change to check for 'click' event type
 		// event.preventDefault();
-		var link = document.createElement("a");
+		link = document.createElement("a");
 
 		var friendName = event.target.textContent;
 
@@ -259,3 +293,5 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 });
+
+export {link , liveChat};
