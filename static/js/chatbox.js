@@ -154,7 +154,6 @@ function liveChat() {
 			chat.scrollTop = chat.scrollHeight;
 
 			elemcontainer.childNodes.forEach((element) => {
-				console.log(data.from);
 				if (element.textContent === data.from)
 				{
 					element.style.color = "lime";

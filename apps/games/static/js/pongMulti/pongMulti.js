@@ -12,7 +12,7 @@ function loadPongMulti(){
 	const chatbox = document.getElementById('box');
 	chatbox.style.display = "none";
 	
-	let speed = 14;
+	let speed = 5;
 	let start = 0;
 	const paddleHeight = 50;
 	const paddleWidth = 5;
@@ -29,6 +29,8 @@ function loadPongMulti(){
 		netcolor: colorpalette.white,
 		scorecolor: colorpalette.white,
 	};
+
+	var cplayer;
 
 	/*t_game*/
 	var t_game = {
@@ -70,37 +72,80 @@ function loadPongMulti(){
 	function draw()
 	{
 		t_game.background.draw(context, canvas, colorset);
-		t_game.background.drawhitbox(context, colorset);
 		t_game.player1.draw(context);
 		t_game.player2.draw(context);
 		t_game.player3.draw(context);
 		t_game.player4.draw(context);
 		t_game.ball.draw(context);
-		// t_game.ball.drawhitbox(context);
 	}
 
 	function update()
 	{
-		t_game.player1.update();
-		t_game.player2.update();
-		t_game.player3.update();
-		t_game.player4.update();
+		t_game.player1.update(canvas);
+		t_game.player2.update(canvas);
+		t_game.player3.update(canvas);
+		t_game.player4.update(canvas);
 		t_game.ball.update(canvas, t_game.background, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball);
 	}
 	
 	function keyhookdownforgame(event)
 	{
+		if (event.key === "ArrowLeft")
+		{
+			if (cplayer === t_game.player3)
+				t_game.player3.goLeft();
+			else if (cplayer === t_game.player4)
+				t_game.player4.goLeft();
+		}
+		else if (event.key === "ArrowRight")
+		{
+			if (cplayer === t_game.player3)
+				t_game.player3.goRight();
+			else if (cplayer === t_game.player4)
+				t_game.player4.goRight();
+		}
+		else if (event.key === "ArrowUp")
+		{
+			if (cplayer === t_game.player1)
+				t_game.player1.goUp();
+			else if (cplayer === t_game.player2)
+				t_game.player2.goUp();
+		}
+		else if (event.key === "ArrowDown")
+		{
+			if (cplayer === t_game.player1)
+				t_game.player1.goDown();
+			else if (cplayer === t_game.player2)
+				t_game.player2.goDown();
+		}
 	}
 	
 	/* Mouvement des raquettes */
 	document.addEventListener("keydown", (event) =>
 	{
+		if (chatbox.style.display === "block")
+			return ;
+		if (start === 1)
+			keyhookdownforgame(event);
 
 	});
 	
 	function keyhookupforgame(event)
 	{
-
+		if (event.key === "ArrowLeft" || event.key === "ArrowRight")
+		{
+			if (cplayer === t_game.player3)
+				t_game.player3.stop();
+			else if (cplayer === t_game.player4)
+				t_game.player4.stop();
+		}
+		else if (event.key === "ArrowUp" || event.key === "ArrowDown")
+		{
+			if (cplayer === t_game.player1)
+				t_game.player1.stop();
+			else if (cplayer === t_game.player2)
+				t_game.player2.stop();
+		}
 	}
 	
 	document.body.addEventListener("keyup", (event) =>
@@ -157,10 +202,10 @@ function loadPongMulti(){
 	
 	function initvariables()
 	{
-		t_game.player1 = new Player(paddleWidth, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team1, 1);
-		t_game.player2 = new Player(canvas.width - paddleWidth * 2, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team1, 1);
-		t_game.player3 = new Player(canvas.width / 2 - paddleHeight / 2, paddleWidth, paddleHeight, paddleWidth, colorset.team2, 2);
-		t_game.player4 = new Player(canvas.width / 2 - paddleHeight / 2, canvas.height - paddleWidth * 2, paddleHeight, paddleWidth, colorset.team2, 2);
+		t_game.player1 = new Player(paddleWidth, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team1, 1, speed);
+		t_game.player2 = new Player(canvas.width - paddleWidth * 2, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team1, 1, speed);
+		t_game.player3 = new Player(canvas.width / 2 - paddleHeight / 2, paddleWidth, paddleHeight, paddleWidth, colorset.team2, 2, speed);
+		t_game.player4 = new Player(canvas.width / 2 - paddleHeight / 2, canvas.height - paddleWidth * 2, paddleHeight, paddleWidth, colorset.team2, 2, speed);
 		var ballplassement = new point(0, 0);
 		ballplassement.x = Math.floor(Math.random() * 10);
 		if (ballplassement.x % 3 === 0)
@@ -191,16 +236,16 @@ function loadPongMulti(){
 			t_game.ball.dy = -1;
 		t_game.background = new background(0, 0, canvas.width, canvas.height, colorset.backgroundcolor, canvas);
 		start = 1;
+		cplayer = t_game.player1;
 	}
 	
 	function startPong()
 	{
 		if (start === 1)
 			return ;
-		// countdown();
+		countdown();
 		initvariables();
-		// setTimeout(loop, 5000);
-		loop();
+		setTimeout(loop, 5000);
 	}
 	
 	function wait()
