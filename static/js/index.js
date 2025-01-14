@@ -17,27 +17,32 @@ const allPage = {
 };
 
 function loadPage(path) {
-    if (window.location.pathname.includes('account/'))
+    if (path.includes('account/'))
         loadAccount();
     else if (allPage[path]) {
         allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
     } else if (allPage[path + '/']) {
         allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
     }
-    if (window.location.pathname === '/authe/login/')
+    if (path === '/authe/login/')
         document.getElementById('chat').style.display = 'none';
+}
+
+async function changePage(path, disableHistory) {
+    const response = await fetch(path);
+    if (response.ok) {
+        const content = await response.text();
+        if (!disableHistory)
+            history.pushState({}, '', response.url);
+        document.body.innerHTML = content;
+        liveChat();
+        loadPage(path);
+    }
 }
 
 async function fetchAndReplaceContent(event) {
     try {
-        const response = await fetch(event.target.getAttribute('href'));
-        if (response.ok) {
-            const content = await response.text();
-            history.pushState({}, '', response.url);
-            document.body.innerHTML = content;
-            liveChat();
-            loadPage(event.target.getAttribute('href'));
-        }
+        await changePage(event.target.getAttribute('href'));
     } catch (err) {
         console.error(`Error fetching content: ${err}`);
     }
@@ -64,3 +69,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+export { changePage }
