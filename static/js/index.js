@@ -1,6 +1,5 @@
 import { loadAccount } from "/static/js/account.js";
 import { liveChat } from "/static/js/chatbox.js";
-import { link } from "/static/js/chatbox.js";
 
 const allPage = {
     "/games/pong/local/": () => import("/static/js/pong.js").then(module => module.loadPong()),
@@ -16,7 +15,6 @@ const allPage = {
     "/games/spaceinvaders/tournament/": () => import("/static/js/tournament.js").then(module => module.setupPlayerList()),
     "/games/": () => import("/static/js/games.js").then(module => module.loadBtn()),
 };
-
 
 function loadPage(path) {
     if (window.location.pathname.includes('account/'))
