@@ -13,12 +13,19 @@ Profil
 {% include "navbar.html" %}
 <div class="row" style="margin:0;padding:0">
     <div class="col-md-8 offset-md-2">
-        <h1 class="text-center">Profile</h1>
+        <h1 class="text-center">Profil</h1>
         <div class="card mt-4">
             <div class="card-body">
-                <h3 class="card-title">{{ user.username }}</h3>
+                <h3 class="card-title text-center d-flex justify-content-center align-items-center">
+                    {{ user.username }}
+                    <span 
+                        class="status-icon {% if user.is_online %}online{% else %}offline{% endif %} ms-4" 
+                        title="{% if user.is_online %}Online{% else %}Offline{% endif %}">
+                    </span>
+                </h3>
                 <p>Email: {{ user.email }}</p>
                 <p>Joined: {{ user.date_joined|date:"F d, Y" }}</p>
+                <p>Last login: {{ user.last_login|date:"F d, Y H:i" }}</p>
                 <img    src="{{ user.profil_picture }}"
                         alt="Photo de profil"
                         class="img-thumbnail mx-auto d-block"
