@@ -1,26 +1,22 @@
 import requests
-import pprint
+# import pprint
 import logging
 import os
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
 from django.contrib import messages
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.conf import settings
 from django.utils.timezone import now
 from django.db.utils import IntegrityError
-from .models import CustomUser
-from .forms import RegistrationForm, LoginForm
-from .serializer import CustomUserSerializer
-from django.contrib.auth.decorators import login_required
-from apps.authe.decorators import logout_required
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.http import JsonResponse
-from apps.authe.models import Message
-from apps.authe.models import Tournament
-from .serializer import TournamentSerializer
 from rest_framework.permissions import AllowAny
+from .models import CustomUser, Message, Tournament
+from .forms import RegistrationForm, LoginForm
+from .serializer import CustomUserSerializer, TournamentSerializer
+from .decorators import logout_required
 
 logger = logging.getLogger(__name__)
 
@@ -71,8 +67,8 @@ def auth_callback(request):
 		messages.error(request, "Impossible de récupérer les informations utilisateur.")
 		return redirect('/')
 
-	# Débogage : affichez les données reçues dans la console
-	pprint.pprint(user_info)
+	# # Débogage : affichez les données reçues dans la console
+	# pprint.pprint(user_info)
 
 	# Sauvegarder ou connecter l'utilisateur ici
 	try:
@@ -86,7 +82,7 @@ def auth_callback(request):
 	user.last_login = now()
 	user.save()
 	messages.success(request, f"Bienvenue, {user.username}!")
-	return redirect(reverse('profil:profil'))
+	return redirect(reverse('profil:profil', kwargs={'username': user.username}))
 
 def save_user(user_info):
 	picture_url = user_info.get('image', {}).get('versions', {}).get('medium', '/static/pictures/user-avatar-01.png')
@@ -147,13 +143,26 @@ def login_view(request):
 			if user is not None:
 				login(request, user)
 				messages.success(request, "Connexion réussie !")
-				return redirect(reverse('profil:profil'))
+				return redirect(reverse('profil:profil', kwargs={'username': username}))
 			else:
 				messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
 	else:
 		form = LoginForm()
 	return render(request, 'login.html', {'form': form})
 
+@login_required
+def logout_view(request):
+    logout(request)
+    messages.success(request, "Déconnexion réussie !")
+    return redirect(reverse('authe:login'))
+
+# @login_required
+# def get_profil_view(request, name):
+# 	try:
+# 		user = CustomUser.objects.get(username = name)
+# 		return JsonResponse({'email': user.email})
+# 	except CustomUser.DoesNotExist:
+# 		return JsonResponse({'error': True})
 
 class CustomUserAPIView(APIView):
 	def get(self, request):
@@ -167,13 +176,6 @@ class MessageAPIView(APIView):
 		messages = Message.objects.all()
 		return Response({'messages': messages})
 
-@login_required
-def get_profil_view(request, name):
-	try:
-		user = CustomUser.objects.get(username = name)
-		return JsonResponse({'email': user.email})
-	except CustomUser.DoesNotExist:
-		return JsonResponse({'error': True})
 
 class MeAPIView(APIView):
 	def get(self, request):

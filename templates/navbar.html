@@ -9,25 +9,25 @@
                 <!-- Home -->
                 <li class="nav-item">
                     <a class="nav-link" href="/">
-                    <i class="bi bi-house-door" href="/"></i> Home
+                    <i class="bi bi-house-door"></i> Home
                     </a>
                 </li>
                 <!-- Game -->
                 <li class="nav-item">
                     <a class="nav-link" href="/games">
-                        <i class="bi bi-controller" href="/games"></i> Games
+                        <i class="bi bi-controller"></i> Games
                     </a>
                 </li>
                 <!-- Profile -->
                 <li class="nav-item">
-                    <a class="nav-link" href="/profil">
-                    <i class="bi bi-person" href="/profil"></i> Profile
+                    <a class="nav-link" href="{% url 'profil:profil' username=request.user.username %}">
+                    <i class="bi bi-person"></i> Profil
                     </a>
                 </li>
                 <!-- Logout -->
                 <li class="nav-item">
                     <a class="nav-link text-danger" href="/profil/logout">
-                    <i class="bi bi-box-arrow-right" href="/profil/logout"></i> Logout
+                    <i class="bi bi-box-arrow-right"></i> Logout
                     </a>
                 </li>
                 {% if is_staff %}

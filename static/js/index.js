@@ -1,4 +1,4 @@
-import { loadAccount } from "/static/js/account.js";
+// import { loadAccount } from "/static/js/account.js";
 import { liveChat } from "/static/js/chatbox.js";
 
 const allPage = {
@@ -17,13 +17,13 @@ const allPage = {
 };
 
 function loadPage(path) {
-    if (path.includes('account/'))
-        loadAccount();
-    else if (allPage[path]) {
-        allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
-    } else if (allPage[path + '/']) {
-        allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
-    }
+    // if (path.includes('account/'))
+    //     loadAccount();
+    // else if (allPage[path]) {
+    //     allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
+    // } else if (allPage[path + '/']) {
+    //     allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
+    // }
     if (path === '/authe/login/')
         document.getElementById('chat').style.display = 'none';
 }

@@ -16,7 +16,7 @@ Profil
         <h1 class="text-center">Profile</h1>
         <div class="card mt-4">
             <div class="card-body">
-                <h3 class="card-title">Hello, {{ user.username }}!</h3>
+                <h3 class="card-title">{{ user.username }}</h3>
                 <p>Email: {{ user.email }}</p>
                 <p>Joined: {{ user.date_joined|date:"F d, Y" }}</p>
                 <img    src="{{ user.profil_picture }}"

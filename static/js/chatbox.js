@@ -107,7 +107,7 @@ function delprevconversation() {
 
 function liveChat() {
 
-	if (window.location.pathname === "/authe/login/" || window.location.pathname === "/authe/register/")
+	if (window.location.pathname.substring(0, 7) === "/authe/")
 		return;
 
 	const ChatButton = document.getElementById('chat');
@@ -211,7 +211,7 @@ function loadBar(event) {
 		var friendName = event.target.textContent;
 
 		// Correct the link, add http:// to make it a valid URL
-		link.href = "/account/" + friendName + "/";
+		link.href = "/profil/" + friendName + "/";
 		link.textContent = friendName;
 
 		// Find the 'selectFriend' element and append the link
