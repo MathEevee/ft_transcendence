@@ -12,9 +12,11 @@ from django.db.utils import IntegrityError
 from .models import CustomUser
 from .forms import RegistrationForm, LoginForm
 from .serializer import CustomUserSerializer
+from django.contrib.auth.decorators import login_required
 from apps.authe.decorators import logout_required
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.http import JsonResponse
 from apps.authe.models import Message
 from apps.authe.models import Tournament
 from .serializer import TournamentSerializer
@@ -164,7 +166,15 @@ class MessageAPIView(APIView):
 		# Récupérer les messages
 		messages = Message.objects.all()
 		return Response({'messages': messages})
-	
+
+@login_required
+def get_profil_view(request, name):
+	try:
+		user = CustomUser.objects.get(username = name)
+		return JsonResponse({'email': user.email})
+	except CustomUser.DoesNotExist:
+		return JsonResponse({'error': True})
+
 class MeAPIView(APIView):
 	def get(self, request):
 		# Récupérer les informations de l'utilisateur connecté
