@@ -16,6 +16,9 @@ from apps.authe.decorators import logout_required
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from apps.authe.models import Message
+from apps.authe.models import Tournament
+from .serializer import TournamentSerializer
+from rest_framework.permissions import AllowAny
 
 logger = logging.getLogger(__name__)
 
@@ -170,3 +173,36 @@ class MeAPIView(APIView):
 			return Response(serializer.data)
 		else:
 			return Response({'error': 'Vous n\'êtes pas connecté.'}, status=401)
+		
+class TournamentAPIView(APIView):
+	permission_classes = [AllowAny]
+
+	def get(self, request):
+		data = request.data
+		if 'id' in data:
+			tournament = Tournament.objects.get(id=data.get('id'))
+			serializer = TournamentSerializer(tournament)
+			return Response(serializer.data)
+		tournaments = Tournament.objects.all()
+		serializer = TournamentSerializer(tournaments, many=True)
+		return Response(serializer.data)
+	
+	def post(self, request):
+		serializer = TournamentSerializer(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data, status=201)
+		return Response(serializer.errors, status=400)
+	
+	def put(self, request):
+		tournament = Tournament.objects.get(id=request.data.get('id'))
+		serializer = TournamentSerializer(tournament, data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data, status=200)
+		return Response(serializer.errors, status=400)
+	
+	def delete(self, request):
+		tournament = Tournament.objects.get(id=request.data.get('id'))
+		tournament.delete()
+		return Response(status=204)

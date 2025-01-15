@@ -176,26 +176,22 @@ class Ball
 		} // player1
 		else if (ispointinrectangle(trajectory, player1.hitbox))
 		{
-			console.log("player1 collision");
 			ball.dx = -ball.dx;
 			return (1);
 		} // player2
 		else if (ispointinrectangle(trajectory, player2.hitbox))
 		{
-			console.log("player2 collision");
 			ball.dx = -ball.dx;
 			return (1);
 		} // player3
 		else if (ispointinrectangle(trajectory, player3.hitbox))
 		{
-			console.log("player3 collision");
 			ball.dy = -ball.dy;
 			return (1);
 
 		} // player4
 		else if (ispointinrectangle(trajectory, player4.hitbox))
 		{
-			console.log("player4 collision");
 			ball.dy = -ball.dy;
 			return (1);
 		}

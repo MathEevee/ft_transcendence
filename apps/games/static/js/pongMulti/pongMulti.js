@@ -236,7 +236,7 @@ function loadPongMulti(){
 			t_game.ball.dy = -1;
 		t_game.background = new background(0, 0, canvas.width, canvas.height, colorset.backgroundcolor, canvas);
 		start = 1;
-		cplayer = t_game.player1;
+		cplayer = t_game.player4;
 	}
 	
 	function startPong()

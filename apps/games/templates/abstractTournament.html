@@ -9,8 +9,10 @@ Tournament
 <link rel="stylesheet" href="{% static 'css/tournament.css' %}">
 {% endblock %}
 
+
 {% block content %}
 {% include "navbar.html" %}
+<meta name="csrf-token" content="{{ csrf_token }}">
 <div id="games-container">
     <h1>{% block heading %}Default Heading{% endblock %}</h1>
 	<table id="games-table">
@@ -21,13 +23,9 @@ Tournament
 	</table>
 	<div id="games-buttons">
 		<button id="add-player">Join</button>
+		<input type="text" id="player-name" placeholder="Invite a player">
 		<button id="start-tournament">Start Tournament</button>
 	</div>
-	<div id="players-list-container">
-        <h2>Players in the Tournament:</h2>
-        <ul id="players-list">
-            <!-- dynamic via js -->
-        </ul>
     </div>
 </div>
 {% endblock %}
