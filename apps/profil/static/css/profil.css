@@ -57,55 +57,6 @@ body {
 
 .list-group {
     background-color: #1a0033;
-<<<<<<< HEAD
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px #cd6aff;
-    margin-top: 1.5rem;
-}
-
-.list-group-item {
-    background-color: #120052;
-    color: #ffffff;
-    border: none;
-    border-bottom: 1px solid #cd6aff;
-    font-size: 1rem;
-    padding: 10px 15px;
-}
-
-.list-group-item:last-child {
-    border-bottom: none;
-}
-
-.logout-link {
-    text-align: center;
-    margin-top: 2rem;
-}
-
-.logout-link a {
-    color: #e74c3c;
-    font-size: 1.2rem;
-    text-decoration: none;
-    padding: 0.5rem 1.5rem;
-    border-radius: 8px;
-    background-color: #120052;
-    box-shadow: 0px 0px 10px #e74c3c;
-    transition: background-color 0.3s, transform 0.3s;
-    display: inline-block;
-}
-
-.logout-link a:hover {
-    transform: scale(1.05);
-}
-
-.container {
-    margin-top: 20px;
-}
-
-h1, h4 {
-    color: #ffffff;
-    text-shadow: 0px 0px 10px #ff00ff, 0px 0px 20px #ff00ff;
-}
-=======
     color: #ffffff;
     padding: 20px;
     border-radius: 5px;
@@ -174,4 +125,3 @@ h3.card-title {
 .mx-auto, .d-block{
     display:none;
 } */
->>>>>>> matde-ol
