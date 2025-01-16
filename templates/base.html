@@ -17,6 +17,7 @@
         <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
         <link rel="stylesheet" href="{% static 'css/chatbox.css' %}">
         <link rel="shortcut icon" href="{% static 'pictures/favicon.ico' %}" type="image/x-icon">
+        <meta name="csrf_token" content="{{ csrf_token }}" />
         {% block css %}
         {% endblock %}
     </head>

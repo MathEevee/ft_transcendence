@@ -37,6 +37,7 @@ function loadPong() {
 	
 	let start = 0;
 	let option = 0;
+	let gameId;
 	
 	//options
 	const colorpalette = ["#FFFFFF", "#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"];
@@ -432,6 +433,7 @@ function loadPong() {
 			context.fillStyle = colorset.fontcolor;
 			context.fillText(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!", canvas.width / 2 - sizeofstringdisplayed(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!").width / 2, canvas.height / 2);
 			setTimeout(wait, 2000);
+			//send end game score + set gameid = NULL 
 			start = 0;
 			return 1;
 		}
@@ -574,6 +576,22 @@ function loadPong() {
 		start = 1;
 		if (gamemode === "solo" && start === 1)
 		{
+			console.log()
+			fetch('/games/local-ia-start/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content')
+				},
+				body: JSON.stringify({
+					'type' : '1v1',
+					'started_at': Date.now(),
+				})
+			})
+			.then(response => response.json())
+			.then(data => {
+				gameId = data.id;
+			})
 			setTimeout(() => {
 				interval = setInterval(updateAI, 1000);
 			}, 5000);
