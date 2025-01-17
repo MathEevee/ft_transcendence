@@ -5,12 +5,7 @@ const allPage = {
     "/games/pong/solo/": () => import("/static/js/pong.js").then(module => module.loadPong()),
     "/games/pong/online/": () => import("/static/js/pongMulti/pongMulti.js").then(module => module.loadPongMulti()),
     "/games/spaceinvaders/": () => import("/static/js/spaceInvadeur.js").then(module => module.loadSpaceInvadersGame()),
-    "/games/pong/tournament/": async () => {
-        const { PongTournament } = await import("/static/js/pongMulti/PongTournament.js");
-        const { loadTournament } = await import("/static/js/tournament.js");
-        PongTournament();
-        loadTournament();
-    },
+    "/games/pong/tournament/": () => import("/static/js/tournament.js").then(module => module.loadTournament()),
     "/games/spaceinvaders/tournament/": () => import("/static/js/tournament.js").then(module => module.loadTournament()),
     "/games/": () => import("/static/js/games.js").then(module => module.loadBtn()),
 };
