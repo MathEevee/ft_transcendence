@@ -220,7 +220,7 @@ class TournamentAPIView(APIView):
 			tournament = obj.first()
 			
 		# Vérifier les données reçues
-		if not tournament_id or not username:
+		if not username:
 			return Response(
 				{"error": "Tournament ID and username are required."},
 				status=status.HTTP_400_BAD_REQUEST,

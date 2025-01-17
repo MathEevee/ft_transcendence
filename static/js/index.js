@@ -7,9 +7,7 @@ const allPage = {
     "/games/pong/online/": () => import("/static/js/pongMulti/pongMulti.js").then(module => module.loadPongMulti()),
     "/games/spaceinvaders/": () => import("/static/js/spaceInvadeur.js").then(module => module.loadSpaceInvadersGame()),
     "/games/pong/tournament/": async () => {
-        const { PongTournament } = await import("/static/js/pongMulti/PongTournament.js");
         const { loadTournament } = await import("/static/js/tournament.js");
-        PongTournament();
         loadTournament();
     },
     "/games/spaceinvaders/tournament/": () => import("/static/js/tournament.js").then(module => module.loadTournament()),
@@ -23,7 +21,7 @@ function loadPage(path) {
         allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
     } else if (allPage[path + '/']) {
         allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
-    }
+    }   
     if (path.substring(0, 7) === "/authe/")
         document.getElementById('chat').style.display = 'none';
 }
