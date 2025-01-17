@@ -2,7 +2,7 @@ import requests
 # import pprint
 import logging
 import os
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -10,10 +10,11 @@ from django.urls import reverse
 from django.conf import settings
 from django.utils.timezone import now
 from django.db.utils import IntegrityError
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from .models import CustomUser, Message, Tournament
+from .models import CustomUser, Message, Tournament, PlayerEntry
 from .forms import RegistrationForm, LoginForm
 from .serializer import CustomUserSerializer, TournamentSerializer
 from .decorators import logout_required
@@ -152,9 +153,9 @@ def login_view(request):
 
 @login_required
 def logout_view(request):
-    logout(request)
-    messages.success(request, "Déconnexion réussie !")
-    return redirect(reverse('authe:login'))
+	logout(request)
+	messages.success(request, "Déconnexion réussie !")
+	return redirect(reverse('authe:login'))
 
 # @login_required
 # def get_profil_view(request, name):
@@ -199,23 +200,49 @@ class TournamentAPIView(APIView):
 		serializer = TournamentSerializer(tournaments, many=True)
 		return Response(serializer.data)
 	
-	def post(self, request):
-		request.data["players"] = [request.user.id]
-		serializer = TournamentSerializer(data=request.data)
-		if serializer.is_valid():
-			serializer.save()
-			return Response(serializer.data, status=201)
-		return Response(serializer.errors, status=400)
-	
-	def put(self, request):
-		tournament = Tournament.objects.get(id=request.data.get('id'))
-		serializer = TournamentSerializer(tournament, data=request.data)
-		if serializer.is_valid():
-			serializer.save()
-			return Response(serializer.data, status=200)
-		return Response(serializer.errors, status=400)
-	
-	def delete(self, request):
-		tournament = Tournament.objects.get(id=request.data.get('id'))
-		tournament.delete()
-		return Response(status=204)
+	def post(self, request, *args, **kwargs):
+		# Récupérer les données envoyées par le POST
+		tournament_id = request.data.get('tournament_id')
+		username = request.data.get('username')
+		team_name = request.data.get('team_name', None)  # Optionnel
+
+		# Vérifier les données reçues
+		if not tournament_id or not username:
+			return Response(
+				{"error": "Tournament ID and username are required."},
+				status=status.HTTP_400_BAD_REQUEST,
+			)
+
+		# Récupérer le tournoi et l'utilisateur
+		print(tournament_id)
+		tournament = get_object_or_404(Tournament, type_pong=tournament_id)
+		player = get_object_or_404(CustomUser, username=username)
+
+		# Vérifier si le tournoi est plein
+		if tournament.player_entries.count() >= 8:
+			return Response(
+				{"error": "Tournament is already full."},
+				status=status.HTTP_400_BAD_REQUEST,
+			)
+
+		# Ajouter le joueur au tournoi via PlayerEntry
+		player_entry, created = PlayerEntry.objects.get_or_create(
+			tournament=tournament, player=player, defaults={"team_name": team_name}
+		)
+
+		if not created:
+			return Response(
+				{"error": "Player is already in the tournament."},
+				status=status.HTTP_400_BAD_REQUEST,
+			)
+
+		# Réponse réussie
+		return Response(
+			{
+				"message": "Player added to tournament successfully.",
+				"tournament_id": tournament.id,
+				"player": player.username,
+				"team_name": player_entry.team_name,
+			},
+			status=status.HTTP_200_OK,
+		)

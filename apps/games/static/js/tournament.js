@@ -6,6 +6,9 @@ function randomTeamName()
 	return (teamname[Math.floor(Math.random() * teamname.length)] + " " + teamadjective[Math.floor(Math.random() * teamadjective.length)]);
 }
 
+const teamName = randomTeamName();
+const tournamentId = window.location.pathname.split('/')[2] === 'pong';
+
 async function getUserName() {
 	const response = await fetch('/authe/api/me/');
 	const data = await response.json();
@@ -32,7 +35,7 @@ async function displayPlayerTournament()
 						const cell = document.createElement('td');
 						const text = document.createTextNode(player);
 						const teamcell = document.createElement('td');
-						const team = document.createTextNode(randomTeamName());
+						const team = document.createTextNode(teamName);
 
 						cell.appendChild(text);
 						teamcell.appendChild(team);
@@ -62,7 +65,6 @@ export async function setupPlayerList()
 		{
 			players.add(username);
 			const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-			console.log(csrftoken);
 			fetch('/authe/api/tournaments/', {
 				method: 'POST',
 				headers: {
@@ -71,11 +73,9 @@ export async function setupPlayerList()
 				},
 				body: JSON.stringify(
 					{
-						"id": Math.floor(Math.random() * 1000),
-						"game": window.location.pathname.split('/')[2],
-						"players": Array.from(players),
-						"status": "waiting",
-						"created_at": new Date().toISOString(),
+						tournament_id: tournamentId,
+						username: username,
+						team_name: teamName,
 					}
 				),
 			}).then(() => {
@@ -83,7 +83,7 @@ export async function setupPlayerList()
 				const cell = document.createElement('td');
 				const text = document.createTextNode(username);
 				const teamcell = document.createElement('td');
-				const team = document.createTextNode(randomTeamName());
+				const team = document.createTextNode(teamName);
 
 				cell.appendChild(text);
 				teamcell.appendChild(team);

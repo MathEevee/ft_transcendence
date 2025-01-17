@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, Tournament
+from .models import CustomUser, Tournament, PlayerEntry
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
@@ -15,11 +15,19 @@ class CustomUserAdmin(UserAdmin):
 @admin.register(Tournament)
 class TournamentAdmin(admin.ModelAdmin):
     model = Tournament
-    list_display = ['get_players', 'teamname', 'status', 'started', 'created_at', 'started_at', 'ended_at','winner']
-    list_filter = ['status', 'started']
-    search_fields = ['teamname']
+    list_display = ['id', 'type_pong', 'get_players', 'status', 'started', 'created_at', 'started_at', 'ended_at','winner']
+    list_filter = ['status', 'started', 'type_pong']
+    search_fields = ['status', 'player_entries__player__username', 'player_entries__team_name']
 
     def get_players(self, obj):
-        return ", ".join([player.username for player in obj.players.all()])
-    get_players.short_description = "Players"
+        return ", ".join(
+            [f"{e.player.username} (Team: {e.team_name})" for e in obj.player_entries.all()])
+    get_players.short_description = "Players (Team)"
 
+@admin.register(PlayerEntry)
+class PlayerEntryAdmin(admin.ModelAdmin):
+    model = PlayerEntry
+
+    # Colonnes à afficher dans la liste des entrées de joueurs
+    list_display = ['tournament', 'player', 'team_name']
+    search_fields = ['tournament__id', 'player__username', 'team_name']
