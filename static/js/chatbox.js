@@ -48,6 +48,7 @@ function fetchFriendList() {
 			for (let i = 0; i < friendlist.length; i++) {
 				var newFriend = document.createElement("button");
 				newFriend.textContent = friendlist[i];
+				
 				if (data[i].is_online)
 				{
 					newFriend.style.color = "lime";
@@ -119,7 +120,7 @@ function liveChat() {
 	const elemcontainer = document.getElementById('FriendList');
 	const selectFriend = document.getElementById('selectFriend');
 
-	fetchFriendList();
+	setTimeout(fetchFriendList, 100);
 
 	g_socket.onmessage = function(event) {
 		const data = JSON.parse(event.data);
@@ -295,4 +296,4 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 });
 
-export {link , liveChat};
+export {link , liveChat, allconversations}
