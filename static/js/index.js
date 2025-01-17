@@ -19,12 +19,12 @@ const allPage = {
 function loadPage(path) {
     // if (path.includes('account/'))
     //     loadAccount();
-    // else if (allPage[path]) {
-    //     allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
-    // } else if (allPage[path + '/']) {
-    //     allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
-    // }
-    if (path === '/authe/login/')
+    if (allPage[path]) {
+        allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
+    } else if (allPage[path + '/']) {
+        allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
+    }
+    if (path.substring(0, 7) === "/authe/")
         document.getElementById('chat').style.display = 'none';
 }
 
