@@ -8,11 +8,11 @@ const allPage = {
     "/games/spaceinvaders/": () => import("/static/js/spaceInvadeur.js").then(module => module.loadSpaceInvadersGame()),
     "/games/pong/tournament/": async () => {
         const { PongTournament } = await import("/static/js/pongMulti/PongTournament.js");
-        const { setupPlayerList } = await import("/static/js/tournament.js");
+        const { loadTournament } = await import("/static/js/tournament.js");
         PongTournament();
-        setupPlayerList();
+        loadTournament();
     },
-    "/games/spaceinvaders/tournament/": () => import("/static/js/tournament.js").then(module => module.setupPlayerList()),
+    "/games/spaceinvaders/tournament/": () => import("/static/js/tournament.js").then(module => module.loadTournament()),
     "/games/": () => import("/static/js/games.js").then(module => module.loadBtn()),
 };
 

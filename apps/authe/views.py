@@ -18,6 +18,7 @@ from .models import CustomUser, Message, Tournament, PlayerEntry
 from .forms import RegistrationForm, LoginForm
 from .serializer import CustomUserSerializer, TournamentSerializer
 from .decorators import logout_required
+from django.http import JsonResponse
 
 logger = logging.getLogger(__name__)
 
@@ -206,19 +207,26 @@ class TournamentAPIView(APIView):
 		username = request.data.get('username')
 		team_name = request.data.get('team_name', None)  # Optionnel
 
+		# creer un tournoi si il n'existe pas
+		# if not any(obj['type_pong'] == tournament_id for obj in Tournament.objects.all().values('type_pong')):
+		# 	tournament = Tournament.objects.create(type_pong=tournament_id)
+		# 	tournament.save()
+
+		obj = Tournament.objects.filter(type_pong=tournament_id)
+		if not obj.exists():
+			tournament = Tournament.objects.create(type_pong=tournament_id)
+			tournament.save()
+		else:
+			tournament = obj.first()
+			
 		# Vérifier les données reçues
 		if not tournament_id or not username:
 			return Response(
 				{"error": "Tournament ID and username are required."},
 				status=status.HTTP_400_BAD_REQUEST,
 			)
-		
-		# creer un tournoi si la db est vide
-		if Tournament.objects.count() == 0:
-			Tournament.objects.create(type_pong=tournament_id)
 
 		# Récupérer le tournoi et l'utilisateur
-		print(tournament_id)
 		tournament = get_object_or_404(Tournament, type_pong=tournament_id)
 		player = get_object_or_404(CustomUser, username=username)
 
@@ -237,7 +245,7 @@ class TournamentAPIView(APIView):
 		if not created:
 			return Response(
 				{"error": "Player is already in the tournament."},
-				status=status.HTTP_400_BAD_REQUEST,
+				status=status.HTTP_200_OK,
 			)
 
 		# Réponse réussie
