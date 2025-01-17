@@ -1,4 +1,3 @@
-// import { loadAccount } from "/static/js/account.js";
 import { liveChat } from "/static/js/chatbox.js";
 
 const allPage = {
@@ -17,15 +16,8 @@ const allPage = {
 };
 
 function loadPage(path) {
-    // if (path.includes('account/'))
-    //     loadAccount();
-    if (allPage[path]) {
+    if (allPage[path])
         allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
-    } else if (allPage[path + '/']) {
-        allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
-    }
-    if (path.substring(0, 7) === "/authe/")
-        document.getElementById('chat').style.display = 'none';
 }
 
 async function changePage(path, disableHistory) {
@@ -35,7 +27,8 @@ async function changePage(path, disableHistory) {
         if (!disableHistory)
             history.pushState({}, '', response.url);
         document.body.innerHTML = content;
-        liveChat();
+        if (!window.location.pathname.startsWith("/authe/"))
+            liveChat();
         loadPage(path);
     }
 }
@@ -47,6 +40,7 @@ async function fetchAndReplaceContent(event) {
         console.error(`Error fetching content: ${err}`);
     }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     loadPage(window.location.pathname);
 
@@ -69,5 +63,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-export { changePage }

@@ -1,4 +1,6 @@
-var g_socket = new WebSocket('ws://localhost:8000/ws/chat/');
+if (!window.location.pathname.startsWith('/authe/'))
+    var g_socket = new WebSocket('ws://localhost:8000/ws/chat/');
+
 var allconversations = [];
 let link;
 
