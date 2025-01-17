@@ -11,8 +11,16 @@ const allPage = {
 };
 
 function loadPage(path) {
+    console.log(path)
     if (allPage[path])
         allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
+    // else if (allPage[path + '/'])
+    //     allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
+    if (window.location.pathname.startsWith('/authe/')) {
+        var chatBtn = document.getElementById('chat')
+        if (chatBtn)
+            chatBtn.style.display = 'none';
+    }
 }
 
 async function changePage(path, disableHistory) {
