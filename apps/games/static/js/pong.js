@@ -434,6 +434,24 @@ function loadPong() {
 			context.fillText(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!", canvas.width / 2 - sizeofstringdisplayed(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!").width / 2, canvas.height / 2);
 			setTimeout(wait, 2000);
 			//send end game score + set gameid = NULL 
+			fetch('/games/local-ia-end/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+				},
+				body: JSON.stringify({
+					'id' : gameId,
+					'ended_at': Date.now(),
+					'score_player': score1,
+					'score_IA': score2,
+				})
+			})
+			.then(response => response.json())
+			.then(data => {
+				console.log(data);
+				gameId = null;
+			})
 			start = 0;
 			return 1;
 		}
@@ -576,7 +594,6 @@ function loadPong() {
 		start = 1;
 		if (gamemode === "solo" && start === 1)
 		{
-			console.log()
 			fetch('/games/local-ia-start/', {
 				method: 'POST',
 				headers: {

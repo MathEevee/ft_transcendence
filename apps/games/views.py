@@ -43,19 +43,22 @@ def start_game_local_IA(request):
 
 @login_required
 def end_game_local_IA(request):
+    print(request.body)
     data = json.loads(request.body)
     try:
         game = Game.objects.get(id=data['id'])
         if (game.ended_at != None):
             return JsonResponse({'error': True, 'message':'Game already end'})
-        players = Player.objects.filter(game = game).order_by('is_IA').values()
-        game.ended_at = data['ended_at']
-        players[0].score = data['score_IA']
-        players[1].score = data['score_player']
-        players[0].save()
-        players[1].save()
-        # players.save()
+        player = Player.objects.get(game = game, is_IA = False)
+        player_ia = Player.objects.get(game = game, is_IA = True)
+        game.ended_at = datetime.datetime.fromtimestamp(data['ended_at'] / 1000)
+        player.score = data['score_player']
+        player_ia.score = data['score_IA']
+        player.save()
+        player_ia.save()
         game.save()
         return JsonResponse({'error':False})
     except Game.DoesNotExist:
-        return JsonResponse({'error': True, 'message':'Invalid ID'})
+            return JsonResponse({'error': True, 'message':'Invalid ID'})
+    except Player.DoesNotExist:
+        return JsonResponse({'error': True, 'message':'Invalid Player ID'})
