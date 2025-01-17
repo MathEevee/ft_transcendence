@@ -212,6 +212,10 @@ class TournamentAPIView(APIView):
 				{"error": "Tournament ID and username are required."},
 				status=status.HTTP_400_BAD_REQUEST,
 			)
+		
+		# creer un tournoi si la db est vide
+		if Tournament.objects.count() == 0:
+			Tournament.objects.create(type_pong=tournament_id)
 
 		# Récupérer le tournoi et l'utilisateur
 		print(tournament_id)

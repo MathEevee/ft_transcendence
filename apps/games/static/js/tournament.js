@@ -20,32 +20,33 @@ async function displayPlayerTournament()
 	const response = await fetch('/authe/api/tournaments/');
 	const data = await response.json();
 	const tabplayers = document.getElementById('games-table');
-	const players = new Set();
+	let players = new Set();
 
-	if (data.length > 0)
+	console.log(data);
+	for (let i = 0; i < data.length; i++)
 	{
-		data.forEach((tournament) => {
-			if (tournament.game === window.location.pathname.split('/')[2])
+		{
+			if (data[i].type_pong === tournamentId)
 			{
-				tournament.players.forEach((player) => {
-					if (players.has(player) === false)
-					{
-						players.add(player);
-						const row = document.createElement('tr');
-						const cell = document.createElement('td');
-						const text = document.createTextNode(player);
-						const teamcell = document.createElement('td');
-						const team = document.createTextNode(teamName);
+				console.log(data[i]);
+				players = data[i].player_entries;
+				console.log(players);
+				for (let j = 0; j < players.length; j++)
+				{
+					const row = document.createElement('tr');
+					const cell = document.createElement('td');
+					const text = document.createTextNode(players[j].player.username);
+					const teamcell = document.createElement('td');
+					const team = document.createTextNode(players[j].team_name);
 
-						cell.appendChild(text);
-						teamcell.appendChild(team);
-						row.appendChild(cell);
-						row.appendChild(teamcell);
-						tabplayers.appendChild(row);
-					}
-				});
+					cell.appendChild(text);
+					teamcell.appendChild(team);
+					row.appendChild(cell);
+					row.appendChild(teamcell);
+					tabplayers.appendChild(row);
+				}
 			}
-		});
+		}
 	}
 }
 
