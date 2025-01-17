@@ -200,6 +200,7 @@ class TournamentAPIView(APIView):
 		return Response(serializer.data)
 	
 	def post(self, request):
+		request.data["players"] = [request.user.id]
 		serializer = TournamentSerializer(data=request.data)
 		if serializer.is_valid():
 			serializer.save()

@@ -21,17 +21,15 @@ class Message(models.Model):
 		return f"Message from {self.author.username}"
 	
 class Tournament(models.Model):
-	id = models.AutoField(primary_key=True, unique=True, null=False)
-	game = models.CharField(max_length=255, null=True, blank=True)
-	player = models.ManyToManyField(CustomUser, related_name='tournament_as_player')
+	players = models.ManyToManyField(CustomUser, related_name='tournament_players')
 	teamname = models.CharField(max_length=255, null=True, blank=True)
 	status = models.CharField(max_length=255, default='pending')
 	started = models.BooleanField(default=False)
 	created_at = models.DateTimeField(auto_now_add=True)
 	started_at = models.DateTimeField(null=True, blank=True)
 	ended_at = models.DateTimeField(null=True, blank=True)
-	winner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='tournament_as_winner', null=True, blank=True)
+	winner = models.ForeignKey(CustomUser, related_name='tournament_winner', on_delete=models.CASCADE, null=True, blank=True)
 
 	def __str__(self):
-		return f"Tournament {self.id} for {self.game}"
+		return f"Tournament Pong : {self.status}"
 	
