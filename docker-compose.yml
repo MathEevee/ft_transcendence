@@ -1,0 +1,43 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    volumes:
+      - db-postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./secrets
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      # POSTGRES_HOST_AUTH_METHOD: trust
+
+  backend:
+    container_name: backend
+    restart: on-failure:5
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+  # nginx:
+  #   container_name: nginx
+  #   restart: on-failure:5
+  #   build:
+  #     context: buildContext
+
+
+volumes:
+  db-postgres:
+
+# networks:
+#   transcendence:
+#     name: transcendence
+#     driver: bridge
