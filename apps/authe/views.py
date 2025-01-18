@@ -171,7 +171,7 @@ def get_profil_view(request, name):
 		return JsonResponse({'email': user.email})
 	except CustomUser.DoesNotExist:
 		return JsonResponse({'error': True})
-
+	
 class MeAPIView(APIView):
 	def get(self, request):
 		# Récupérer les informations de l'utilisateur connecté

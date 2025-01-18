@@ -33,20 +33,73 @@ function sendMessage() {
 
 var friendlist = [];
 
-function fetchFriendList() {
-	fetch('/authe/api/users/')
+// async function fetchFriendList() {
+// 	fetch('/authe/api/users/')
+// 		.then(response => response.json())
+// 		.then(data => {
+// 			const elemcontainer = document.getElementById('FriendList');
+
+// 			for (let i = 0; i < data.length; i++) {
+// 				friendlist[i] = data[i].username;
+// 			}
+
+// 			for (let i = 0; i < friendlist.length; i++) {
+// 				var newFriend = document.createElement("button");
+// 				newFriend.textContent = friendlist[i];
+// 				if (data[i].is_online)
+// 				{
+// 					newFriend.style.color = "lime";
+// 					newFriend.style.fontWeight = "bold";
+// 				}
+// 				else
+// 				{
+// 					newFriend.style.color = "red";
+// 					newFriend.style.fontWeight = "normal";
+// 				}
+// 				newFriend.classList.add("friend");
+// 				if (elemcontainer == null)
+// 					return;
+// 				elemcontainer.appendChild(newFriend);
+// 				newFriend.addEventListener('click', function(event) {
+// 					loadBar(event);
+// 				});
+// 			}
+// 		})
+// 		.catch((error) => {
+// 			console.error('Error:', error);
+// 		});
+// }
+
+async function fetchFriendList() {
+	const elemcontainer = document.getElementById('FriendList');
+	let friendlistlength = 0;
+	const user = await fetch('/authe/api/me/')
 		.then(response => response.json())
-		.then(data => {
-			const elemcontainer = document.getElementById('FriendList');
-
-			for (let i = 0; i < data.length; i++) {
-				friendlist[i] = data[i].username;
-			}
-
-			for (let i = 0; i < friendlist.length; i++) {
+	const relationships = await fetch(`/chat/relationships/${user.id}/`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+		},
+	})
+	.then(response => response.json())
+	.then(data => {
+		for (let i = 0; i < data.length; i++)
+		{
+			let friend_name = fetch(`/profil/account/${data[i].target}/`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+				},
+			})
+			.then(response => response.json())
+			.then(data => {
+				friendlist[i] = data.user.username;
 				var newFriend = document.createElement("button");
 				newFriend.textContent = friendlist[i];
-				if (data[i].is_online)
+				console.log(friendlist[i]);
+				if (friendlist[i].is_online)
 				{
 					newFriend.style.color = "lime";
 					newFriend.style.fontWeight = "bold";
@@ -61,14 +114,14 @@ function fetchFriendList() {
 					return;
 				elemcontainer.appendChild(newFriend);
 				newFriend.addEventListener('click', function(event) {
-					loadBar(event);
+				loadBar(event);
 				});
-			}
-		})
-		.catch((error) => {
-			console.error('Error:', error);
-		});
+				console.log(friendlist[i]);
+			})
+		}
+	})
 }
+		
 
 function retrieveConversations(data) {
 	if (allconversations[data.from] === undefined)
@@ -251,42 +304,67 @@ function notindatabase(inputValue) {
 	return true;
 }
 
-function addFriends(event, elemcontainer) {
+async function addFriends(event, elemcontainer) {
 	if (event.key === 'Enter') {
 		event.preventDefault();
-		var inputValue = document.getElementById('addFriends').value;
-		if (alreadyfriend(inputValue)) {
-			document.getElementById('addFriends').value = '';
-			document.getElementById('addFriends').placeholder = "Already a friend";
-			return;
-		}
-		if (notindatabase(inputValue)) {
-			document.getElementById('addFriends').value = '';
-			document.getElementById('addFriends').placeholder = "User not found";
-			return;
-		}
-		friendlist.push(inputValue);
-		document.getElementById('addFriends').value = '';
-
-		var newFriend = document.createElement("button");
-		newFriend.classList.add("friend");
-		//check if the inputname exist in the database
 		
-		newFriend.textContent = inputValue;
-		elemcontainer.appendChild(newFriend);
-		document.getElementById('addFriends').placeholder = "Add a friend";
-
-		newFriend.addEventListener('click', function(event) {
-			loadBar(event);
-		});
-
-		elemcontainer.scrollTop = elemcontainer.scrollHeight;
+		var inputValue = document.getElementById('addFriends').value;
+		
+		const user = await fetch('/authe/api/me/')
+		.then(response => response.json())
+		const relation = await fetch(`/chat/relationships/${user.id}/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+			},
+			body: JSON.stringify({
+				'username': inputValue,
+				'status': 'friend',
+			}),
+		})
+		.then(response => response.json(), )
+		.then(data => {
+		if (data.relations === "friend")
+		{
+			console.log(data)
+			document.getElementById('addFriends').value = '';
+			console.log(document);
+			
+			var newFriend = document.createElement("button");
+			newFriend.classList.add("friend");
+			newFriend.textContent = inputValue;
+			
+			newFriend.addEventListener('click', function(event) {
+				loadBar(event, inputValue);
+			});
+			// Ajouter le bouton dans le conteneur
+			elemcontainer.appendChild(newFriend);
+			
+			// Remettre le placeholder du champ de texte
+			document.getElementById('addFriends').placeholder = "Add a friend";
+			
+			// S'assurer que le nouvel ami est visible dans le conteneur
+			elemcontainer.scrollTop = elemcontainer.scrollHeight;
+		}
+		else
+		{
+			console.log(data.message)
+			document.getElementById('addFriends').value = '';
+			if (data.message == 'Relationship already exists.')
+				document.getElementById('addFriends').placeholder = "Already friend";
+			else if (data.message == 'You cannot be friends with yourself.')
+				document.getElementById('addFriends').placeholder = "it's you";
+			else
+				document.getElementById('addFriends').placeholder = "User not found";
+		}
+		})
 	}
 }
 
 document.addEventListener('DOMContentLoaded', () => {
 	liveChat();
-
+	
 	document.body.addEventListener('keyup', function(event) {
 		if (event.key === 'Enter' && document.getElementById('selectFriend').textContent !== '') {
 			sendMessage();
