@@ -22,8 +22,11 @@ class Player(models.Model):
 	team = models.CharField(max_length=50, null=True, blank=True)
 	is_host = models.BooleanField(default=False)
 	is_IA = models.BooleanField(default=False)
+	score = models.IntegerField(default=0)
 
 	def __str__(self):
 		return f"Player {self.user.username if self.user else 'IA'} in Game {self.game.id}"
 	
 
+# class GameStats(models.Model):
+	# game = models.ForeignKey(Game, on_delete=models.CASCADE, unique=True)

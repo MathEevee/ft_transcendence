@@ -33,42 +33,59 @@ function sendMessage() {
 
 var friendlist = [];
 
-function fetchFriendList() {
-	fetch('/authe/api/users/')
+
+async function fetchFriendList() {
+	const elemcontainer = document.getElementById('FriendList');
+	const user = await fetch('/authe/api/me/')
 		.then(response => response.json())
-		.then(data => {
-			const elemcontainer = document.getElementById('FriendList');
-
-			for (let i = 0; i < data.length; i++) {
-				friendlist[i] = data[i].username;
-			}
-
-			for (let i = 0; i < friendlist.length; i++) {
+	const relationships = await fetch(`/chat/relationships/${user.id}/`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+		},
+	})
+	.then(response => response.json())
+	.then(data => {
+		for (let i = 0; i < data.length; i++)
+		{
+			if (data[i].relations === "friend")
+			{
+				let friend_name = fetch(`/profil/account/${data[i].target}/`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+					},
+				})
+				.then(response => response.json())
+				.then(data => {
+				friendlist[i] = data.user;
 				var newFriend = document.createElement("button");
-				newFriend.textContent = friendlist[i];
-				if (data[i].is_online)
-				{
-					newFriend.style.color = "lime";
-					newFriend.style.fontWeight = "bold";
-				}
-				else
-				{
-					newFriend.style.color = "red";
-					newFriend.style.fontWeight = "normal";
-				}
-				newFriend.classList.add("friend");
-				if (elemcontainer == null)
-					return;
-				elemcontainer.appendChild(newFriend);
-				newFriend.addEventListener('click', function(event) {
-					loadBar(event);
-				});
+				newFriend.textContent = friendlist[i].username;
+				if (friendlist[i].is_online === true)
+					{
+						newFriend.style.color = "lime";
+						newFriend.style.fontWeight = "bold";
+					}
+					else
+					{
+						newFriend.style.color = "red";
+						newFriend.style.fontWeight = "normal";
+					}
+					newFriend.classList.add("friend");
+					if (elemcontainer == null)
+						return;
+					elemcontainer.appendChild(newFriend);
+					newFriend.addEventListener('click', function(event) {
+						loadBar(event);
+					});
+				})
 			}
-		})
-		.catch((error) => {
-			console.error('Error:', error);
-		});
+		}
+	})
 }
+		
 
 function retrieveConversations(data) {
 	if (allconversations[data.from] === undefined)
@@ -105,6 +122,39 @@ function delprevconversation() {
 	}
 }
 
+async function block_friend(event) {
+	const user = await fetch('/authe/api/me/')
+	.then(response => response.json())
+	const relation = await fetch(`/chat/relationships/${user.id}/`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+		},
+		body: JSON.stringify({
+			'username': document.getElementById('selectFriend').textContent,
+			'status': 'blocked',
+		}),
+	})
+	.then(response => response.json())
+	.then(data => {
+		console.log(data);
+		if (data.relations === "blocked")
+		{
+			const elemcontainer = document.getElementById('FriendList');
+			elemcontainer.childNodes.forEach((element) => {
+				if (element.textContent === document.getElementById('selectFriend').textContent)
+				{
+					elemcontainer.removeChild(element);
+				}
+			});
+			document.getElementById('selectFriend').textContent = '';
+			delprevconversation();
+			create_locked_btn('');
+		}
+	})
+}
+
 function liveChat() {
 
 	if (window.location.pathname === "/authe/login/" || window.location.pathname === "/authe/register/")
@@ -116,6 +166,7 @@ function liveChat() {
 	const search = document.getElementById('addFriends');
 	const elemcontainer = document.getElementById('FriendList');
 	const selectFriend = document.getElementById('selectFriend');
+	const blocked = document.getElementById('lock');
 
 	fetchFriendList();
 
@@ -200,8 +251,23 @@ function liveChat() {
 		addFriends(event, elemcontainer);
 	});
 
+	blocked.addEventListener('click', function(event) {
+		block_friend(event);
+	});
+
 	// receiveMessage();
 }
+
+function create_locked_btn(friendName)
+{
+	const btn_locked = document.getElementById('lock');
+	if (friendName)
+		btn_locked.style.display = 'block';
+	else
+		btn_locked.style.display = 'none';
+
+}
+
 
 function loadBar(event) {
 	if (event.type === 'click') {  // Fix: change to check for 'click' event type
@@ -213,6 +279,8 @@ function loadBar(event) {
 		// Correct the link, add http:// to make it a valid URL
 		link.href = "/account/" + friendName + "/";
 		link.textContent = friendName;
+		if (link)
+			create_locked_btn(friendName);
 
 		// Find the 'selectFriend' element and append the link
 		var selectFriendElement = document.getElementById('selectFriend'); // Assuming you're using the ID
@@ -250,42 +318,83 @@ function notindatabase(inputValue) {
 	return true;
 }
 
-function addFriends(event, elemcontainer) {
+async function addFriends(event, elemcontainer) {
 	if (event.key === 'Enter') {
 		event.preventDefault();
-		var inputValue = document.getElementById('addFriends').value;
-		if (alreadyfriend(inputValue)) {
-			document.getElementById('addFriends').value = '';
-			document.getElementById('addFriends').placeholder = "Already a friend";
-			return;
-		}
-		if (notindatabase(inputValue)) {
-			document.getElementById('addFriends').value = '';
-			document.getElementById('addFriends').placeholder = "User not found";
-			return;
-		}
-		friendlist.push(inputValue);
-		document.getElementById('addFriends').value = '';
-
-		var newFriend = document.createElement("button");
-		newFriend.classList.add("friend");
-		//check if the inputname exist in the database
 		
-		newFriend.textContent = inputValue;
-		elemcontainer.appendChild(newFriend);
-		document.getElementById('addFriends').placeholder = "Add a friend";
+		var inputValue = document.getElementById('addFriends').value;
+		
+		const user = await fetch('/authe/api/me/')
+		.then(response => response.json())
+		const relation = await fetch(`/chat/relationships/${user.id}/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+			},
+			body: JSON.stringify({
+				'username': inputValue,
+				'status': 'friend',
+			}),
+		})
+		.then(response => response.json(), )
+		.then(data => {
+		if (data.relations === "friend")
+		{
+				let friend_name = fetch(`/profil/account/${data.target}/`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+					},
+				})
+				.then(response => response.json())
+				.then(data => {
+					var newFriend = document.createElement("button");
+					newFriend.classList.add("friend");
+					newFriend.textContent = inputValue;
+					if (data.user.is_online === true)
+					{
+						newFriend.style.color = "lime";
+						newFriend.style.fontWeight = "bold";
+					}
+					else
+					{
+						newFriend.style.color = "red";
+						newFriend.style.fontWeight = "normal";
+					}
+					elemcontainer.appendChild(newFriend);
+					if (elemcontainer == null)
+						return;
+					newFriend.addEventListener('click', function(event) {
+						loadBar(event, inputValue);
+					});
+						
+					document.getElementById('addFriends').value = '';
 
-		newFriend.addEventListener('click', function(event) {
-			loadBar(event);
-		});
+					document.getElementById('addFriends').placeholder = "Add a friend";
+					
+					elemcontainer.scrollTop = elemcontainer.scrollHeight;
+				});
+		
+		}
+		else
+		{
+			document.getElementById('addFriends').value = '';
+			if (data.message == 'Already friend')
+				document.getElementById('addFriends').placeholder = "Already friend";
+			else if (data.message == 'You cannot be friends with yourself.')
+				document.getElementById('addFriends').placeholder = "it's you";
+			else
+				document.getElementById('addFriends').placeholder = "User not found";
+		}
+	})
+}}
 
-		elemcontainer.scrollTop = elemcontainer.scrollHeight;
-	}
-}
 
 document.addEventListener('DOMContentLoaded', () => {
 	liveChat();
-
+	
 	document.body.addEventListener('keyup', function(event) {
 		if (event.key === 'Enter' && document.getElementById('selectFriend').textContent !== '') {
 			sendMessage();

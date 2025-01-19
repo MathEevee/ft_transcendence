@@ -2,7 +2,10 @@ from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
-from .models import CustomUser, Message, Friend
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .models import CustomUser, Message, Friend, Relationship
+from .serializer import RelationshipSerializer
 
 @login_required
 def send_message(request, recipient_id):
@@ -24,13 +27,6 @@ def send_message(request, recipient_id):
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
 @login_required
-def load_friends(request):
-    friends = Friend.objects.filter(user=request.user, status='accepted')
-    context = {'friends': friends}
-    html = render_to_string('chat/friends_list.html', context)
-    return JsonResponse({'html': html})
-
-@login_required
 def load_messages(request, recipient_id):
     recipient = get_object_or_404(CustomUser, id=recipient_id)
     
@@ -44,3 +40,56 @@ def load_messages(request, recipient_id):
     context = {'messages': messages}
     html = render_to_string('chat/messages.html', context)
     return JsonResponse({'html': html})
+
+class RelationshipsAPIView(APIView):
+    def get(self, request, user_id):
+        """
+        Récupère toutes les relations pour un utilisateur donné.
+        """
+        relationships = Relationship.objects.filter(user_id=user_id)
+        if not relationships.exists():
+            return JsonResponse(
+                {'error': True, 'message': 'No relationships found.'}
+            )
+        serializer = RelationshipSerializer(relationships, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request, user_id):
+        """
+        Crée une nouvelle relation pour l'utilisateur.
+        """
+        try:
+            # Vérification des utilisateurs
+            username = request.data.get('username')
+            if not username:
+                return JsonResponse(
+                    {'error': True, 'message': 'Username is required.'}
+                )
+            target = get_object_or_404(CustomUser, username=username)
+            user = get_object_or_404(CustomUser, id=user_id)
+
+            # Validation des données
+            if target == user:
+                return JsonResponse(
+                    {'error': True, 'message': 'You cannot be friends with yourself.'}
+                )
+
+            status = request.data.get('status')
+            if not status:
+                return JsonResponse(
+                    {'error': True, 'message': 'Status is required.'}
+                )
+
+            # Création de la relation
+            if Relationship.objects.filter(user=user, target=target, relations=status).exists():
+                    if (status == 'friend'):
+                        return JsonResponse(
+                            {'error': True, 'message': 'Already friend'}
+                        )
+                    Relationship.objects.filter(user=user, target=target).delete()
+            relation = Relationship.objects.create(user=user, target=target, relations=status)
+            serializer = RelationshipSerializer(relation)
+            return Response(serializer.data)
+
+        except Exception as e:
+            return JsonResponse({'error': True, 'message': 'An unexpected error occurred.'})

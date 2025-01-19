@@ -15,4 +15,6 @@ urlpatterns = [
     path('spaceinvaders/', views.space_invader),
     path('pong/tournament/', views.pong_tournament),
     path('spaceinvaders/tournament/', views.space_tournament),
+    path('local-ia-start/', views.start_game_local_IA),
+    path('local-ia-end/', views.end_game_local_IA),
 ]

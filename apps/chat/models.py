@@ -18,3 +18,15 @@ class Message(models.Model):
     recipient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="messages_received", null=True, blank=True)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+class Relationship(models.Model):
+    class Status(models.TextChoices):
+        NONE = 'none'
+        FRIEND = 'friend'
+        BLOCKED = 'blocked'
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="user")
+    target = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="friend")
+    relations = models.CharField(
+        choices=Status.choices,
+        default=Status.NONE
+    )
