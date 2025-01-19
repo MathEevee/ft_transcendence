@@ -46,9 +46,7 @@ class RelationshipsAPIView(APIView):
         """
         Récupère toutes les relations pour un utilisateur donné.
         """
-        print(f"GET request for user_id: {user_id}")  # Debug
         relationships = Relationship.objects.filter(user_id=user_id)
-        print(f"Relationships: {relationships}")  # Debug
         if not relationships.exists():
             return JsonResponse(
                 {'error': True, 'message': 'No relationships found.'}
@@ -60,10 +58,6 @@ class RelationshipsAPIView(APIView):
         """
         Crée une nouvelle relation pour l'utilisateur.
         """
-        print("check request.user", request.user)
-        print("check user_id", user_id)
-        print("check request.data", request.data)
-        print("check self", self.get(request, user_id))
         try:
             # Vérification des utilisateurs
             username = request.data.get('username')
@@ -72,7 +66,6 @@ class RelationshipsAPIView(APIView):
                     {'error': True, 'message': 'Username is required.'}
                 )
             target = get_object_or_404(CustomUser, username=username)
-            print("check target", target.id)
             user = get_object_or_404(CustomUser, id=user_id)
 
             # Validation des données
@@ -88,14 +81,15 @@ class RelationshipsAPIView(APIView):
                 )
 
             # Création de la relation
-            if Relationship.objects.filter(user=user, target=target).exists():
-                return JsonResponse(
-                    {'error': True, 'message': 'Relationship already exists.'}
-                )
+            if Relationship.objects.filter(user=user, target=target, relations=status).exists():
+                    if (status == 'friend'):
+                        return JsonResponse(
+                            {'error': True, 'message': 'Already friend'}
+                        )
+                    Relationship.objects.filter(user=user, target=target).delete()
             relation = Relationship.objects.create(user=user, target=target, relations=status)
             serializer = RelationshipSerializer(relation)
             return Response(serializer.data)
 
         except Exception as e:
-            print(f"Error: {e}")  # Debug log
             return JsonResponse({'error': True, 'message': 'An unexpected error occurred.'})

@@ -160,6 +160,12 @@
 	margin-left: 2%;
 }
 
+#lock.lock{
+	display: none;
+	background: none;
+	border: none;
+}
+
 #FriendList button.friend:hover {
 	color: white;
 	overflow: hidden;
