@@ -6,3 +6,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['username', 'is_online', 'id']
+
+class TournamentSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Tournament
+		fields = '__all__'
