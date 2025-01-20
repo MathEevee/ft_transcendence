@@ -81,7 +81,7 @@ class RelationshipsAPIView(APIView):
                 )
 
             # Création de la relation
-            if Relationship.objects.filter(user=user, target=target, relations=status).exists():
+            if Relationship.objects.filter(user=user, target=target, relations='friend').exists():
                     if (status == 'friend'):
                         return JsonResponse(
                             {'error': True, 'message': 'Already friend'}
