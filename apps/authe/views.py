@@ -1,26 +1,24 @@
 import requests
-import pprint
+# import pprint
 import logging
 import os
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.conf import settings
 from django.utils.timezone import now
 from django.db.utils import IntegrityError
-from .models import CustomUser
-from .forms import RegistrationForm, LoginForm
-from .serializer import CustomUserSerializer
-from django.contrib.auth.decorators import login_required
-from apps.authe.decorators import logout_required
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.http import JsonResponse
-from apps.authe.models import Message
-from apps.authe.models import Tournament
-from .serializer import TournamentSerializer
 from rest_framework.permissions import AllowAny
+from .models import CustomUser, Message, Tournament, PlayerEntry
+from .forms import RegistrationForm, LoginForm
+from .serializer import CustomUserSerializer, TournamentSerializer
+from .decorators import logout_required
+from django.http import JsonResponse
 
 logger = logging.getLogger(__name__)
 
@@ -71,8 +69,8 @@ def auth_callback(request):
 		messages.error(request, "Impossible de récupérer les informations utilisateur.")
 		return redirect('/')
 
-	# Débogage : affichez les données reçues dans la console
-	pprint.pprint(user_info)
+	# # Débogage : affichez les données reçues dans la console
+	# pprint.pprint(user_info)
 
 	# Sauvegarder ou connecter l'utilisateur ici
 	try:
@@ -86,7 +84,7 @@ def auth_callback(request):
 	user.last_login = now()
 	user.save()
 	messages.success(request, f"Bienvenue, {user.username}!")
-	return redirect(reverse('profil:profil'))
+	return redirect(reverse('profil:profil', kwargs={'username': user.username}))
 
 def save_user(user_info):
 	picture_url = user_info.get('image', {}).get('versions', {}).get('medium', '/static/pictures/user-avatar-01.png')
@@ -147,13 +145,26 @@ def login_view(request):
 			if user is not None:
 				login(request, user)
 				messages.success(request, "Connexion réussie !")
-				return redirect(reverse('profil:profil'))
+				return redirect(reverse('profil:profil', kwargs={'username': username}))
 			else:
 				messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
 	else:
 		form = LoginForm()
 	return render(request, 'login.html', {'form': form})
 
+@login_required
+def logout_view(request):
+	logout(request)
+	messages.success(request, "Déconnexion réussie !")
+	return redirect(reverse('authe:login'))
+
+# @login_required
+# def get_profil_view(request, name):
+# 	try:
+# 		user = CustomUser.objects.get(username = name)
+# 		return JsonResponse({'email': user.email})
+# 	except CustomUser.DoesNotExist:
+# 		return JsonResponse({'error': True})
 
 class CustomUserAPIView(APIView):
 	def get(self, request):
@@ -197,22 +208,60 @@ class TournamentAPIView(APIView):
 		serializer = TournamentSerializer(tournaments, many=True)
 		return Response(serializer.data)
 	
-	def post(self, request):
-		serializer = TournamentSerializer(data=request.data)
-		if serializer.is_valid():
-			serializer.save()
-			return Response(serializer.data, status=201)
-		return Response(serializer.errors, status=400)
-	
-	def put(self, request):
-		tournament = Tournament.objects.get(id=request.data.get('id'))
-		serializer = TournamentSerializer(tournament, data=request.data)
-		if serializer.is_valid():
-			serializer.save()
-			return Response(serializer.data, status=200)
-		return Response(serializer.errors, status=400)
-	
-	def delete(self, request):
-		tournament = Tournament.objects.get(id=request.data.get('id'))
-		tournament.delete()
-		return Response(status=204)
+	def post(self, request, *args, **kwargs):
+		# Récupérer les données envoyées par le POST
+		tournament_id = request.data.get('tournament_id')
+		username = request.data.get('username')
+		team_name = request.data.get('team_name', None)  # Optionnel
+
+		# creer un tournoi si il n'existe pas
+		# if not any(obj['type_pong'] == tournament_id for obj in Tournament.objects.all().values('type_pong')):
+		# 	tournament = Tournament.objects.create(type_pong=tournament_id)
+		# 	tournament.save()
+
+		obj = Tournament.objects.filter(type_pong=tournament_id)
+		if not obj.exists():
+			tournament = Tournament.objects.create(type_pong=tournament_id)
+			tournament.save()
+		else:
+			tournament = obj.first()
+			
+		# Vérifier les données reçues
+		if not username:
+			return Response(
+				{"error": "Tournament ID and username are required."},
+				status=status.HTTP_400_BAD_REQUEST,
+			)
+
+		# Récupérer le tournoi et l'utilisateur
+		tournament = get_object_or_404(Tournament, type_pong=tournament_id)
+		player = get_object_or_404(CustomUser, username=username)
+
+		# Vérifier si le tournoi est plein
+		if tournament.player_entries.count() >= 8:
+			return Response(
+				{"error": "Tournament is already full."},
+				status=status.HTTP_400_BAD_REQUEST,
+			)
+
+		# Ajouter le joueur au tournoi via PlayerEntry
+		player_entry, created = PlayerEntry.objects.get_or_create(
+			tournament=tournament, player=player, defaults={"team_name": team_name}
+		)
+
+		if not created:
+			return Response(
+				{"error": "Player is already in the tournament."},
+				status=status.HTTP_200_OK,
+			)
+
+		# Réponse réussie
+		return Response(
+			{
+				"message": "Player added to tournament successfully.",
+				"tournament_id": tournament.id,
+				"player": player.username,
+				"team_name": player_entry.team_name,
+			},
+			status=status.HTTP_200_OK,
+		)

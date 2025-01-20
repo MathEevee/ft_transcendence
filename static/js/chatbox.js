@@ -1,4 +1,6 @@
-var g_socket = new WebSocket('ws://localhost:8000/ws/chat/');
+if (!window.location.pathname.startsWith('/authe/'))
+    var g_socket = new WebSocket('ws://localhost:8000/ws/chat/');
+
 var allconversations = [];
 let link;
 
@@ -157,7 +159,7 @@ async function block_friend(event) {
 
 function liveChat() {
 
-	if (window.location.pathname === "/authe/login/" || window.location.pathname === "/authe/register/")
+	if (window.location.pathname.substring(0, 7) === "/authe/")
 		return;
 
 	const ChatButton = document.getElementById('chat');
@@ -168,7 +170,7 @@ function liveChat() {
 	const selectFriend = document.getElementById('selectFriend');
 	const blocked = document.getElementById('lock');
 
-	fetchFriendList();
+	setTimeout(fetchFriendList, 100);
 
 	g_socket.onmessage = function(event) {
 		const data = JSON.parse(event.data);
@@ -277,7 +279,7 @@ function loadBar(event) {
 		var friendName = event.target.textContent;
 
 		// Correct the link, add http:// to make it a valid URL
-		link.href = "/account/" + friendName + "/";
+		link.href = "/profil/" + friendName + "/";
 		link.textContent = friendName;
 		if (link)
 			create_locked_btn(friendName);
@@ -402,4 +404,4 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 });
 
-export {link , liveChat};
+export {link , liveChat, allconversations}

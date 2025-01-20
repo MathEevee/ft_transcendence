@@ -1,4 +1,3 @@
-import { loadAccount } from "/static/js/account.js";
 import { liveChat } from "/static/js/chatbox.js";
 
 const allPage = {
@@ -6,26 +5,22 @@ const allPage = {
     "/games/pong/solo/": () => import("/static/js/pong.js").then(module => module.loadPong()),
     "/games/pong/online/": () => import("/static/js/pongMulti/pongMulti.js").then(module => module.loadPongMulti()),
     "/games/spaceinvaders/": () => import("/static/js/spaceInvadeur.js").then(module => module.loadSpaceInvadersGame()),
-    "/games/pong/tournament/": async () => {
-        const { PongTournament } = await import("/static/js/pongMulti/PongTournament.js");
-        const { setupPlayerList } = await import("/static/js/tournament.js");
-        PongTournament();
-        setupPlayerList();
-    },
-    "/games/spaceinvaders/tournament/": () => import("/static/js/tournament.js").then(module => module.setupPlayerList()),
+    "/games/pong/tournament/": () => import("/static/js/tournament.js").then(module => module.loadTournament()),
+    "/games/spaceinvaders/tournament/": () => import("/static/js/tournament.js").then(module => module.loadTournament()),
     "/games/": () => import("/static/js/games.js").then(module => module.loadBtn()),
 };
 
 function loadPage(path) {
-    if (path.includes('account/'))
-        loadAccount();
-    else if (allPage[path]) {
+    console.log(path)
+    if (allPage[path])
         allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
-    } else if (allPage[path + '/']) {
-        allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
+    // else if (allPage[path + '/'])
+    //     allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
+    if (window.location.pathname.startsWith('/authe/')) {
+        var chatBtn = document.getElementById('chat')
+        if (chatBtn)
+            chatBtn.style.display = 'none';
     }
-    if (path === '/authe/login/')
-        document.getElementById('chat').style.display = 'none';
 }
 
 async function changePage(path, disableHistory) {
@@ -35,7 +30,8 @@ async function changePage(path, disableHistory) {
         if (!disableHistory)
             history.pushState({}, '', response.url);
         document.body.innerHTML = content;
-        liveChat();
+        if (!window.location.pathname.startsWith("/authe/"))
+            liveChat();
         loadPage(path);
     }
 }
@@ -47,6 +43,7 @@ async function fetchAndReplaceContent(event) {
         console.error(`Error fetching content: ${err}`);
     }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     loadPage(window.location.pathname);
 
@@ -69,5 +66,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-export { changePage }
