@@ -158,14 +158,6 @@ def logout_view(request):
 	messages.success(request, "Déconnexion réussie !")
 	return redirect(reverse('authe:login'))
 
-# @login_required
-# def get_profil_view(request, name):
-# 	try:
-# 		user = CustomUser.objects.get(username = name)
-# 		return JsonResponse({'email': user.email})
-# 	except CustomUser.DoesNotExist:
-# 		return JsonResponse({'error': True})
-
 class CustomUserAPIView(APIView):
 	def get(self, request):
 		users = CustomUser.objects.all()
@@ -215,9 +207,6 @@ class TournamentAPIView(APIView):
 		team_name = request.data.get('team_name', None)  # Optionnel
 
 		# creer un tournoi si il n'existe pas
-		# if not any(obj['type_pong'] == tournament_id for obj in Tournament.objects.all().values('type_pong')):
-		# 	tournament = Tournament.objects.create(type_pong=tournament_id)
-		# 	tournament.save()
 
 		obj = Tournament.objects.filter(type_pong=tournament_id)
 		if not obj.exists():
@@ -229,7 +218,7 @@ class TournamentAPIView(APIView):
 		# Vérifier les données reçues
 		if not username:
 			return Response(
-				{"error": "Tournament ID and username are required."},
+				{"error": "Username are required."},
 				status=status.HTTP_400_BAD_REQUEST,
 			)
 
@@ -245,8 +234,13 @@ class TournamentAPIView(APIView):
 			)
 
 		# Ajouter le joueur au tournoi via PlayerEntry
-		player_entry, created = PlayerEntry.objects.get_or_create(
-			tournament=tournament, player=player, defaults={"team_name": team_name}
+		if tournament.player_entries.count() <= 0:
+			player_entry, created = PlayerEntry.objects.get_or_create(
+				tournament=tournament, player=player, defaults={"team_name": team_name}, is_host=True
+			)
+		else:
+			player_entry, created = PlayerEntry.objects.get_or_create(
+				tournament=tournament, player=player, defaults={"team_name": team_name}, is_host=False
 		)
 
 		if not created:

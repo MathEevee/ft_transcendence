@@ -45,6 +45,7 @@ class PlayerEntry(models.Model):
 	tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="player_entries")
 	player = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
 	team_name = models.CharField(max_length=255, null=True, blank=True)
+	is_host = models.BooleanField(default=False)
 
 	class Meta:
 		unique_together = ('tournament', 'player')  # Un joueur ne peut être associé qu'une fois à un tournoi.

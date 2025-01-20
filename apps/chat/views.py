@@ -73,7 +73,7 @@ class RelationshipsAPIView(APIView):
                 return JsonResponse(
                     {'error': True, 'message': 'You cannot be friends with yourself.'}
                 )
-
+            #todo check if user is already friend with target or blocked
             status = request.data.get('status')
             if not status:
                 return JsonResponse(

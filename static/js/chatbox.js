@@ -234,6 +234,7 @@ function liveChat() {
 	function openChat() {
 		ChatButton.style.display = "none";
 		liveChat.style.display = "block";
+		printallConversations("other");
 		elemcontainer.scrollTop = elemcontainer.scrollHeight;
 	}
 	

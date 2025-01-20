@@ -13,7 +13,7 @@ class PlayerEntrySerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = PlayerEntry
-		fields = ['player', 'team_name']
+		fields = ['player', 'team_name', 'is_host']
 
 class TournamentSerializer(serializers.ModelSerializer):
     player_entries = PlayerEntrySerializer(many=True)

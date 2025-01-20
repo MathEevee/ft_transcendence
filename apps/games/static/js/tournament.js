@@ -4,7 +4,7 @@ function loadTournament()
 {
 
 const startButton = document.getElementById('start-tournament');
-const inviteinput = document.getElementById('invite-player');
+const inviteButton = document.getElementById('player-name');
 const socket = new WebSocket(`ws://localhost:8000/ws/chat/`);
 
 let teamname = ["Patron", "Polygone", "Gravier", "Rempart", "Philentropes", "Poussière", "Poussin", "Poulet", "Noix", "Balle", "Parchemin", "Chaudron", "Café", "Cafard", "Protéïne"];
@@ -36,7 +36,11 @@ async function displayPlayerTournament()
 		{
 			if (data[i].type_pong === tournamentId)
 			{
-				players = data[i].player_entries;
+
+				for (let j = 0; j < data[i].player_entries.length; j++)
+					players.add(data[i].player_entries[j]);
+
+				players = Array.from(players);
 				for (let j = 0; j < players.length; j++)
 				{
 					const row = document.createElement('tr');
@@ -50,6 +54,14 @@ async function displayPlayerTournament()
 					row.appendChild(cell);
 					row.appendChild(teamcell);
 					tabplayers.appendChild(row);
+
+					if (players[j].is_host)
+					{
+						cell.style.color = 'yellow';
+						teamcell.style.color = 'yellow';
+						if (players[j].player.username === await getUserName())
+							startButton.style.display = 'block';
+					}
 				}
 			}
 		}
@@ -82,11 +94,39 @@ function startTournoi()
 	}
 }
 
+async function checkPlayer(playername)
+{
+	players.forEach(player => {
+		if (player.player.username === playername)
+		{
+			let error = document.getElementById('error');
+			if (error)
+				error.remove();
+			error = document.createElement('p');
+			const text = document.createTextNode('Player already in the tournament');
+			const errorDiv = document.getElementById('games-container');
+
+			error.appendChild(text);
+			errorDiv.appendChild(error);
+			error.setAttribute('id', 'error');
+			error.setAttribute('class', 'error-message');
+			inviteButton.value = '';
+			setInterval(() => {
+				error.remove();
+			}, 3000);
+			return true;
+		}
+	});
+	return false;
+}
+
 async function setupPlayerList()
 {
 	const joinButton = document.getElementById('add-player');
 	const tabplayers = document.getElementById('games-table');
 	const startButton = document.getElementById('start-tournament');
+
+	startButton.style.display = 'none';
 	displayPlayerTournament();
 
 	let username = await getUserName();
@@ -150,9 +190,8 @@ async function setupPlayerList()
 		// console.log(players.length);
 		for (let i = 0; i < players.length; i++)
 		{
-			console.log(players[i].player.username);
-			allconversations[players[i].player.username] = [];
-			allconversations[players[i].player.username].push({
+			allconversations["other"] = [];
+			allconversations["other"].push({
 				'from': 'Tournament',
 				'message': 'The tournament is starting',
 			});
@@ -164,6 +203,19 @@ async function setupPlayerList()
 		//todo send request to start the tournament
 		//todo send request to add in db the match history
 		startTournoi();
+	});
+
+
+
+	inviteButton.addEventListener('keypress', (e) => {
+		if (e.key === 'Enter')
+		{
+			let playername = inviteButton.value;
+			if (checkPlayer(playername))
+				return;
+			inviteButton.value = '';
+
+		}
 	});
 }
 
