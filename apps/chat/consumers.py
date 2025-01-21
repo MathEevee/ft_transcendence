@@ -1,3 +1,4 @@
+import asyncio
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from apps.chat.globals import user_sockets, conversations, online_users, conv_rooms
@@ -5,6 +6,8 @@ from apps.authe.models import CustomUser
 from asgiref.sync import sync_to_async
 # from django.contrib.auth import get_user_model
 # from asgiref.sync import sync_to_async
+from apps.chat.models import Relationship
+from django.db.models import Q
 
 class ChatConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
@@ -12,6 +15,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 		if self.user.is_authenticated:
 			user_sockets[self.user.username] = self
 			await sync_to_async(CustomUser.objects.filter(username=self.user.username).update)(is_online=True)
+			await sync_to_async(self.update_online_status)(True)
 			print(f'{self.user.username} connected')
 			online_users.add(self.user.username)
 			await self.accept()
@@ -23,7 +27,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
 			del user_sockets[self.user.username]
 			online_users.remove(self.user.username)
 			await sync_to_async(CustomUser.objects.filter(username=self.user.username).update)(is_online=False)
+			await sync_to_async(self.update_online_status)(False)
 			print(f'{self.user.username} disconnected')
+
+	def update_online_status(self, status):
+		friends = Relationship.objects.filter(Q(target=self.user) & Q(relations='friend'))
+		for relation in friends:
+			user = relation.user
+			if user.username in user_sockets:
+				asyncio.run(user_sockets[user.username].send(text_data=json.dumps({
+					'status' : status,
+					'user' : self.user.username,
+				})))
 
 	async def receive(self, text_data):
 		try:

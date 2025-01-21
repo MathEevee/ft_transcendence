@@ -64,6 +64,7 @@ async function fetchFriendList() {
 				.then(data => {
 				friendlist[i] = data.user;
 				var newFriend = document.createElement("button");
+				newFriend.dataset.friend = friendlist[i].username;
 				newFriend.textContent = friendlist[i].username;
 				if (friendlist[i].is_online === true)
 					{
@@ -174,6 +175,13 @@ function liveChat() {
 
 	g_socket.onmessage = function(event) {
 		const data = JSON.parse(event.data);
+		if (data.status !== undefined) {
+			let status = document.querySelector(`#chatbox .friend[data-friend="${data.user}"`);
+			status.style.color = data.status === true ? "lime" : "red";
+			status.style.fontWeight = data.status === true ? "bold" : "normal";
+			console.log(data, "todo update status");
+			return;
+		}
 		if (data.from === undefined || data.message === undefined)
 			return;
 		retrieveConversations(data);
@@ -354,6 +362,7 @@ async function addFriends(event, elemcontainer) {
 				.then(response => response.json())
 				.then(data => {
 					var newFriend = document.createElement("button");
+					newFriend.dataset.friend = inputValue;
 					newFriend.classList.add("friend");
 					newFriend.textContent = inputValue;
 					if (data.user.is_online === true)
