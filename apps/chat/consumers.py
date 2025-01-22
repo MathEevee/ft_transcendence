@@ -1,7 +1,7 @@
 import asyncio
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from apps.chat.globals import user_sockets, conversations, online_users, conv_rooms
+from apps.chat.globals import user_sockets, conversations, conv_rooms
 from apps.authe.models import CustomUser
 from asgiref.sync import sync_to_async
 # from django.contrib.auth import get_user_model
@@ -13,19 +13,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.user = self.scope['user']
 		if self.user.is_authenticated:
-			user_sockets[self.user.username] = self
-			await sync_to_async(CustomUser.objects.filter(username=self.user.username).update)(is_online=True)
-			await sync_to_async(self.update_online_status)(True)
-			print(f'{self.user.username} connected')
-			online_users.add(self.user.username)
+			if self.user.username not in user_sockets:
+				user_sockets[self.user.username] = []	
+			if len(user_sockets[self.user.username]) == 0:
+				await sync_to_async(CustomUser.objects.filter(username=self.user.username).update)(is_online=True)
+				await sync_to_async(self.update_online_status)(True)
+				print(f'{self.user.username} connected')
+			user_sockets[self.user.username].append(self)
 			await self.accept()
 		else:
 			await self.close()
 
 	async def disconnect(self, close_code):
-		if self.user.username in user_sockets:
-			del user_sockets[self.user.username]
-			online_users.remove(self.user.username)
+		user_sockets[self.user.username].remove(self)
+		if len(user_sockets[self.user.username]) == 0:
 			await sync_to_async(CustomUser.objects.filter(username=self.user.username).update)(is_online=False)
 			await sync_to_async(self.update_online_status)(False)
 			print(f'{self.user.username} disconnected')
@@ -34,11 +35,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
 		friends = Relationship.objects.filter(Q(target=self.user) & Q(relations='friend'))
 		for relation in friends:
 			user = relation.user
-			if user.username in user_sockets:
-				asyncio.run(user_sockets[user.username].send(text_data=json.dumps({
-					'status' : status,
-					'user' : self.user.username,
-				})))
+			if user.username in user_sockets and len(user_sockets[user.username]) != 0:
+				for socket in user_sockets[user.username]:
+					asyncio.run(socket.send(text_data=json.dumps({
+						'status' : status,
+						'user' : self.user.username,
+					})))
 
 	async def receive(self, text_data):
 		try:
@@ -46,7 +48,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 			message = data['message']
 			to_user = data['to']
 
-			if to_user in user_sockets:
+			if to_user in user_sockets and len(user_sockets[to_user]) != 0:
 				conversation_key = tuple(sorted([self.user.username, to_user]))
 
 				conversations[conversation_key].append({
@@ -55,14 +57,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
 					'message': message
 				})
 
-				recipient_socket = user_sockets[to_user]
-				await recipient_socket.send(text_data=json.dumps({
-					'message': message,
-					'from': self.user.username,
-					'to': to_user,
-					'all_messages': list(conversations[conversation_key])
-				}))
-
+				for socket in user_sockets[to_user]:
+					await socket.send(text_data=json.dumps({
+						'message': message,
+						'from': self.user.username,
+						'to': to_user,
+						'all_messages': list(conversations[conversation_key])
+					}))
+				
 				await self.send(text_data=json.dumps({
 					'conversation': list(conversations[conversation_key])
 				}))
