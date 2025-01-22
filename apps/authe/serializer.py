@@ -1,7 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser
-from .models import Tournament
-from .models import PlayerEntry
+from .models import CustomUser, Tournament, PlayerEntry
 
 class CustomUserSerializer(serializers.ModelSerializer):
 	class Meta:

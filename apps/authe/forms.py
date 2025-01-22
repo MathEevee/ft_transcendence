@@ -18,3 +18,16 @@ class RegistrationForm(UserCreationForm):
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=150)
     password = forms.CharField(widget=forms.PasswordInput)
+
+class UserSettingsForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username', 'email']
+        labels = {
+            'username'  : 'Username',
+            'email'     : 'Email',
+        }
+        widgets = {
+            'username'  : forms.TextInput(attrs={'class': 'form-control'}),
+            'email'  : forms.EmailInput(attrs={'class': 'form-control'}),
+        }

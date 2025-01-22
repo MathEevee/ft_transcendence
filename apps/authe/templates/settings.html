@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Inscription
+Settings
 {% endblock %}
 
 {% load static %}
@@ -12,7 +12,7 @@ Inscription
 
 {% block content %}
 
-<h2>Inscription</h2>
+<h2>Parametres</h2>
 
 <form method="post">
     {% csrf_token %}
@@ -27,8 +27,7 @@ Inscription
         {% endfor %}
     </div>
 
-    <button type="submit">S'inscrire</button>
+    <button type="submit">Valider</button>
 </form>
-<a href="{% url 'authe:login' %}">Déjà inscrit ? Connectez-vous ici.</a>
 
 {% endblock %}

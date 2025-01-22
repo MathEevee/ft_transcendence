@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
@@ -48,9 +48,8 @@ class RelationshipsAPIView(APIView):
         """
         relationships = Relationship.objects.filter(user_id=user_id)
         if not relationships.exists():
-            return JsonResponse(
-                {'error': True, 'message': 'No relationships found.'}
-            )
+            return JsonResponse({'error': True, 'message': 'No relationships found.'})
+        
         serializer = RelationshipSerializer(relationships, many=True)
         return Response(serializer.data)
     
@@ -62,31 +61,27 @@ class RelationshipsAPIView(APIView):
             # Vérification des utilisateurs
             username = request.data.get('username')
             if not username:
-                return JsonResponse(
-                    {'error': True, 'message': 'Username is required.'}
-                )
+                return JsonResponse({'error': True, 'message': 'Username is required.'})
+        
             target = get_object_or_404(CustomUser, username=username)
             user = get_object_or_404(CustomUser, id=user_id)
 
             # Validation des données
             if target == user:
-                return JsonResponse(
-                    {'error': True, 'message': 'You cannot be friends with yourself.'}
-                )
+                return JsonResponse({'error': True, 'message': 'You cannot be friends with yourself.'})
+            
             #todo check if user is already friend with target or blocked
             status = request.data.get('status')
             if not status:
-                return JsonResponse(
-                    {'error': True, 'message': 'Status is required.'}
-                )
+                return JsonResponse({'error': True, 'message': 'Status is required.'})
 
             # Création de la relation
             if Relationship.objects.filter(user=user, target=target, relations='friend').exists():
-                    if (status == 'friend'):
-                        return JsonResponse(
-                            {'error': True, 'message': 'Already friend'}
-                        )
-                    Relationship.objects.filter(user=user, target=target).delete()
+                if (status == 'friend'):
+                    return JsonResponse({'error': True, 'message': 'Already friend'})
+                    
+                Relationship.objects.filter(user=user, target=target).delete()
+            
             relation = Relationship.objects.create(user=user, target=target, relations=status)
             serializer = RelationshipSerializer(relation)
             return Response(serializer.data)

@@ -33,9 +33,6 @@ function sendMessage() {
 	document.getElementById('inputMessages').value = '';
 }
 
-var friendlist = [];
-
-
 async function fetchFriendList() {
 	const elemcontainer = document.getElementById('FriendList');
 	const user = await fetch('/authe/api/me/')
@@ -53,7 +50,7 @@ async function fetchFriendList() {
 		{
 			if (data[i].relations === "friend")
 			{
-				let friend_name = fetch(`/profil/account/${data[i].target}/`, {
+				fetch(`/authe/api/users/${data[i].target}/`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
@@ -62,27 +59,26 @@ async function fetchFriendList() {
 				})
 				.then(response => response.json())
 				.then(data => {
-				friendlist[i] = data.user;
-				var newFriend = document.createElement("button");
-				newFriend.dataset.friend = friendlist[i].username;
-				newFriend.textContent = friendlist[i].username;
-				if (friendlist[i].is_online === true)
-					{
-						newFriend.style.color = "lime";
-						newFriend.style.fontWeight = "bold";
-					}
-					else
-					{
-						newFriend.style.color = "red";
-						newFriend.style.fontWeight = "normal";
-					}
-					newFriend.classList.add("friend");
-					if (elemcontainer == null)
-						return;
-					elemcontainer.appendChild(newFriend);
-					newFriend.addEventListener('click', function(event) {
-						loadBar(event);
-					});
+					var newFriend = document.createElement("button");
+					newFriend.dataset.friend = data.username;
+					newFriend.textContent = data.username;
+					if (data.is_online === true)
+						{
+							newFriend.style.color = "lime";
+							newFriend.style.fontWeight = "bold";
+						}
+						else
+						{
+							newFriend.style.color = "red";
+							newFriend.style.fontWeight = "normal";
+						}
+						newFriend.classList.add("friend");
+						if (elemcontainer == null)
+							return;
+						elemcontainer.appendChild(newFriend);
+						newFriend.addEventListener('click', function(event) {
+							loadBar(event);
+						});
 				})
 			}
 		}
@@ -306,28 +302,28 @@ function loadBar(event) {
 	}
 }
 
-function pageFriend(event) {
-		var url = event.target.href;
-		window.location.href = url;  // Voir avec les urls et les views car ca marche pas
-}
+// function pageFriend(event) {
+// 		var url = event.target.href;
+// 		window.location.href = url;  // Voir avec les urls et les views car ca marche pas
+// }
 
-function alreadyfriend(inputValue) {
-	for (let i = 0; i < friendlist.length; i++) {
-		if (friendlist[i] === inputValue) {
-			return true;
-		}
-	}
-	return false;
-}
+// function alreadyfriend(inputValue) {
+// 	for (let i = 0; i < friendlist.length; i++) {
+// 		if (friendlist[i] === inputValue) {
+// 			return true;
+// 		}
+// 	}
+// 	return false;
+// }
 
-function notindatabase(inputValue) {
-	for (let i = 0; i < friendlist.length; i++) {
-		if (friendlist[i] === inputValue) {
-			return false;
-		}
-	}
-	return true;
-}
+// function notindatabase(inputValue) {
+// 	for (let i = 0; i < friendlist.length; i++) {
+// 		if (friendlist[i] === inputValue) {
+// 			return false;
+// 		}
+// 	}
+// 	return true;
+// }
 
 async function addFriends(event, elemcontainer) {
 	if (event.key === 'Enter') {
@@ -352,7 +348,7 @@ async function addFriends(event, elemcontainer) {
 		.then(data => {
 		if (data.relations === "friend")
 		{
-				let friend_name = fetch(`/profil/account/${data.target}/`, {
+				fetch(`/authe/api/users/${data.target}/`, {
 					method: 'GET',
 					headers: {
 						'Content-Type': 'application/json',
@@ -365,7 +361,7 @@ async function addFriends(event, elemcontainer) {
 					newFriend.dataset.friend = inputValue;
 					newFriend.classList.add("friend");
 					newFriend.textContent = inputValue;
-					if (data.user.is_online === true)
+					if (data.is_online === true)
 					{
 						newFriend.style.color = "lime";
 						newFriend.style.fontWeight = "bold";

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Friend, Channel, Message
+from .models import Friend, Channel, Message, Relationship
 
 @admin.register(Friend)
 class FriendAdmin(admin.ModelAdmin):
@@ -25,3 +25,10 @@ class MessageAdmin(admin.ModelAdmin):
     list_display = ('sender', 'recipient', 'channel', 'content', 'timestamp')
     list_filter = ('timestamp',)
     search_fields = ('sender__username', 'recipient__username', 'content')
+
+@admin.register(Relationship)
+class RelationshipAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'target', 'relations')
+    list_filter = ('relations',)
+    search_fields = ('user__username', 'target__username')
+    ordering = ('id',)

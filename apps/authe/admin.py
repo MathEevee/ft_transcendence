@@ -5,7 +5,7 @@ from .models import CustomUser, Tournament, PlayerEntry
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    list_display = ['username', 'email', 'intra_id', 'is_staff', 'is_superuser', 'is_online', 'last_login','profil_picture']
+    list_display = ['id', 'username', 'email', 'intra_id', 'is_staff', 'is_superuser', 'is_online', 'last_login', 'profil_picture']
     list_filter = ['is_staff', 'is_superuser']
     search_fields = ['username', 'email']
     fieldsets = UserAdmin.fieldsets + (

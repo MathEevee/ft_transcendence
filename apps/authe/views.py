@@ -1,5 +1,4 @@
 import requests
-# import pprint
 import logging
 import os
 from django.shortcuts import render, redirect, get_object_or_404
@@ -14,11 +13,11 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from rest_framework.exceptions import NotFound
 from .models import CustomUser, Message, Tournament, PlayerEntry
-from .forms import RegistrationForm, LoginForm
+from .forms import RegistrationForm, LoginForm, UserSettingsForm
 from .serializer import CustomUserSerializer, TournamentSerializer
 from .decorators import logout_required
-from django.http import JsonResponse
 
 logger = logging.getLogger(__name__)
 
@@ -68,9 +67,6 @@ def auth_callback(request):
 	if 'id' not in user_info or 'email' not in user_info:
 		messages.error(request, "Impossible de récupérer les informations utilisateur.")
 		return redirect('/')
-
-	# # Débogage : affichez les données reçues dans la console
-	# pprint.pprint(user_info)
 
 	# Sauvegarder ou connecter l'utilisateur ici
 	try:
@@ -134,6 +130,20 @@ def register_view(request):
 	
 	return render(request, 'register.html', {'form': form, 'avatars': avatars})
 
+@login_required
+def settings_view(request):
+	if request.method == 'POST':
+		form = UserSettingsForm(request.POST, instance=request.user)
+		if form.is_valid():
+			form.save()
+			username = form.cleaned_data.get('username')
+			messages.success(request, "Modifications réussies !")
+			return redirect(reverse('profil:profil', kwargs={'username': username}))
+	else:
+		form = UserSettingsForm(instance=request.user)
+	
+	return render(request, 'settings.html', {'form': form})
+
 @logout_required
 def login_view(request):
 	if request.method == 'POST':
@@ -159,9 +169,16 @@ def logout_view(request):
 	return redirect(reverse('authe:login'))
 
 class CustomUserAPIView(APIView):
-	def get(self, request):
-		users = CustomUser.objects.all()
-		serializer = CustomUserSerializer(users, many=True)
+	def get(self, request, id=None):
+		if id:
+			try:
+				user = CustomUser.objects.get(id=id)
+				serializer = CustomUserSerializer(user)
+			except CustomUser.DoesNotExist:
+				raise NotFound(f"User with ID {id} not found.")
+		else:
+			users = CustomUser.objects.all()
+			serializer = CustomUserSerializer(users, many=True)
 		return Response(serializer.data)
 
 class MessageAPIView(APIView):
@@ -169,14 +186,6 @@ class MessageAPIView(APIView):
 		# Récupérer les messages
 		messages = Message.objects.all()
 		return Response({'messages': messages})
-
-@login_required
-def get_profil_view(request, name):
-	try:
-		user = CustomUser.objects.get(username = name)
-		return JsonResponse({'email': user.email})
-	except CustomUser.DoesNotExist:
-		return JsonResponse({'error': True})
 	
 class MeAPIView(APIView):
 	def get(self, request):
@@ -207,7 +216,6 @@ class TournamentAPIView(APIView):
 		team_name = request.data.get('team_name', None)  # Optionnel
 
 		# creer un tournoi si il n'existe pas
-
 		obj = Tournament.objects.filter(type_pong=tournament_id)
 		if not obj.exists():
 			tournament = Tournament.objects.create(type_pong=tournament_id)
@@ -234,13 +242,9 @@ class TournamentAPIView(APIView):
 			)
 
 		# Ajouter le joueur au tournoi via PlayerEntry
-		if tournament.player_entries.count() <= 0:
-			player_entry, created = PlayerEntry.objects.get_or_create(
-				tournament=tournament, player=player, defaults={"team_name": team_name}, is_host=True
-			)
-		else:
-			player_entry, created = PlayerEntry.objects.get_or_create(
-				tournament=tournament, player=player, defaults={"team_name": team_name}, is_host=False
+		is_host = True if tournament.player_entries.count() <= 0 else False
+		player_entry, created = PlayerEntry.objects.get_or_create(
+			tournament=tournament, player=player, defaults={"team_name": team_name}, is_host=is_host
 		)
 
 		if not created:

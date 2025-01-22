@@ -5,6 +5,7 @@ app_name = 'authe'
 
 urlpatterns = [
     path('register/', views.register_view, name='register'),
+    path('settings/', views.settings_view, name='user-settings'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     
@@ -14,7 +15,7 @@ urlpatterns = [
 
     # for API CustomUsers
     path('api/users/', views.CustomUserAPIView.as_view(), name='api-users'),
-    # path('api/users/<str:name>/', views.get_profil_view),
+    path('api/users/<int:id>/', views.CustomUserAPIView.as_view(), name='api-user'),
 	path('api/messages/', views.MessageAPIView.as_view(), name='api-message'),
 	path('api/me/', views.MeAPIView.as_view(), name='api-me'),
 	path('api/tournaments/', views.TournamentAPIView.as_view(), name='api-tournaments'),
