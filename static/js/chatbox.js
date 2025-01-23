@@ -106,10 +106,17 @@ function printallConversations(of) {
 	const chat = document.getElementById('chatMessages');
 	chat.textContent = '';
 	if (allconversations[of] === undefined)
-	{
 		allconversations[of] = [];
-	}
 	for (let i = 0; i < allconversations[of].length; i++) {
+		if (allconversations[of][i].message.includes('<button>'))
+		{
+			const newMessage = document.createElement('btn');
+			newMessage.classList.add('message');
+			newMessage.innerHTML = allconversations[of][i].from + ': ' + allconversations[of][i].message;
+			chat.appendChild(newMessage);
+			chat.scrollTop = chat.scrollHeight;
+			continue;
+		}
 		const newMessage = document.createElement('div');
 		newMessage.classList.add('message');
 		newMessage.textContent = allconversations[of][i].from + ': ' + allconversations[of][i].message;
@@ -173,7 +180,7 @@ function liveChat() {
 
 	setTimeout(fetchFriendList, 100);
 
-	g_socket.onmessage = function(event) {
+	g_socket.onmessage = async function(event) {
 		const data = JSON.parse(event.data);
 		if (data.status !== undefined) {
 			let status = document.querySelector(`#chatbox .friend[data-friend="${data.user}"`);
@@ -204,21 +211,35 @@ function liveChat() {
 			chat.scrollTop = chat.scrollHeight;
 
 		}
-		else if (document.getElementById('selectFriend').textContent === data.from)
+    	const chat = document.getElementById('chatMessages');
+		const newMessage = document.createElement('div');
+		newMessage.classList.add('message');
+		newMessage.textContent = data.from + ': ' + data.message;
+		chat.appendChild(newMessage);
+		chat.scrollTop = chat.scrollHeight;
+
+		elemcontainer.childNodes.forEach((element) => {
+			if (element.textContent === data.from)
+			{
+				element.style.color = "lime";
+				element.style.fontWeight = "bold";
+			}
+		});
+
+		if (data.invitation)
 		{
-        	const chat = document.getElementById('chatMessages');
-			const newMessage = document.createElement('div');
-			newMessage.classList.add('message');
-			newMessage.textContent = data.from + ': ' + data.message;
-			chat.appendChild(newMessage);
+			const newbutton = document.createElement('button');
+			newbutton.classList.add('message');
+			newbutton.textContent = 'join';
+			
+			chat.appendChild(newbutton);
 			chat.scrollTop = chat.scrollHeight;
 
-			elemcontainer.childNodes.forEach((element) => {
-				if (element.textContent === data.from)
-				{
-					element.style.color = "lime";
-					element.style.fontWeight = "bold";
-				}
+			if (allconversations[data.from] === undefined)
+				allconversations[data.from] = [];
+			allconversations[data.from].push({
+				'from': data.from,
+				'message': '<button>join</button>',
 			});
 		}
     };
