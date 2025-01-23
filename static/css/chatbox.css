@@ -214,6 +214,32 @@ div.message {
     padding: 5px;
 }
 
+a.message.btn.btn-primary {
+	background-color: #17BEBB;
+	color: #3f0a70;
+	border-radius: 5px;
+	box-shadow: 1px 1px 5px 0px  #1cf3ef;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	margin-left: 2%;
+	width: 95%;
+	max-width: 95%;
+	height: auto;
+	overflow-wrap: break-word;
+	white-space: normal;
+	word-wrap: break-word;
+	justify-content: initial;
+	content-visibility: auto;
+	align-content: space-evenly;
+	padding: 5px;
+}
+
+
+a.message.btn.btn-primary:hover{
+	background-color: #076463;
+}
+
+
 
 
 
