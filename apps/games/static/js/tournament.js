@@ -33,35 +33,32 @@ async function displayPlayerTournament()
 
 	for (let i = 0; i < data.length; i++)
 	{
+		if (data[i].type_pong === tournamentId)
 		{
-			if (data[i].type_pong === tournamentId)
+			for (let j = 0; j < data[i].player_entries.length; j++)
+				players.add(data[i].player_entries[j]);
+
+			players = Array.from(players);
+			for (let j = 0; j < players.length; j++)
 			{
+				const row = document.createElement('tr');
+				const cell = document.createElement('td');
+				const text = document.createTextNode(players[j].player.username);
+				const teamcell = document.createElement('td');
+				const team = document.createTextNode(players[j].team_name);
 
-				for (let j = 0; j < data[i].player_entries.length; j++)
-					players.add(data[i].player_entries[j]);
+				cell.appendChild(text);
+				teamcell.appendChild(team);
+				row.appendChild(cell);
+				row.appendChild(teamcell);
+				tabplayers.appendChild(row);
 
-				players = Array.from(players);
-				for (let j = 0; j < players.length; j++)
+				if (players[j].is_host)
 				{
-					const row = document.createElement('tr');
-					const cell = document.createElement('td');
-					const text = document.createTextNode(players[j].player.username);
-					const teamcell = document.createElement('td');
-					const team = document.createTextNode(players[j].team_name);
-
-					cell.appendChild(text);
-					teamcell.appendChild(team);
-					row.appendChild(cell);
-					row.appendChild(teamcell);
-					tabplayers.appendChild(row);
-
-					if (players[j].is_host)
-					{
-						cell.style.color = 'yellow';
-						teamcell.style.color = 'yellow';
-						if (players[j].player.username === await getUserName())
-							startButton.style.display = 'block';
-					}
+					cell.style.color = 'yellow';
+					teamcell.style.color = 'yellow';
+					if (players[j].player.username === await getUserName())
+						startButton.style.display = 'block';
 				}
 			}
 		}
@@ -96,27 +93,21 @@ function startTournoi()
 
 async function checkPlayer(playername)
 {
-	players.forEach(player => {
-		if (player.player.username === playername)
+	if (playername === await getUserName())
+		return false;
+	const response = await fetch('/authe/api/users/');
+	const data = await response.json();
+	for (let i = 0; i < data.length; i++)
+	{
+		if (data[i].username === playername)
 		{
-			let error = document.getElementById('error');
-			if (error)
-				error.remove();
-			error = document.createElement('p');
-			const text = document.createTextNode('Player already in the tournament');
-			const errorDiv = document.getElementById('games-container');
-
-			error.appendChild(text);
-			errorDiv.appendChild(error);
-			error.setAttribute('id', 'error');
-			error.setAttribute('class', 'error-message');
-			inviteButton.value = '';
-			setInterval(() => {
-				error.remove();
-			}, 3000);
+			players.forEach(player => {
+				if (player.player.username === playername)
+					return false;
+			});
 			return true;
 		}
-	});
+	}
 	return false;
 }
 
@@ -177,6 +168,9 @@ async function setupPlayerList()
 
 					joinButton.disabled = true;
 					joinButton.style.backgroundColor = 'grey';
+
+					console.log(players);
+
 				}
 			})
 			.catch(err => {
@@ -190,7 +184,8 @@ async function setupPlayerList()
 		// console.log(players.length);
 		for (let i = 0; i < players.length; i++)
 		{
-			allconversations["other"] = [];
+			if (!allconversations["other"])
+				allconversations["other"] = [];
 			allconversations["other"].push({
 				'from': 'Tournament',
 				'message': 'The tournament is starting',
@@ -205,16 +200,33 @@ async function setupPlayerList()
 		startTournoi();
 	});
 
-
-
-	inviteButton.addEventListener('keypress', (e) => {
+	inviteButton.addEventListener('keypress', async (e) => {
 		if (e.key === 'Enter')
 		{
 			let playername = inviteButton.value;
-			if (checkPlayer(playername))
-				return;
-			inviteButton.value = '';
+			console.log((playername));
+			if (await checkPlayer(playername))
+			{
+				inviteButton.value = '';
 
+				const buttonforjoin = document.createElement('button');
+				const text = document.createTextNode('Join');
+
+				buttonforjoin.appendChild(text);
+				
+				if (!allconversations[playername])
+					allconversations[playername] = [];
+				allconversations[playername].push({
+					'from': 'You',
+					'message': 'Invite ' + playername + ' to join the tournament',
+				});
+				socket.send(JSON.stringify({
+					'to': playername,
+					'message': 'Invating you to join the tournament',
+				}));
+			}
+			else
+				console.log('Player not found');
 		}
 	});
 }
