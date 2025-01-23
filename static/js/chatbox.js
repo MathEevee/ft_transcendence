@@ -110,9 +110,11 @@ function printallConversations(of) {
 	for (let i = 0; i < allconversations[of].length; i++) {
 		if (allconversations[of][i].message.includes('<button>'))
 		{
-			const newMessage = document.createElement('btn');
+			const newMessage = document.createElement('a');
 			newMessage.classList.add('message');
-			newMessage.innerHTML = allconversations[of][i].from + ': ' + allconversations[of][i].message;
+			newMessage.classList.add('btn');
+			newMessage.classList.add('btn-primary');
+			newMessage.textContent = 'JOIN';
 			chat.appendChild(newMessage);
 			chat.scrollTop = chat.scrollHeight;
 			continue;
@@ -228,8 +230,10 @@ function liveChat() {
 
 		if (data.invitation)
 		{
-			const newbutton = document.createElement('button');
+			const newbutton = document.createElement('a');
 			newbutton.classList.add('message');
+			newbutton.classList.add('btn');
+			newbutton.classList.add('btn-primary');
 			newbutton.textContent = 'join';
 			
 			chat.appendChild(newbutton);
