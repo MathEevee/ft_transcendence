@@ -47,6 +47,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
 			data = json.loads(text_data)
 			message = data['message']
 			to_user = data['to']
+			if 'is_invite' in data:
+				is_invite = data['is_invite']
+				tournamentType = data['message'].split(':')[1]
+			else:
+				is_invite = False
+				tournamentType = 'None'
 
 			if to_user in user_sockets and len(user_sockets[to_user]) != 0:
 				conversation_key = tuple(sorted([self.user.username, to_user]))
@@ -54,7 +60,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 				conversations[conversation_key].append({
 					'from': self.user.username,
 					'to': to_user,
-					'message': message
+					'message': message,
+					'invitation': is_invite,
+					'tournamentType': tournamentType
 				})
 
 				for socket in user_sockets[to_user]:
@@ -62,7 +70,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 						'message': message,
 						'from': self.user.username,
 						'to': to_user,
-						'all_messages': list(conversations[conversation_key])
+						'all_messages': list(conversations[conversation_key]),
+						'invitation': is_invite,
+						'tournamentType': tournamentType
 					}))
 				
 				await self.send(text_data=json.dumps({
@@ -72,12 +82,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
 				await self.send(text_data=json.dumps({
 					'message': to_user + ' is not connected',
 					'from': 'admin',
-					'to': self.user.username
+					'to': self.user.username,
+					'invitation': is_invite,
+					'tournamentType': tournamentType
 				}))
 		except Exception as e:
 			print(f"Error in receive: {e}")
 			await self.send(text_data=json.dumps({
 				'message': 'An error occurred',
 				'from': 'admin',
-				'to': self.user.username
+				'to': self.user.username,
+				'invitation': is_invite,
+				'tournamentType': tournamentType
 			}))

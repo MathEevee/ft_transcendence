@@ -209,11 +209,6 @@ async function setupPlayerList()
 			{
 				inviteButton.value = '';
 
-				const buttonforjoin = document.createElement('button');
-				const text = document.createTextNode('Join');
-
-				buttonforjoin.appendChild(text);
-				
 				if (!allconversations[playername])
 					allconversations[playername] = [];
 				allconversations[playername].push({
@@ -222,7 +217,8 @@ async function setupPlayerList()
 				});
 				socket.send(JSON.stringify({
 					'to': playername,
-					'message': 'Invating you to join the tournament',
+					'message': 'Invating you to join the tournament to : ' + (tournamentId ? 'Pong' : 'Space Battle'),
+					'is_invite': true,
 				}));
 			}
 			else
