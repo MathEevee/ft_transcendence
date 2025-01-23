@@ -5,6 +5,10 @@ var allconversations = [];
 let link;
 
 function sendMessage() {
+	const privatewith = document.getElementById('selectFriend');
+	const lock = document.getElementById('lock');
+	if (privatewith.style.display === 'none' || lock.style.display === 'none')
+		return;
 	const message = document.getElementById('inputMessages').value;
 	const chat = document.getElementById('chatMessages');
 	const newMessage = document.createElement('div');
@@ -179,7 +183,6 @@ function liveChat() {
 			let status = document.querySelector(`#chatbox .friend[data-friend="${data.user}"`);
 			status.style.color = data.status === true ? "lime" : "red";
 			status.style.fontWeight = data.status === true ? "bold" : "normal";
-			console.log(data, "todo update status");
 			return;
 		}
 		if (data.from === undefined || data.message === undefined)
@@ -249,6 +252,10 @@ function liveChat() {
 	function closeChat() {
 		liveChat.style.display = "none";
 		ChatButton.style.display = "flex";
+		const privatewith = document.getElementById('selectFriend');
+		const lock = document.getElementById('lock');
+		privatewith.style.display = 'none';
+		lock.style.display = 'none';
 	}
 	
 	ChatButton.addEventListener('click', openChat);
@@ -284,6 +291,10 @@ function loadBar(event) {
 	if (event.type === 'click') {  // Fix: change to check for 'click' event type
 		// event.preventDefault();
 		link = document.createElement("a");
+		const privatewith = document.getElementById('selectFriend');
+		const lock = document.getElementById('lock');
+		privatewith.style.display = 'block';
+		lock.style.display = 'block';
 
 		var friendName = event.target.textContent;
 
