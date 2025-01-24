@@ -134,6 +134,7 @@ async function setupPlayerList()
 
 	//put the player in the tournament db
 	joinButton.addEventListener('click', () => {
+			console.log(tournamentId);
 			const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 			fetch('/authe/api/tournaments/', {
 				method: 'POST',
@@ -182,14 +183,14 @@ async function setupPlayerList()
 	startButton.addEventListener('click', () => {
 
 		// console.log(players.length);
+		if (!allconversations["other"])
+			allconversations["other"] = [];
+		allconversations["other"].push({
+			'from': 'Tournament',
+			'message': 'The tournament is starting',
+		});
 		for (let i = 0; i < players.length; i++)
 		{
-			if (!allconversations["other"])
-				allconversations["other"] = [];
-			allconversations["other"].push({
-				'from': 'Tournament',
-				'message': 'The tournament is starting',
-			});
 			socket.send(JSON.stringify({
 				'to': players[i].player.username,
 				'message': 'The tournament is starting',

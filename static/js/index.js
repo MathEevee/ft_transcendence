@@ -66,3 +66,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+export { loadPage, changePage, fetchAndReplaceContent };
