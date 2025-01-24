@@ -2,20 +2,20 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# copy Python dependencies
-COPY requirements.txt ./
-
-# dependencies (gcc & libpq-dev for psycopg2) + requirements.txt
-RUN apt update && apt upgrade -y && \
-    apt install -y gcc libpq-dev && \
-    pip install --no-cache-dir -r requirements.txt && \
-    apt purge -y gcc && \
-    apt autoremove -y && apt-get clean
-
 # copy project files
 COPY . .
 
+# dependencies (gcc & libpq-dev for psycopg2)
+# requirements.txt
+# delete gcc & clean apt & cache apt
 # scripts permissions
-RUN chmod +x data/create_db.sh
+RUN apt update && \
+    apt install -y --no-install-recommends gcc libpq-dev && \
+    pip install --no-cache-dir -r requirements.txt && \
+    apt purge -y gcc && \
+    apt autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    chmod +x wait_postgres.sh create_db.sh
 
-CMD ["bash", "-c", "data/create_db.sh && python3 data/setup_db.py && python3 manage.py runserver 0.0.0.0:8000"]
+CMD ["sh", "-c", "./data/wait_postgres.sh && ./data/create_db.sh && python manage.py runserver 0.0.0.0:8000"]
