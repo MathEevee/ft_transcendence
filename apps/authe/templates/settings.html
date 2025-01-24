@@ -6,28 +6,29 @@ Settings
 
 {% load static %}
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/register.css' %}">
-
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
 {% endblock %}
 
 {% block content %}
+{% include "navbar.html" %}
 
-<h2>Parametres</h2>
+<div class="body-container">
+    <h2>Parametres</h2> 
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+    
+        <div id="avatar-selection" class="avatar-selection">
+            {% for avatar in avatars %}
+            <label>
+                <input type="radio" name="profil_picture" value="{{ avatar }}"></input>
+                <img src="{{ avatar }}" class="avatar" alt="Avatar"></img>
+            </label>
+            {% endfor %}
+        </div>
 
-    <div id="avatar-selection" class="avatar-selection">
-        {% for avatar in avatars %}
-        <label>
-            <input type="radio" name="profil_picture" value="{{ avatar }}"></input>
-            <img src="{{ avatar }}" class="avatar" alt="Avatar"></img>
-        </label>
-        {% endfor %}
-    </div>
-
-    <button type="submit">Valider</button>
-</form>
-
+        <button class="btn-settings" type="submit">Valider</button>
+    </form>
+</div>
 {% endblock %}
