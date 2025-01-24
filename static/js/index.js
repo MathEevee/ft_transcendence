@@ -11,7 +11,6 @@ const allPage = {
 };
 
 function loadPage(path) {
-    // console.log(path)
     if (allPage[path])
         allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
     else if (allPage[path + '/'])
@@ -62,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (href.startsWith('/')) {
             event.preventDefault();
-            fetchAndReplaceContent(link);
+            fetchAndReplaceContent(href);
         }
     });
 
