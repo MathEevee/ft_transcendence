@@ -3,7 +3,7 @@ services:
     container_name: postgres
     image: postgres:15
     volumes:
-      - db-postgres:/var/lib/postgresql/data
+      - ft_transcendence_db-postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     env_file:
@@ -22,7 +22,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./backend:/app
+      - ft_transcendence_backend:/app
     ports:
       - "8000:8000"
     depends_on:
