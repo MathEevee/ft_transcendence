@@ -1,0 +1,54 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:15
+    volumes:
+      - ft_transcendence_db-postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - transcendence
+    env_file:
+      - ./app/.env
+      - ./app/secrets
+
+  backend:
+    container_name: backend
+    restart: on-failure:5
+    build:
+      context: ./app/
+      dockerfile: Dockerfile
+    volumes:
+      - ft_transcendence_backend:/app
+    ports:
+      - "8000:8000"
+    networks:
+      - transcendence
+    depends_on:
+      - postgres
+    env_file:
+      - ./app/.env
+      - ./app/secrets
+
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    restart: on-failure
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8080:80"
+    networks:
+      - transcendence
+    depends_on:
+      - backend
+
+
+volumes:
+  ft_transcendence_db-postgres:
+  ft_transcendence_backend:
+
+networks:
+  transcendence:
+    name: transcendence
+    driver: bridge
