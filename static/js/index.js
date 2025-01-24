@@ -3,7 +3,7 @@ import { liveChat } from "/static/js/chatbox.js";
 const allPage = {
     "/games/pong/local/": () => import("/static/js/pong.js").then(module => module.loadPong()),
     "/games/pong/solo/": () => import("/static/js/pong.js").then(module => module.loadPong()),
-    "/games/pong/online/": () => import("/static/js/pongMulti/pongMulti.js").then(module => module.loadPongMulti()),
+    "/games/pong/multiplayer/": () => import("/static/js/pongMulti/pongMulti.js").then(module => module.loadPongMulti()),
     "/games/spaceinvaders/": () => import("/static/js/spaceInvadeur.js").then(module => module.loadSpaceInvadersGame()),
     "/games/pong/tournament/": () => import("/static/js/tournament.js").then(module => module.loadTournament()),
     "/games/spaceinvaders/tournament/": () => import("/static/js/tournament.js").then(module => module.loadTournament()),

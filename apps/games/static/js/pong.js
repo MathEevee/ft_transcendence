@@ -19,8 +19,8 @@ function loadPong() {
 		gamemode = "local";
 	else if (window.location.pathname === "/games/pong/solo/")
 		gamemode = "solo";
-	else if (window.location.pathname === "/games/pong/online/")
-		gamemode = "online";
+	else if (window.location.pathname === "/games/pong/multiplayer/")
+		gamemode = "multiplayer";
 
 	// Balle
 	const ball = { x: canvas.width / 2, y: canvas.height / 2, radius: 8, speed: 5, dx: 1, dy: Math.random() - 0.5 };

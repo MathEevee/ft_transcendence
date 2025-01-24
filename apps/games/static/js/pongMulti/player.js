@@ -1,16 +1,13 @@
 import { drawdiamond, drawRect } from './utils.js';
 import { point } from './point.js';
-import { background } from './background.js';
-
-let p = 0;
 
 class Player
 {
 	update(canvas)
 	{
-		if (this.y + this.dy == canvas.height / 4 || this.y + this.dy + this.height == canvas.height / 4 * 3)
+		if (this.y + this.dy < 0 || this.y + this.dy + this.height > canvas.height)
 			return ;
-		if (this.x + this.dx == canvas.width / 4 || this.x + this.dx + this.width == canvas.width / 4 * 3)
+		if (this.x + this.dx < 0 || this.x + this.dx + this.width > canvas.width)
 			return ;
 		this.x += this.dx;
 		this.y += this.dy;

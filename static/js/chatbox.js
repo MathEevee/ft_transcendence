@@ -287,7 +287,7 @@ function liveChat() {
 			newMessage.textContent = data.from + ': ' + data.message;
 			chat.appendChild(newMessage);
 			chat.scrollTop = chat.scrollHeight;
-
+			return;
 		}
     	const chat = document.getElementById('chatMessages');
 		const newMessage = document.createElement('div');
