@@ -36,9 +36,9 @@ async function changePage(path, disableHistory) {
     }
 }
 
-async function fetchAndReplaceContent(event) {
+async function fetchAndReplaceContent(href) {
     try {
-        await changePage(event.target.getAttribute('href'));
+        await changePage(href);
     } catch (err) {
         console.error(`Error fetching content: ${err}`);
     }
@@ -48,12 +48,21 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPage(window.location.pathname);
 
     document.addEventListener('click', (event) => {
-        const href = event.target.getAttribute('href');
-        if (href && href.includes('/authe/oauth42/'))
+        const link = event.target.closest('a');
+        if (!link) return; // pas un lien
+
+        const href = link.getAttribute('href');
+        if (!href) return; // pas de href
+
+        if (href.includes('/authe/oauth42/'))
             return;
-        if ((event.target.tagName === 'A' || event.target.tagName === 'I') && href && href.startsWith('/' )){
+        if (href === '/admin') {
+            window.location.href = href; // Rechargement complet
+            return;
+        }
+        if (href.startsWith('/')) {
             event.preventDefault();
-            fetchAndReplaceContent(event);
+            fetchAndReplaceContent(link);
         }
     });
 
