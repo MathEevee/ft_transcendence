@@ -6,8 +6,8 @@ myenv/
 __pycache__/
 
 # secrets files
-.env
-secrets
+# .env
+# secrets
 
 # other dir & files
 .git/

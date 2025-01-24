@@ -6,30 +6,29 @@ services:
       - ft_transcendence_db-postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - transcendence
     env_file:
-      - .env
-      - ./secrets
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-      # POSTGRES_HOST_AUTH_METHOD: trust
+      - ./app/.env
+      - ./app/secrets
 
   backend:
     container_name: backend
     restart: on-failure:5
     build:
-      context: .
+      context: ./app/
       dockerfile: Dockerfile
     volumes:
       - ft_transcendence_backend:/app
     ports:
       - "8000:8000"
+    networks:
+      - transcendence
     depends_on:
       - postgres
     env_file:
-      - .env
-      - ./secrets
+      - ./app/.env
+      - ./app/secrets
 
   # nginx:
   #   container_name: nginx
@@ -39,9 +38,10 @@ services:
 
 
 volumes:
-  db-postgres:
+  ft_transcendence_db-postgres:
+  ft_transcendence_backend:
 
-# networks:
-#   transcendence:
-#     name: transcendence
-#     driver: bridge
+networks:
+  transcendence:
+    name: transcendence
+    driver: bridge
