@@ -1,3 +1,10 @@
+# DOCKER (for DEBIAN)
+
+./install_docker.sh
+## docker version must be >= 27.5.0
+## docker compose version must be >= v2.32.3
+
+
 # BACKEND
 
 # install python3
