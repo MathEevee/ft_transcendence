@@ -25,21 +25,21 @@ def setup_database():
     print("creating users...")
     try:
         CustomUser.objects.create_superuser(
-            username="ajas",
-            email="ajas@example.com",
-            password="SuperPower",
+            username=os.getenv("USERNAME1"),
+            email=os.getenv("EMAIL1"),
+            password=os.getenv("PASSWORD1"),
             profil_picture=" /static/pictures/user-avatar-01.png"
         )
         CustomUser.objects.create_user(
-            username="yoda",
-            email="yoda@example.com",
-            password="TheForce",
+            username=os.getenv("USERNAME2"),
+            email=os.getenv("EMAIL2"),
+            password=os.getenv("PASSWORD2"),
             profil_picture=" /static/pictures/user-avatar-02.png"
         )
         CustomUser.objects.create_user(
-            username="luke",
-            email="luke@example.com",
-            password="StarKiller",
+            username=os.getenv("USERNAME3"),
+            email=os.getenv("EMAIL3"),
+            password=os.getenv("PASSWORD3"),
             profil_picture=" /static/pictures/user-avatar-03.png"
         )
     except IntegrityError:

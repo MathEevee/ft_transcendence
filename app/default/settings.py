@@ -14,6 +14,8 @@ secrets_conf = Config(RepositoryEnv(BASE_DIR / 'secrets'))
 OAUTH_UID = secrets_conf('OAUTH_UID')
 OAUTH_SECRET = secrets_conf('OAUTH_SECRET')
 
+SITE_URL = env_conf('SITE_URL')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -22,8 +24,14 @@ SECRET_KEY = 'django-insecure-3t6@4euv&+e-7g$u_syy_9cd+de!x^cwe-57i_z*45v3hfnj(g
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-    
-ALLOWED_HOSTS = []
+
+CSRF_TRUSTED_ORIGINS = [
+    f"http://{SITE_URL}:8080"
+]
+
+ALLOWED_HOSTS = [
+    SITE_URL
+]
 
 # Application definition
 
