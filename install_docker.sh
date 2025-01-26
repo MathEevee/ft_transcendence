@@ -4,9 +4,11 @@ set -e
 
 echo ">>> Détection du système d'exploitation"
 if [ -f /etc/debian_version ]; then
-    DISTRO="debian"
+    DISTRO=$(grep -i "^ID=" /etc/os-release | cut -d= -f2 | tr -d '"')
+    VERSION_CODENAME=$(grep -i "^VERSION_CODENAME=" /etc/os-release | cut -d= -f2 | tr -d '"')
 elif [ -f /etc/lsb-release ] && grep -q "Ubuntu" /etc/lsb-release; then
     DISTRO="ubuntu"
+    VERSION_CODENAME=$(grep -i "^DISTRIB_CODENAME=" /etc/lsb-release | cut -d= -f2)
 else
     echo "Ce script est uniquement compatible avec Debian et Ubuntu."
     exit 1
