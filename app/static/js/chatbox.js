@@ -1,10 +1,10 @@
 import {changePage} from './index.js';
 
 if (!window.location.pathname.startsWith('/authe/')) {
-    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsURL = `${wsProtocol}//${window.location.host}/ws/chat/`;
-	console.log(wsURL);
-    var g_socket = new WebSocket(wsURL);
+    // const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    // const wsURL = `${wsProtocol}//${window.location.host}/ws/chat/`;
+	// console.log(wsURL);
+    var g_socket = new WebSocket('ws://10.13.248.126:8080/ws/chat/');
 }
 
 var allconversations = [];
