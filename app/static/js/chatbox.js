@@ -1,7 +1,11 @@
 import {changePage} from './index.js';
 
-if (!window.location.pathname.startsWith('/authe/'))
-    var g_socket = new WebSocket('ws://localhost:8000/ws/chat/');
+if (!window.location.pathname.startsWith('/authe/')) {
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsURL = `${wsProtocol}//${window.location.host}/ws/chat/`;
+	console.log(wsURL);
+    var g_socket = new WebSocket(wsURL);
+}
 
 var allconversations = [];
 let link;
