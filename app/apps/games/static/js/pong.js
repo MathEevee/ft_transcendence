@@ -601,7 +601,7 @@ function loadPong() {
 					'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content')
 				},
 				body: JSON.stringify({
-					'type' : '1v1',
+					'type' : 'Pong 1v1',
 					'started_at': Date.now(),
 				})
 			})

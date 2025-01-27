@@ -62,3 +62,10 @@ def end_game_local_IA(request):
             return JsonResponse({'error': True, 'message':'Invalid ID'})
     except Player.DoesNotExist:
         return JsonResponse({'error': True, 'message':'Invalid Player ID'})
+
+@login_required
+def display_all_game(request):
+    history = Player.objects.filter(user=request.user)
+    history_list = [ele.json() for ele in history]
+    return JsonResponse({'history':history_list})
+    
