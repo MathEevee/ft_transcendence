@@ -17,6 +17,9 @@ rebuild:
 	make clean
 	make up
 
+watch:
+	docker compose -f ./docker-compose.yml watch
+
 init_data:
 	docker exec -it ft_transcendence_backend bash -c "data/create_db.sh"
 	docker exec -it ft_transcendence_backend python3 data/setup_db.py

@@ -1,6 +1,7 @@
 import { allconversations } from "/static/js/chatbox.js";
 
 function loadPong() {
+	console.log('Pong game loaded');
 	let interval = null;
 	const canvas = document.getElementById('pong');
 	const context = canvas.getContext('2d');
@@ -12,17 +13,37 @@ function loadPong() {
 	const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 	const wsURL = `${wsProtocol}//${window.location.host}/ws/chat/`;
 	const socket = new WebSocket(wsURL);
+	const gamesocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/`);
 	chatbox.style.display = "none";
-
-	const gamesocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/games/pong/`);
-
-	const gameName = window.location.pathname.split('/')[2];
 
 	async function getUserName() {
 		const response = await fetch('/authe/api/me/');
 		const data = await response.json();
 		return data.username;
 	}
+
+	async function putnameinbox()
+	{
+		const playernamebox = document.createElement('h1');
+		playernamebox.setAttribute('id', 'playername');
+		playernamebox.textContent = await getUserName();
+		divofbox.appendChild(playernamebox);
+	}
+
+
+	gamesocket.onmessage = function(event)
+	{
+		const data = JSON.parse(event.data);
+		console.log(data);
+	}
+
+	gamesocket.onopen = function(event)
+	{
+		putnameinbox();
+	}
+
+	const gameName = window.location.pathname.split('/')[2];
+
 
 	async function checkPlayer(playername)
 	{
@@ -36,18 +57,7 @@ function loadPong() {
 				return true;
 		}
 		return false;
-	}
-
-	async function putnameinbox()
-	{
-		const playernamebox = document.createElement('h1');
-		playernamebox.setAttribute('id', 'playername');
-		playernamebox.textContent = await getUserName();
-		divofbox.appendChild(playernamebox);
-	}
-
-	putnameinbox();
-	
+	}	
 	// Joueurs
 	const paddleWidth = 10;
 	const paddleHeight = 100;
@@ -61,7 +71,25 @@ function loadPong() {
 	else if (window.location.pathname === "/games/pong/solo/")
 		gamemode = "solo";
 	else if (window.location.pathname === "/games/pong/multiplayer/")
+	{
+		inviteinput.style.display = "block";
+		divofbox.style.display = "block";
+		setTimeout(() => {
+		document.getElementById('game-info-player').style.display = "block";
+		document.getElementById('playername').style.display = "block";
+		}, 1000);
 		gamemode = "multiplayer";
+	}
+	else if (window.location.pathname === "/games/pong/online/")
+	{
+		inviteinput.style.display = "block";
+		divofbox.style.display = "block";
+		setTimeout(() => {
+			document.getElementById('game-info-player').style.display = "block";
+			document.getElementById('playername').style.display = "block";
+			}, 1000);
+		gamemode = "online";
+	}
 
 	// Balle
 	const ball = { x: canvas.width / 2, y: canvas.height / 2, radius: 8, speed: 5, dx: 1, dy: Math.random() - 0.5 };
