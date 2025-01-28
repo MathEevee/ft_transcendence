@@ -26,6 +26,10 @@ def auth_with_42(request):
 	client_id = settings.OAUTH_UID
 	# redirect_uri = '<VOTRE_REDIRECT_URI>'
 	redirect_uri = request.build_absolute_uri(reverse('authe:auth_callback'))
+	tmpsplit = redirect_uri.split('/')
+	tmpsplit[2] += ':8080'
+	redirect_uri = '/'.join(tmpsplit)
+	print("redirect_uri: ", redirect_uri)
 	scope = 'public'  # Demande d'accès aux informations publiques de l'utilisateur
 	auth_url = f'https://api.intra.42.fr/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}'
 	return redirect(auth_url)
@@ -36,7 +40,11 @@ def auth_callback(request):
 	code = request.GET.get('code')
 	if not code:
 		messages.error(request, "Code d'autorisation manquant.")
-		return redirect('/')  # Rediriger vers page home 
+		return redirect('/')  # Rediriger vers page home
+	redirect_uri = request.build_absolute_uri(reverse('authe:auth_callback'))
+	tmpsplit = redirect_uri.split('/')
+	tmpsplit[2] += ':8080'
+	redirect_uri = '/'.join(tmpsplit)
 
 	# Préparer la requête pour obtenir un token
 	token_url = 'https://api.intra.42.fr/oauth/token'
@@ -45,7 +53,7 @@ def auth_callback(request):
 		'client_id': settings.OAUTH_UID,
 		'client_secret': settings.OAUTH_SECRET,
 		'code': code,
-		'redirect_uri': request.build_absolute_uri(reverse('authe:auth_callback')),
+		'redirect_uri': redirect_uri,
 	}
 	
 	# Envoyer la requête pour obtenir un token
