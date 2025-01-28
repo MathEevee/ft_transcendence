@@ -1,12 +1,63 @@
+import { allconversations } from "/static/js/chatbox.js";
+
 function loadPong() {
+	console.log('Pong game loaded');
 	let interval = null;
 	const canvas = document.getElementById('pong');
 	const context = canvas.getContext('2d');
 	const redbutton = document.getElementById('red');
 	const bluebutton = document.getElementById('blue');
 	const chatbox = document.getElementById('box');
+	const inviteinput = document.getElementById('invite');
+	const divofbox = document.getElementById('game-info-player');
+	const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+	const wsURL = `${wsProtocol}//${window.location.host}/ws/chat/`;
+	const socket = new WebSocket(wsURL);
+	const gamesocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/`);
 	chatbox.style.display = "none";
-	
+
+	async function getUserName() {
+		const response = await fetch('/authe/api/me/');
+		const data = await response.json();
+		return data.username;
+	}
+
+	async function putnameinbox()
+	{
+		const playernamebox = document.createElement('h1');
+		playernamebox.setAttribute('id', 'playername');
+		playernamebox.textContent = await getUserName();
+		divofbox.appendChild(playernamebox);
+	}
+
+
+	gamesocket.onmessage = function(event)
+	{
+		const data = JSON.parse(event.data);
+		console.log(data);
+	}
+
+	gamesocket.onopen = function(event)
+	{
+		putnameinbox();
+	}
+
+	const gameName = window.location.pathname.split('/')[2];
+
+
+	async function checkPlayer(playername)
+	{
+		if (playername === await getUserName())
+			return false;
+		const response = await fetch('/authe/api/users/');
+		const data = await response.json();
+		for (let i = 0; i < data.length; i++)
+		{
+			if (data[i].username === playername)
+				return true;
+		}
+		return false;
+	}	
 	// Joueurs
 	const paddleWidth = 10;
 	const paddleHeight = 100;
@@ -20,7 +71,25 @@ function loadPong() {
 	else if (window.location.pathname === "/games/pong/solo/")
 		gamemode = "solo";
 	else if (window.location.pathname === "/games/pong/multiplayer/")
+	{
+		inviteinput.style.display = "block";
+		divofbox.style.display = "block";
+		setTimeout(() => {
+		document.getElementById('game-info-player').style.display = "block";
+		document.getElementById('playername').style.display = "block";
+		}, 1000);
 		gamemode = "multiplayer";
+	}
+	else if (window.location.pathname === "/games/pong/online/")
+	{
+		inviteinput.style.display = "block";
+		divofbox.style.display = "block";
+		setTimeout(() => {
+			document.getElementById('game-info-player').style.display = "block";
+			document.getElementById('playername').style.display = "block";
+			}, 1000);
+		gamemode = "online";
+	}
 
 	// Balle
 	const ball = { x: canvas.width / 2, y: canvas.height / 2, radius: 8, speed: 5, dx: 1, dy: Math.random() - 0.5 };
@@ -344,7 +413,7 @@ function loadPong() {
 	
 	document.body.addEventListener("keyup", (event) =>
 	{
-		if (chatbox.style.display !== "none")
+		if (chatbox.style.display !== "none" || start === 0)
 			return ;
 		if (event.key === "r")
 			startPong();
@@ -640,10 +709,42 @@ function loadPong() {
 		context.font = "30px Arial";
 		context.fillText("Press blue button for options", canvas.width / 2 - sizeofstringdisplayed("Press blue button for options").width / 2, canvas.height - 10);
 	}
+
+	async function sendInvite(event)
+	{
+		if (event.key === "Enter")
+		{
+			let playername = inviteinput.value;
+			console.log((playername));
+			if (await checkPlayer(playername))
+			{
+				inviteinput.value = '';
+
+				if (!allconversations[playername])
+					allconversations[playername] = [];
+				allconversations[playername].push({
+					'from': 'You',
+					'message': 'Invite ' + playername + ' to join a game of ' + gameName,
+				});
+				socket.send(JSON.stringify({
+					'to': playername,
+					'message': 'Invating you to play : ' + gameName,
+					'is_invite': true,
+					'tournament': false,
+				}));
+			}
+			else
+				console.log('Player not found');
+		}
+	}
+
 	
 	wait();
+
+
 	redbutton.addEventListener("click", startPong);
 	bluebutton.addEventListener("click", startOption);
+	inviteinput.addEventListener("keypress", sendInvite);
 }
 
 export { loadPong }
