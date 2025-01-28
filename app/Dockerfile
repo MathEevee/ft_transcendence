@@ -19,4 +19,4 @@ RUN apt update && \
     # # mv .env app/.env
     # if [ -f .env ]; then mv .env app/.env; else echo ".env not found, skipping move"; fi
 
-CMD ["sh", "-c", "./data/wait_postgres.sh && ./data/create_db.sh && python data/setup_db.py && python manage.py runserver 0.0.0.0:8000"]
+CMD ["sh", "-c", "./data/wait_postgres.sh && ./data/create_db.sh && python data/setup_db.py && python -u manage.py runserver 0.0.0.0:8000"]

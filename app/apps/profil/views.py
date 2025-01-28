@@ -8,7 +8,7 @@ from apps.games.views import display_all_game
 def profil_view(request, username):
     user_profil = get_object_or_404(CustomUser, username=username)
 
-    players_game = Player.objects.filter(user=request.user) #TODO change to username for profil
+    players_game = Player.objects.filter(user=user_profil)
     total = len(players_game)
     win = 0
     for player_game in players_game:
