@@ -58,7 +58,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 			else:
 				is_invite = False
 				tournamentType = 'None'
+				is_tournament = False
 
+			print(f"Message: {message}, To: {to_user}, is_invite: {is_invite}, is_tournament: {is_tournament}, tournamentType: {tournamentType}")
 			if to_user in user_sockets and len(user_sockets[to_user]) != 0:
 				conversation_key = tuple(sorted([self.user.username, to_user]))
 
