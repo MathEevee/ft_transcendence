@@ -93,6 +93,12 @@ async function fetchFriendList() {
 		}
 	})
 }
+
+async function getUserName() {
+	const response = await fetch('/authe/api/me/');
+	const data = await response.json();
+	return data.username;
+}
 		
 
 function retrieveConversations(data) {
@@ -113,7 +119,7 @@ async function printallConversations(of) {
 	if (allconversations[of] === undefined)
 		allconversations[of] = [];
 	for (let i = 0; i < allconversations[of].length; i++) {
-		if (allconversations[of][i].message.includes('<button>'))
+		if (allconversations[of][i].message.includes('<tournament>join</tournament>'))
 		{
 			let teamname = ["Patron", "Polygone", "Gravier", "Rempart", "Philentropes", "Poussière", "Poussin", "Poulet", "Noix", "Balle", "Parchemin", "Chaudron", "Café", "Cafard", "Protéïne"];
 			let teamadjective = ["Furieux", "Livide", "Avide", "Granuleux", "Marant", "Etourdie", "Furtif", "Mystèrieux", "Intriguant", "Fou", "Dingue", "Cinglé", "Barré", "Bizarre", "Etrange", "Curieux", "Ridicule", "Insolite", "Inhabituel", "Original", "Excentrique", "Extraordinaire", "Fantaisiste", "Farfelu", "Inouï", "Inouïe", "Insensé", "Invraisemblable", "Incongru", "Incroyable", "Inimaginable", "Décomplexé", "Délirant", "Déjanté", "Dément", "musclé", "puissant", "robuste", "solide", "costaud", "résistant", "vif", "alerte", "agile", "rapide", "Boulémique"];
@@ -122,14 +128,7 @@ async function printallConversations(of) {
 			{
 				return (teamname[Math.floor(Math.random() * teamname.length)] + " " + teamadjective[Math.floor(Math.random() * teamadjective.length)]);
 			}
-
-			async function getUserName() {
-				const response = await fetch('/authe/api/me/');
-				const data = await response.json();
-				return data.username;
-			}
 			
-			// console.log('message includes tournamentname ?', allconversations[of][i - 1]);
 			let tournamentId = allconversations[of][i - 1].message.split(' ');
 			tournamentId = tournamentId[tournamentId.length - 1];
 			tournamentId = tournamentId === 'Pong';
@@ -180,9 +179,6 @@ async function printallConversations(of) {
 							joinButton.disabled = true;
 							joinButton.style.backgroundColor = 'grey';
 						}
-
-						console.log(players);
-
 					}
 				})
 				.catch(err => {
@@ -195,6 +191,25 @@ async function printallConversations(of) {
 					changePage('/games/pong/tournament/', true);
 				else
 					changePage('/games/spaceinvaders/tournament/', true);
+			});
+			continue;
+		}
+		else if (allconversations[of][i].message.includes('<game>'))
+		{
+			console.log(allconversations[of][i].message);
+			const newMessage = document.createElement('a');
+			newMessage.classList.add('message');
+			newMessage.classList.add('btn');
+			newMessage.classList.add('btn-primary');
+			newMessage.textContent = 'JOIN';
+			chat.appendChild(newMessage);
+			chat.scrollTop = chat.scrollHeight;
+
+			newMessage.addEventListener('click', function(event) {
+				if (allconversations[of][i].message.includes('pong'))
+					changePage('/games/pong/local', true);
+				else
+					changePage('/games/spaceinvaders/', true);
 			});
 			continue;
 		}
@@ -269,10 +284,10 @@ function liveChat() {
 			status.style.fontWeight = data.status === true ? "bold" : "normal";
 			return;
 		}
+		console.log('WebSocket message received:', data);
 		if (data.from === undefined || data.message === undefined)
 			return;
 		retrieveConversations(data);
-		console.log('WebSocket message received:', data);
 		if (data.message.includes('not connected'))
 		{
 			let name = data.message.split(' ')[0];
@@ -299,22 +314,25 @@ function liveChat() {
 		chat.appendChild(newMessage);
 		chat.scrollTop = chat.scrollHeight;
 
-		elemcontainer.childNodes.forEach((element) => {
-			if (element.textContent === data.from)
-			{
-				element.style.color = "lime";
-				element.style.fontWeight = "bold";
-			}
-		});
-
+		console.log('invite', data.invitation);
 		if (data.invitation)
-		{			
+		{
 			if (allconversations[data.from] === undefined)
 				allconversations[data.from] = [];
-			allconversations[data.from].push({
-				'from': data.from,
-				'message': '<button>join</button>',
-			});
+			if (data.is_tournament)
+			{
+				allconversations[data.from].push({
+					'from': data.from,
+					'message': '<tournament>join</tournament>',
+				});
+			}
+			else
+			{
+				allconversations[data.from].push({
+					'from': data.from,
+					'message': '<game>' + (data.invitation ? 'pong' : 'spaceinvaders') + '</game>',
+				});
+			}
 		}
     };
 

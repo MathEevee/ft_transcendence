@@ -49,7 +49,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
 			to_user = data['to']
 			if 'is_invite' in data:
 				is_invite = data['is_invite']
-				tournamentType = data['message'].split(':')[1]
+				if data['tournament'] == True:
+					tournamentType = data['message'].split(':')[1]
+					is_tournament = True
+				else:
+					tournamentType = 'None'
+					is_tournament = False
 			else:
 				is_invite = False
 				tournamentType = 'None'
@@ -62,6 +67,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 					'to': to_user,
 					'message': message,
 					'invitation': is_invite,
+					'is_tournament': is_tournament,
 					'tournamentType': tournamentType
 				})
 
@@ -72,6 +78,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 						'to': to_user,
 						'all_messages': list(conversations[conversation_key]),
 						'invitation': is_invite,
+						'is_tournament': is_tournament,
 						'tournamentType': tournamentType
 					}))
 				
@@ -84,6 +91,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 					'from': 'admin',
 					'to': self.user.username,
 					'invitation': is_invite,
+					'is_tournament': is_tournament,
 					'tournamentType': tournamentType
 				}))
 		except Exception as e:
@@ -93,5 +101,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 				'from': 'admin',
 				'to': self.user.username,
 				'invitation': is_invite,
+				'is_tournament': is_tournament,
 				'tournamentType': tournamentType
 			}))

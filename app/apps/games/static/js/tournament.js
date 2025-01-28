@@ -5,7 +5,9 @@ function loadTournament()
 
 const startButton = document.getElementById('start-tournament');
 const inviteButton = document.getElementById('player-name');
-const socket = new WebSocket(`ws://localhost:8000/ws/chat/`);
+const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const wsURL = `${wsProtocol}//${window.location.host}/ws/chat/`;
+const socket = new WebSocket(wsURL);
 
 let teamname = ["Patron", "Polygone", "Gravier", "Rempart", "Philentropes", "Poussière", "Poussin", "Poulet", "Noix", "Balle", "Parchemin", "Chaudron", "Café", "Cafard", "Protéïne"];
 let teamadjective = ["Furieux", "Livide", "Avide", "Granuleux", "Marant", "Etourdie", "Furtif", "Mystèrieux", "Intriguant", "Fou", "Dingue", "Cinglé", "Barré", "Bizarre", "Etrange", "Curieux", "Ridicule", "Insolite", "Inhabituel", "Original", "Excentrique", "Extraordinaire", "Fantaisiste", "Farfelu", "Inouï", "Inouïe", "Insensé", "Invraisemblable", "Incongru", "Incroyable", "Inimaginable", "Décomplexé", "Délirant", "Déjanté", "Dément", "musclé", "puissant", "robuste", "solide", "costaud", "résistant", "vif", "alerte", "agile", "rapide", "Boulémique"];
@@ -220,6 +222,7 @@ async function setupPlayerList()
 					'to': playername,
 					'message': 'Invating you to join the tournament to : ' + (tournamentId ? 'Pong' : 'Space Battle'),
 					'is_invite': true,
+					'tournament': true,
 				}));
 			}
 			else
