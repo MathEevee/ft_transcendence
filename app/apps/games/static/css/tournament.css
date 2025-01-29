@@ -4,9 +4,8 @@ body {
 	color: #ffffff;
 	margin: 0;
 	padding: 0;
-	display: flex;
-	justify-content: center;
 	height: 100vh;
+	display: grid;
 }
 
 #games-container {
@@ -19,6 +18,8 @@ body {
 	width: 90%;
 	margin-top: 5rem;
 	justify-self: center;
+	align-self: flex-start;
+
 }
 
 #games-container h1 {

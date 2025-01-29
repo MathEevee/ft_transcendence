@@ -29,7 +29,6 @@ def auth_with_42(request):
 	tmpsplit = redirect_uri.split('/')
 	tmpsplit[2] += ':8080'
 	redirect_uri = '/'.join(tmpsplit)
-	print("redirect_uri: ", redirect_uri)
 	scope = 'public'  # Demande d'accès aux informations publiques de l'utilisateur
 	auth_url = f'https://api.intra.42.fr/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}'
 	return redirect(auth_url)

@@ -1,4 +1,6 @@
 import { allconversations } from "/static/js/chatbox.js";
+import { joinagame } from "/static/js/chatbox.js";
+// import { bebousocket } from "/static/js/chatbox.js";
 
 function loadPong() {
 	let interval = null;
@@ -12,7 +14,7 @@ function loadPong() {
 	const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 	const wsURL = `${wsProtocol}//${window.location.host}/ws/chat/`;
 	const socket = new WebSocket(wsURL);
-	const gamesocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/`);
+	let gamesocket;
 	chatbox.style.display = "none";
 
 	async function getUserName() {
@@ -21,28 +23,30 @@ function loadPong() {
 		return data.username;
 	}
 
-	async function putnameinbox()
+	function putnameinbox(name)
 	{
 		const playernamebox = document.createElement('h1');
 		playernamebox.setAttribute('id', 'playername');
-		playernamebox.textContent = await getUserName();
+		playernamebox.textContent = name;
+		playernamebox.style.display = "flex";
 		divofbox.appendChild(playernamebox);
-	}
-
-
-	gamesocket.onmessage = function(event)
-	{
-		const data = JSON.parse(event.data);
-		console.log(data);
-	}
-
-	gamesocket.onopen = function(event)
-	{
-		putnameinbox();
+		if (divofbox.childElementCount >= 2)
+		{
+			inviteinput.style.display = "none";
+			if (gamesocket )
+			{
+				gamesocket.send(JSON.stringify({
+					'message': 'start',
+					// 'player1': divofbox.children[0].textContent,
+					// 'player2': divofbox.children[1].textContent,
+					// 'is_start': true,
+					// 'is_end': false,
+				}));
+			}
+		}
 	}
 
 	const gameName = window.location.pathname.split('/')[2];
-
 
 	async function checkPlayer(playername)
 	{
@@ -69,24 +73,10 @@ function loadPong() {
 		gamemode = "local";
 	else if (window.location.pathname === "/games/pong/solo/")
 		gamemode = "solo";
-	else if (window.location.pathname === "/games/pong/multiplayer/")
-	{
-		inviteinput.style.display = "block";
-		divofbox.style.display = "block";
-		setTimeout(() => {
-		document.getElementById('game-info-player').style.display = "block";
-		document.getElementById('playername').style.display = "block";
-		}, 1000);
-		gamemode = "multiplayer";
-	}
 	else if (window.location.pathname === "/games/pong/online/")
 	{
 		inviteinput.style.display = "block";
 		divofbox.style.display = "block";
-		setTimeout(() => {
-			document.getElementById('game-info-player').style.display = "block";
-			document.getElementById('playername').style.display = "block";
-			}, 1000);
 		gamemode = "online";
 	}
 
@@ -714,9 +704,34 @@ function loadPong() {
 		if (event.key === "Enter")
 		{
 			let playername = inviteinput.value;
-			console.log((playername));
 			if (await checkPlayer(playername))
 			{
+				if (gamesocket == undefined)
+					gamesocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/`);
+
+				gamesocket.onmessage = function(event)
+				{
+					const data = JSON.parse(event.data);
+					console.log(data);
+
+					if (data.message.includes('connected'))
+						putnameinbox(data.message.split(' ')[0]);
+					else if (data.message === 'start')
+						startPong();
+				}
+			
+				gamesocket.onopen = function(event)
+				{
+					console.log('websocket open on pong');
+				}
+		
+				setTimeout(() =>{
+					if (document.getElementById('game-info-player'))
+						document.getElementById('game-info-player').style.display = "flex";
+					if (document.getElementById('playername'))
+						document.getElementById('playername').style.display = "flex";
+				}, 200);
+
 				inviteinput.value = '';
 
 				if (!allconversations[playername])
@@ -737,9 +752,36 @@ function loadPong() {
 		}
 	}
 
-	
-	wait();
+	if (gamemode === "online" && joinagame)
+	{
+		console.log("coco2");
+		var bebousocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/`);
+		bebousocket.onmessage = function(event)
+		{
+			console.log("coucou2");
+			const data = JSON.parse(event.data);
+			console.log("data", data);
 
+			if (divofbox.childElementCount < 2)
+				startPong();
+
+			if (data.message.includes('connected'))
+			{
+				setTimeout(() => {
+				{
+					putnameinbox(data.message.split(' ')[0]);
+					document.getElementById('game-info-player').style.display = "flex";
+					document.getElementById('playername').style.display = "flex";
+					document.getElementById('invite').style.display = "none";
+
+				}}, 200);
+			}
+			else if (data.message === 'start')
+				startPong();
+		}
+	}
+
+	wait();
 
 	redbutton.addEventListener("click", startPong);
 	bluebutton.addEventListener("click", startOption);

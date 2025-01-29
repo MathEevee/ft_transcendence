@@ -15,5 +15,3 @@ application = ProtocolTypeRouter({
         )
     ),
 })
-
-print('asgi.py loaded')
