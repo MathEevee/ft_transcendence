@@ -30,6 +30,10 @@ body {
     max-width: 600px;
 }
 
+#PongClassic{
+    border: 4px solid black;
+}
+
 .card-title {
     font-size: 2rem;
     text-align: center;

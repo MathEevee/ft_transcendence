@@ -68,4 +68,10 @@ def display_all_game(request):
     history = Player.objects.filter(user=request.user)
     history_list = [ele.json() for ele in history]
     return JsonResponse({'history':history_list})
+
+@login_required
+def display_game(request):
+    game = Game.objects.get(id=request.GET.get('id'))
+    return JsonResponse({'game':game})
+
     

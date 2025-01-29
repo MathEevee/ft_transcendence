@@ -5,7 +5,7 @@ from apps.authe.models import CustomUser
 class Game(models.Model):
 	GAME_TYPE_CHOICES = [
 		('Pong 1v1', 'Pong 1v1'),
-		('Pong team', 'Pong Team Battle'),
+		('Pong team', 'Pong team'),
 		('Space 1v1', 'Space 1v1'),
 	]
 
@@ -14,9 +14,21 @@ class Game(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	started_at = models.DateTimeField(null=True, blank=True)
 	ended_at = models.DateTimeField(null=True, blank=True)
+	tournament = models.BooleanField(default=False)
 
 	def __str__(self):
 		return f"Game {self.id} ({self.type})"
+
+	def json(self):
+		return {
+			'id': self.id,
+			'type': self.type,
+			'nb_players_required': self.nb_players_required,
+			'created_at': self.created_at,
+			'started_at': self.started_at,
+			'ended_at': self.ended_at,
+			'tournament': self.tournament,
+		}
 	
 
 
@@ -34,7 +46,7 @@ class Player(models.Model):
 	def json(self):
 		return {
 			'user': str(self.user),
-			'game': self.game.id,
+			'game': self.game.json(),
 			'team': self.team,
 			'is_host': self.is_host,
 			'is_IA': self.is_IA,

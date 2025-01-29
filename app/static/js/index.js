@@ -9,6 +9,7 @@ const allPage = {
     "/games/pong/tournament/": () => import("/static/js/tournament.js").then(module => module.loadTournament()),
     "/games/spaceinvaders/tournament/": () => import("/static/js/tournament.js").then(module => module.loadTournament()),
     "/games/": () => import("/static/js/games.js").then(module => module.loadBtn()),
+    "/profil/matde-ol/": () => import("/static/js/graph.js").then(module => module.display_graph()),
 };
 
 function loadPage(path) {
