@@ -16,13 +16,13 @@ function loadPong() {
 	const socket = new WebSocket(wsURL);
 	let gamesocket;
 	chatbox.style.display = "none";
-
+	
 	async function getUserName() {
 		const response = await fetch('/authe/api/me/');
 		const data = await response.json();
 		return data.username;
 	}
-
+	
 	function putnameinbox(name)
 	{
 		const playernamebox = document.createElement('h1');
@@ -31,21 +31,9 @@ function loadPong() {
 		playernamebox.style.display = "flex";
 		divofbox.appendChild(playernamebox);
 		if (divofbox.childElementCount >= 2)
-		{
-			inviteinput.style.display = "none";
-			if (gamesocket )
-			{
-				gamesocket.send(JSON.stringify({
-					'message': 'start',
-					// 'player1': divofbox.children[0].textContent,
-					// 'player2': divofbox.children[1].textContent,
-					// 'is_start': true,
-					// 'is_end': false,
-				}));
-			}
-		}
+				inviteinput.style.display = "none";
 	}
-
+	
 	const gameName = window.location.pathname.split('/')[2];
 
 	async function checkPlayer(playername)
@@ -55,18 +43,19 @@ function loadPong() {
 		const response = await fetch('/authe/api/users/');
 		const data = await response.json();
 		for (let i = 0; i < data.length; i++)
-		{
-			if (data[i].username === playername)
-				return true;
-		}
-		return false;
-	}	
+			{
+				if (data[i].username === playername)
+					return true;
+			}
+			return false;
+	}
 	// Joueurs
 	const paddleWidth = 10;
 	const paddleHeight = 100;
 	const player1 = { x: 0, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, dy: 0, ismoving: false};
 	const player2 = { x: canvas.width - paddleWidth, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, dy: 0 , ismoving: false};
 	
+	let beplayer = player1;
 	// Gamemode
 	var gamemode = "";
 	if (window.location.pathname === "/games/pong/local/")
@@ -289,26 +278,36 @@ function loadPong() {
 		drawcurrencolorpalette(200, 200);
 		drawScore();
 	}
+
+	function clearendgame()
+	{
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		context.fillStyle = colorset.backgroundcolor;
+		context.fillRect(0, 0, canvas.width, canvas.height);
+		context.fillStyle = colorset.fontcolor;
+		context.fillText(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!", canvas.width / 2 - sizeofstringdisplayed(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!").width / 2, canvas.height / 2);
+		setTimeout(wait, 2000);
+	}
 	
 	
 	function keyhookdownforgame(event)
 	{
-		if (event.key === "ArrowUp" && player2.up !== 1 && gamemode === "local")
+		if (event.key === "ArrowUp" && player2.up !== 1 && (gamemode === "local" || beplayer === player2))
 		{
 			player2.up = 1;
 			player2.dy += -speed;
 		}
-		else if (event.key === "ArrowDown" && player2.down !== 1 && gamemode === "local")
+		else if (event.key === "ArrowDown" && player2.down !== 1 && (gamemode === "local" || beplayer === player2))
 		{
 			player2.down = 1;
 			player2.dy += speed;
 		}
-		else if ((event.key === "z" || event.key === "w") && player1.up !== 1)
+		else if ((event.key === "z" || event.key === "w") && player1.up !== 1 && beplayer === player1)
 		{
 			player1.up = 1;
 			player1.dy += -speed;
 		}
-		else if (event.key === "s" && player1.down !== 1)
+		else if (event.key === "s" && player1.down !== 1 && beplayer === player1)
 		{
 			player1.down = 1;
 			player1.dy += speed;
@@ -378,22 +377,22 @@ function loadPong() {
 	
 	function keyhookupforgame(event)
 	{
-		if (event.key === "ArrowUp" && player2.up === 1 && gamemode === "local")
+		if (event.key === "ArrowUp" && player2.up === 1 && (gamemode === "local" || beplayer === player2))
 		{
 			player2.up = 0;
 			player2.dy -= -speed;
 		}
-		else if (event.key === "ArrowDown" && player2.down === 1 && gamemode === "local")
+		else if (event.key === "ArrowDown" && player2.down === 1 && (gamemode === "local" || beplayer === player2))
 		{
 			player2.down = 0;
 			player2.dy -= speed;
 		}
-		else if ((event.key === "z" || event.key === "w") && player1.up === 1)
+		else if ((event.key === "z" || event.key === "w") && player1.up === 1 && beplayer === player1)
 		{
 			player1.up = 0;
 			player1.dy -= -speed;
 		}
-		else if (event.key === "s" && player1.down === 1)
+		else if (event.key === "s" && player1.down === 1 && beplayer === player1)
 		{
 			player1.down = 0;
 			player1.dy -= speed;
@@ -402,7 +401,11 @@ function loadPong() {
 	
 	document.body.addEventListener("keyup", (event) =>
 	{
-		if (chatbox.style.display !== "none" || start === 0)
+		if (chatbox.style.display !== "none")
+			return ;
+		if (option === 1)
+			keyhookupforoption(event);
+		if (start === 0)
 			return ;
 		if (event.key === "r")
 			startPong();
@@ -412,8 +415,6 @@ function loadPong() {
 			toggleFullscreen(canvas);
 		if (start === 1)
 			keyhookupforgame(event);
-		else if (option === 1)
-			keyhookupforoption(event);
 	});
 	
 	function playerMove()
@@ -422,7 +423,7 @@ function loadPong() {
 			return ;
 		player1.y += player1.dy;
 		player1.y = Math.max(Math.min(player1.y, canvas.height - paddleHeight), 0);
-		if (gamemode === "local")
+		if (gamemode === "local" || gamemode === "online")
 		{
 			player2.y += player2.dy;
 			player2.y = Math.max(Math.min(player2.y, canvas.height - paddleHeight), 0);
@@ -447,6 +448,14 @@ function loadPong() {
 	{
 		ball.y += ball.dy * ball.speed;
 		ball.x += ball.dx * ball.speed;
+		if(gamesocket)
+		{
+			gamesocket.send(JSON.stringify({
+				'message': 'move',
+				'ballx': ball.x,
+				'bally': ball.y,
+			}));
+		}
 	}
 	
 	function ballCollision()
@@ -479,37 +488,43 @@ function loadPong() {
 	
 	function increaseScore()
 	{
-		if (ball.x < 0)
-			score2++;
-		else
-		score1++;
+		if (beplayer === player1)
+		{
+			if (ball.x < 0)
+				score2++;
+			else
+				score1++;
+			if (gamesocket)
+			{
+				gamesocket.send(JSON.stringify({
+					'message': 'point',
+					'score1': score1,
+					'score2': score2,
+				}));
+			}
+		}
 		if (score1 === 5 || score2 === 5)
 		{
-			context.clearRect(0, 0, canvas.width, canvas.height);
-			context.fillStyle = colorset.backgroundcolor;
-			context.fillRect(0, 0, canvas.width, canvas.height);
-			context.fillStyle = colorset.fontcolor;
-			context.fillText(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!", canvas.width / 2 - sizeofstringdisplayed(score1 === 5 ? "Player 1 wins!" : "Player 2 wins!").width / 2, canvas.height / 2);
-			setTimeout(wait, 2000);
+			clearendgame();
 			//send end game score + set gameid = NULL 
-			fetch('/games/local-ia-end/', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
-				},
-				body: JSON.stringify({
-					'id' : gameId,
-					'ended_at': Date.now(),
-					'score_player': score1,
-					'score_IA': score2,
-				})
-			})
-			.then(response => response.json())
-			.then(data => {
-				console.log(data);
-				gameId = null;
-			})
+			// fetch('/games/local-ia-end/', {
+			// 	method: 'POST',
+			// 	headers: {
+			// 		'Content-Type': 'application/json',
+			// 		'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+			// 	},
+			// 	body: JSON.stringify({
+			// 		'id' : gameId,
+			// 		'ended_at': Date.now(),
+			// 		'score_player': score1,
+			// 		'score_IA': score2,
+			// 	})
+			// })
+			// .then(response => response.json())
+			// .then(data => {
+			// 	console.log(data);
+			// 	gameId = null;
+			// })
 			start = 0;
 			return 1;
 		}
@@ -619,7 +634,7 @@ function loadPong() {
 	
 	function loop()
 	{
-		if (update())
+		if (update() || start === 0)
 			return 1;
 		draw();
 		requestAnimationFrame(loop);
@@ -641,6 +656,33 @@ function loadPong() {
 		player1.ismoving = false;
 		player2.ismoving = false;
 		AIdest = canvas.height / 2 - paddleHeight / 2;
+	}
+
+	function sendmove()
+	{
+		if (gamemode === "online" && start === 1)
+		{
+			setInterval(() => {
+				if (start === 0)
+					return ;
+				if (bebousocket)
+				{
+					bebousocket.send(JSON.stringify({
+						'message': 'move',
+						'player': 'player2',
+						'y': player2.y,
+					}));
+				}
+				else if (gamesocket)
+				{
+					gamesocket.send(JSON.stringify({
+						'message': 'move',
+						'player': 'player1',
+						'y': player1.y,
+					}));
+				}
+			}, 1000 / 20);
+		}
 	}
 	
 	function startPong()
@@ -671,6 +713,7 @@ function loadPong() {
 				interval = setInterval(updateAI, 1000);
 			}, 5000);
 		}
+		setTimeout(sendmove, 5000);
 		setTimeout(loop, 5000);
 	}
 	
@@ -712,12 +755,19 @@ function loadPong() {
 				gamesocket.onmessage = function(event)
 				{
 					const data = JSON.parse(event.data);
-					console.log(data);
+					// console.log(data);
 
 					if (data.message.includes('connected'))
 						putnameinbox(data.message.split(' ')[0]);
 					else if (data.message === 'start')
 						startPong();
+					else if (data.message.includes('move'))
+					{
+						if (data.player === 'player1')
+							player1.y = data.y;
+						else if (data.player === 'player2')
+							player2.y = data.y;
+					}
 				}
 			
 				gamesocket.onopen = function(event)
@@ -754,16 +804,12 @@ function loadPong() {
 
 	if (gamemode === "online" && joinagame)
 	{
-		console.log("coco2");
 		var bebousocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/`);
+		beplayer = player2;
 		bebousocket.onmessage = function(event)
 		{
-			console.log("coucou2");
 			const data = JSON.parse(event.data);
-			console.log("data", data);
-
-			if (divofbox.childElementCount < 2)
-				startPong();
+			// console.log("data", data);
 
 			if (data.message.includes('connected'))
 			{
@@ -778,12 +824,56 @@ function loadPong() {
 			}
 			else if (data.message === 'start')
 				startPong();
+			else if (data.message.includes('move'))
+			{
+				if (data.player === 'player1')
+					player1.y = data.y;
+				else if (data.player === 'player2')
+					player2.y = data.y;
+				if (data.ballx && data.bally)
+				{
+					ball.x = data.ballx;
+					ball.y = data.bally;
+				}
+			}
+			else if (data.message === 'point')
+			{
+				score1 = data.score1;
+				score2 = data.score2;
+				if (score1 === 5 || score2 === 5)
+				{
+					clearendgame();
+					start = 0;
+				}
+			}
 		}
 	}
 
 	wait();
 
-	redbutton.addEventListener("click", startPong);
+	if (gamemode === "online")
+	{
+		redbutton.addEventListener("click", () =>
+		{
+			if (start === 0)
+			{
+				if (gamesocket && gamesocket.readyState === WebSocket.OPEN)
+				{
+					gamesocket.send(JSON.stringify({
+						'message': 'start',
+					}));
+				}
+				else if (bebousocket)
+				{
+					bebousocket.send(JSON.stringify({
+						'message': 'start',
+					}));
+				}
+			}
+		});
+	}
+	else
+		redbutton.addEventListener("click", startPong);
 	bluebutton.addEventListener("click", startOption);
 	inviteinput.addEventListener("keypress", sendInvite);
 }
