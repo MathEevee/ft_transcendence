@@ -1,4 +1,4 @@
-function buildGraphScore(scores, canvas, context) {
+function buildGraphScore(scores, canvas, context, scoreMoyen, totalGame) {
     /*var max = Math.max.apply(null, scores);
     var min = Math.min.apply(null, scores);
     var range = max - min;
@@ -7,27 +7,49 @@ function buildGraphScore(scores, canvas, context) {
     var height = canvas.height - 2 * margin;
     context.beginPath();*/
     context.fillStyle = 'rgb(0, 0, 255)';
-    context.fillRect(100, 5, canvas.width - 105, canvas.height - 10);
-/*    context.moveTo(margin, margin + height);
-    for (var i = 0; i < scores.length; i++) {
-        var x = margin + i * width / scores.length;
-        var y = margin + height - (scores[i] - min) * height / range;
-        context.lineTo(x, y);
+    context.fillRect(300, 10, canvas.width - 310, canvas.height - 20);
+    let width = 320;
+    let height = canvas.height - 14;
+    var i = scores.length - 10;
+    if (i < 0)
+        i = 0;
+    for (var j = 0; j < scores.length; i++, j++) {
+        context.beginPath();
+        context.arc(width + (j * 28), height - (scores[i] * 14), 2, 0, 2 * Math.PI);
+        context.stroke();
     }
-    context.stroke();*/
+
+
+    context.beginPath();
+    var i = scores.length - 10;
+    if (i < 0)
+        i = 0;
+    for (var j = 0; j < scores.length - 1; i++, j++) {
+        context.moveTo(width + (j * 28), height - (scores[i] * 14));
+        context.lineTo(width + ((j + 1) * 28), height - (scores[i + 1] * 14));
+    }
+    context.lineWidth = 1;
+    context.stroke();
+
+    var moyenne = scoreMoyen / totalGame;
+    context.fillStyle = 'rgb(255, 200, 255, 0.5)';
+    let start = 10;
+    let end = start + (canvas.height - 20);
+    console.log(start, end);
+    start += 4;
+    end -= 4;
+    console.log(start, end);
+    let size = end - start;
+    let moyenneSize = size * (moyenne / 5);
+    context.fillRect(300, start + (size - moyenneSize), canvas.width - 310, size - (start + (size - moyenneSize) - start) );
 }
 
 async function display_graph(){
-
-    async function getUserName() {
-		const response = await fetch('/authe/api/me/');
-		const data = await response.json();
-		return data.username;
-	}
     const canvas = document.getElementById('PongClassic');
     var context = canvas.getContext('2d');
     context.fillStyle = 'rgb(200, 0, 0)';
-    var user = await getUserName();
+    var user = window.location.pathname.split("/")[2];
+    console.log(user);
     var total_games;
     var win;
 
@@ -54,7 +76,7 @@ async function display_graph(){
     // ('Space 1v1', 'Space 1v1'),
 
     async function getStats() {
-        const response = await fetch('/games/all_game/');
+        const response = await fetch(`/games/all_game/${user}`);
         const data = await response.json();
         return data;
     }
@@ -94,11 +116,12 @@ async function display_graph(){
     }
     }
     console.log((games_pong_casu_solo_win / games_pong_casu_solo) * canvas.height)
-    context.fillRect(10, canvas.height - (games_pong_casu_solo_win / games_pong_casu_solo) * canvas.height, 30, canvas.height);
-    context.fillRect(50, canvas.height - ((games_pong_casu_solo - games_pong_casu_solo_win) / games_pong_casu_solo) * canvas.height, 30, canvas.height);
+
+    context.fillRect(60, canvas.height - (games_pong_casu_solo_win / games_pong_casu_solo) * canvas.height, 60, canvas.height);
+    context.fillRect(160, canvas.height - ((games_pong_casu_solo - games_pong_casu_solo_win) / games_pong_casu_solo) * canvas.height, 60, canvas.height);
 
     //build the graph
-    buildGraphScore(games_space_score_all, canvas, context);
+    buildGraphScore(games_space_score_all, canvas, context, games_pong_casu_solo_score, games_pong_casu_solo);
     console.log(games_space_score_all);
 
     

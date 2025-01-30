@@ -1,4 +1,5 @@
 import { liveChat } from "/static/js/chatbox.js";
+import { display_graph } from "/static/js/graph.js";
 
 const allPage = {
     "/games/pong/local/": () => import("/static/js/pong.js").then(module => module.loadPong()),
@@ -9,7 +10,6 @@ const allPage = {
     "/games/pong/tournament/": () => import("/static/js/tournament.js").then(module => module.loadTournament()),
     "/games/spaceinvaders/tournament/": () => import("/static/js/tournament.js").then(module => module.loadTournament()),
     "/games/": () => import("/static/js/games.js").then(module => module.loadBtn()),
-    "/profil/matde-ol/": () => import("/static/js/graph.js").then(module => module.display_graph()),
 };
 
 function loadPage(path) {
@@ -17,6 +17,8 @@ function loadPage(path) {
         allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
     else if (allPage[path + '/'])
         allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
+    else if (path.split("/")[1] == 'profil')
+        display_graph();
     if (window.location.pathname.startsWith('/authe/')) {
         var chatBtn = document.getElementById('chat')
         if (chatBtn)
