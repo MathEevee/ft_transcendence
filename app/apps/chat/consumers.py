@@ -18,7 +18,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 			if len(user_sockets[self.user.username]) == 0:
 				await sync_to_async(CustomUser.objects.filter(username=self.user.username).update)(is_online=True)
 				await sync_to_async(self.update_online_status)(True)
-				print(f'{self.user.username} connected')
+				print("\033[31m" + f'{self.user.username} connected chat' + "\033[0m")
 			user_sockets[self.user.username].append(self)
 			await self.accept()
 		else:
@@ -60,7 +60,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 				tournamentType = 'None'
 				is_tournament = False
 
-			print(f"Message: {message}, To: {to_user}, is_invite: {is_invite}, is_tournament: {is_tournament}, tournamentType: {tournamentType}")
 			if to_user in user_sockets and len(user_sockets[to_user]) != 0:
 				conversation_key = tuple(sorted([self.user.username, to_user]))
 

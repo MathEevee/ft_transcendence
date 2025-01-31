@@ -4,6 +4,7 @@ if (!window.location.pathname.startsWith('/authe/')) {
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsURL = `${wsProtocol}//${window.location.host}/ws/chat/`;
     var g_socket = new WebSocket(wsURL);
+	var joinagame = false;
 }
 
 var allconversations = [];
@@ -40,6 +41,17 @@ function sendMessage() {
         }));
     }
 	document.getElementById('inputMessages').value = '';
+}
+
+function putnameinbox(name)
+{
+	const playernamebox = document.createElement('h1');
+	playernamebox.setAttribute('id', 'playername');
+	playernamebox.textContent = name;
+	playernamebox.style.display = "flex";
+	document.getElementById('game-info-player').appendChild(playernamebox);
+	if (document.getElementById('game-info-player').childElementCount >= 2)
+		document.getElementById('invite').style.display = "none";
 }
 
 async function fetchFriendList() {
@@ -103,9 +115,7 @@ async function getUserName() {
 
 function retrieveConversations(data) {
 	if (allconversations[data.from] === undefined)
-	{
 		allconversations[data.from] = [];
-	}
 	allconversations[data.from].push({
 		'from': data.from,
 		'message': data.message,
@@ -188,15 +198,14 @@ async function printallConversations(of) {
 				});
 
 				if (tournamentId)
-					changePage('/games/pong/tournament/', true);
+					changePage('/games/pong/tournament/', false);
 				else
-					changePage('/games/spaceinvaders/tournament/', true);
+					changePage('/games/spaceinvaders/tournament/', false);
 			});
 			continue;
 		}
 		else if (allconversations[of][i].message.includes('<game>'))
 		{
-			console.log(allconversations[of][i].message);
 			const newMessage = document.createElement('a');
 			newMessage.classList.add('message');
 			newMessage.classList.add('btn');
@@ -206,10 +215,46 @@ async function printallConversations(of) {
 			chat.scrollTop = chat.scrollHeight;
 
 			newMessage.addEventListener('click', function(event) {
-				if (allconversations[of][i].message.includes('pong'))
-					changePage('/games/pong/local', true);
-				else
-					changePage('/games/spaceinvaders/', true);
+				// const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+				// if (bebousocket == undefined)
+				// 	bebousocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/`);
+
+				// bebousocket.onopen = function() {
+				// 	console.log('WebSocket connection opened on game');
+					if (allconversations[of][i].message.includes('pong'))
+						changePage('/games/pong/online', false);
+					else
+						changePage('/games/spaceinvaders/', false);
+					joinagame = true;
+				// }
+
+				// bebousocket.onclose = function(event) {
+				// 	console.log('WebSocket game connection closed');
+				// }
+
+				// bebousocket.onerror = function(error) {
+				// 	console.error('WebSocket game error:', error);
+				// }
+
+			// 	bebousocket.onmessage = function(event)
+			// 	{
+			// 		console.log("coucou");
+			// 		const data = JSON.parse(event.data);
+			// 		console.log(data);
+		
+			// 		if (data.message.includes('connected'))
+			// 		{
+			// 			setTimeout(() => {
+			// 			{
+			// 				putnameinbox(data.message.split(' ')[0]);
+			// 				document.getElementById('game-info-player').style.display = "flex";
+			// 				document.getElementById('playername').style.display = "flex";
+			// 				document.getElementById('invite').style.display = "none";
+		
+			// 			}}, 200);
+			// 		}
+			// 	}
+
 			});
 			continue;
 		}
@@ -314,7 +359,6 @@ function liveChat() {
 		chat.appendChild(newMessage);
 		chat.scrollTop = chat.scrollHeight;
 
-		console.log('invite', data.invitation);
 		if (data.invitation)
 		{
 			if (allconversations[data.from] === undefined)
@@ -534,4 +578,4 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 });
 
-export {link , liveChat, allconversations}
+export {link , liveChat, allconversations, joinagame};
