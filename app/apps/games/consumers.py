@@ -84,5 +84,10 @@ class PongConsumer(AsyncWebsocketConsumer):
 			score2 = data['score2']
 		else:
 			score2 = None
+
+		if message == 'start':
+			print(message, data)
+		elif message == 'end':
+			print(message, data)
 		
 		await self.send_to_all(message, player, ball, playery, ballx, bally, score1, score2)

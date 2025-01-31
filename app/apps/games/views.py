@@ -76,4 +76,9 @@ def display_game(request):
     game = Game.objects.get(id=request.GET.get('id'))
     return JsonResponse({'game':game})
 
+@login_required
+def search_player_gameID(request):
+    player = Player.objects.filter(game=request.GET.get('id'))
+    return JsonResponse({'player':player.json()})
+
     

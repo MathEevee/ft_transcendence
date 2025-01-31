@@ -17,4 +17,5 @@ urlpatterns = [
     path('local-ia-end/', views.end_game_local_IA),
     path('all_game/<str:username>', views.display_all_game),
     path('game/<int:id>/', views.display_game),
+    path('player/<int:id>/', views.search_player_gameID),
 ]

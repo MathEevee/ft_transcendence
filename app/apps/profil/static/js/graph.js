@@ -35,13 +35,25 @@ function buildGraphScore(scores, canvas, context, scoreMoyen, totalGame) {
     context.fillStyle = 'rgb(255, 200, 255, 0.5)';
     let start = 10;
     let end = start + (canvas.height - 20);
-    console.log(start, end);
     start += 4;
     end -= 4;
-    console.log(start, end);
     let size = end - start;
     let moyenneSize = size * (moyenne / 5);
     context.fillRect(300, start + (size - moyenneSize), canvas.width - 310, size - (start + (size - moyenneSize) - start) );
+}
+
+function print_game(game) {
+    var history = document.getElementById('historyPongClassic');
+    console.log(game);
+    console.log(game.game.id);
+    async function getGame() {
+        const response = await fetch(`/games/game/${game.game.id}`);
+        const data = await response.json();
+        return data;
+    }
+    var test = getGame();
+    console.log(test);
+
 }
 
 async function display_graph(){
@@ -49,7 +61,6 @@ async function display_graph(){
     var context = canvas.getContext('2d');
     context.fillStyle = 'rgb(200, 0, 0)';
     var user = window.location.pathname.split("/")[2];
-    console.log(user);
     var total_games;
     var win;
 
@@ -81,10 +92,8 @@ async function display_graph(){
         return data;
     }
     var stats = await getStats();
-    console.log(stats);
     // total_games = stats.history.length;
     for (var i = 0; i < stats.history.length; i++) {
-        console.log(stats.history[i].game);
         if (stats.history[i].game.type === 'Space 1v1') {
             games_space++;
             games_space_score += stats.history[i].score;
@@ -94,6 +103,7 @@ async function display_graph(){
         }
         if (stats.history[i].game.type === 'Pong 1v1' && stats.history[i].game.tournament === false) {
             games_pong_casu_solo++;
+            print_game(stats.history[i]);
             games_pong_casu_solo_score += stats.history[i].score;
             games_space_score_all.push(stats.history[i].score);
             if (stats.history[i].score === 5) {
@@ -115,14 +125,12 @@ async function display_graph(){
         }
     }
     }
-    console.log((games_pong_casu_solo_win / games_pong_casu_solo) * canvas.height)
 
     context.fillRect(60, canvas.height - (games_pong_casu_solo_win / games_pong_casu_solo) * canvas.height, 60, canvas.height);
     context.fillRect(160, canvas.height - ((games_pong_casu_solo - games_pong_casu_solo_win) / games_pong_casu_solo) * canvas.height, 60, canvas.height);
 
     //build the graph
     buildGraphScore(games_space_score_all, canvas, context, games_pong_casu_solo_score, games_pong_casu_solo);
-    console.log(games_space_score_all);
 
     
 }

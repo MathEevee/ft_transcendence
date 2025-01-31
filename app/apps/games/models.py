@@ -52,7 +52,7 @@ class Player(models.Model):
 			'is_IA': self.is_IA,
 			'score': self.score,
 		}
-		
+	
 
 # class GameStats(models.Model):
 	# game = models.ForeignKey(Game, on_delete=models.CASCADE, unique=True)
