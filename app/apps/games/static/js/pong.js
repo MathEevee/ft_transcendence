@@ -506,25 +506,29 @@ function loadPong() {
 		if (score1 === 5 || score2 === 5)
 		{
 			clearendgame();
-			//send end game score + set gameid = NULL 
-			// fetch('/games/local-ia-end/', {
-			// 	method: 'POST',
-			// 	headers: {
-			// 		'Content-Type': 'application/json',
-			// 		'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
-			// 	},
-			// 	body: JSON.stringify({
-			// 		'id' : gameId,
-			// 		'ended_at': Date.now(),
-			// 		'score_player': score1,
-			// 		'score_IA': score2,
-			// 	})
-			// })
-			// .then(response => response.json())
-			// .then(data => {
-			// 	console.log(data);
-			// 	gameId = null;
-			// })
+			//send end game score + set gameid = NULL
+			if (gamemode === "solo")
+			{
+				fetch('/games/local-ia-end/', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+					},
+					body: JSON.stringify({
+						'id' : gameId,
+						'ended_at': Date.now(),
+						'score_player': score1,
+						'score_IA': score2,
+					})
+				})
+				.then(response => response.json())
+				.then(data => {
+					console.log(data);
+					gameId = null;
+				})
+			}
+			// else if (gamemode === "online")
 			start = 0;
 			return 1;
 		}
