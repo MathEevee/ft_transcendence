@@ -44,7 +44,6 @@ def start_game_local_IA(request):
 
 @login_required
 def end_game_local_IA(request):
-    print(request.body)
     data = json.loads(request.body)
     try:
         game = Game.objects.get(id=data['id'])
@@ -77,8 +76,14 @@ def display_game(request):
     return JsonResponse({'game':game})
 
 @login_required
-def search_player_gameID(request):
-    player = Player.objects.filter(game=request.GET.get('id'))
-    return JsonResponse({'player':player.json()})
+def search_player_gameID(request, id):
+    try:
+        # Recherche des joueurs pour le jeu avec l'ID fourni
+        players = Player.objects.filter(game_id=id)
+        player_data = [player.json() for player in players]
+        return JsonResponse({'players': player_data})
 
-    
+    except Exception as e:
+        # Log l'erreur et renvoie un message d'erreur
+        return JsonResponse({'error': str(e)}, status=500)
+

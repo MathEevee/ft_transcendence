@@ -42,18 +42,101 @@ function buildGraphScore(scores, canvas, context, scoreMoyen, totalGame) {
     context.fillRect(300, start + (size - moyenneSize), canvas.width - 310, size - (start + (size - moyenneSize) - start) );
 }
 
-function print_game(game) {
-    var history = document.getElementById('historyPongClassic');
-    console.log(game);
-    console.log(game.game.id);
-    async function getGame() {
-        const response = await fetch(`/games/game/${game.game.id}`);
-        const data = await response.json();
-        return data;
-    }
-    var test = getGame();
-    console.log(test);
+async function getGame(id) {
+    try {
+        const response = await fetch(`/games/player/${id}/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+            },
+        });
 
+        // Vérifier si la réponse est correcte (status 200)
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP : ${response.status}`);
+        }
+
+        const text = await response.text();  // Récupérer la réponse sous forme de texte brut
+
+        // Tenter de parser le texte en JSON, si c'est du JSON valide
+        const data = JSON.parse(text);
+        return data;  // Retourne les données pour les utiliser plus tard
+    } catch (error) {
+        console.error('Erreur:', error);  // Gestion des erreurs
+        return null;  // Retourne null en cas d'erreur
+    }
+}
+
+function parse_data(data) {
+    var date = data.split('T')[0];
+    date += '\n';
+    date += data.split('T')[1].split('.')[0];
+    return date;
+}
+
+function create_score(data) {
+    var score = '';
+    console.log(data.players[0].score)
+
+    score += data.players[0].score;
+    score += ' - ';
+    score += data.players[1].score;
+    return score;
+}
+
+function print_data_game(data, game) {
+    const tableBody = document.querySelector('#PongClassicHistory tbody');
+    // On parcourt chaque jeu et on crée une ligne pour chaque
+    const row = document.createElement('tr');
+
+    // Crée la cellule pour le début du jeu
+    const typeCell = document.createElement('td');
+    if (data.players[0].is_IA === true || data.players[1].is_IA === true)
+        typeCell.textContent = 'VS IA';
+    else
+        typeCell.textContent = 'Online';  // Valeur par défaut si pas de donnée
+    row.appendChild(typeCell);
+
+    // Crée la cellule pour le début du jeu
+    const startCell = document.createElement('td');
+    var started = parse_data(game.game.started_at);
+    startCell.textContent = started;  // Valeur par défaut si pas de donnée
+    row.appendChild(startCell);
+
+    // Crée la cellule pour la fin du jeu
+    const endCell = document.createElement('td');
+    var ended = parse_data(game.game.ended_at);
+    endCell.textContent = ended;  // Valeur par défaut si pas de donnée
+    row.appendChild(endCell);
+
+    // Crée la cellule pour l'adversaire
+    const opponentCell = document.createElement('td');
+    opponentCell.textContent = data.opponent || "VS Axel's AI, it's not a player but it's a bot";  // Valeur par défaut si pas de donnée
+    row.appendChild(opponentCell);
+        
+    // Crée la cellule pour le score
+    const scoreCell = document.createElement('td');
+
+    scoreCell.textContent = create_score(data) || 'N/A';  // Valeur par défaut si pas de donnée
+    if (data.players[0].score === 5) {
+        scoreCell.style.boxShadow = '0px 0px 10px green, 0px 0px 25px lime';
+    } else {
+        scoreCell.style.boxShadow = '0px 0px 10px red, 0px 0px 25px darkred';
+    }
+    row.appendChild(scoreCell);
+        
+    // Ajoute la ligne au corps du tableau
+    tableBody.appendChild(row);
+}
+
+async function print_game(game) {
+    
+    // Appeler la fonction getGame et utiliser son résultat
+    getGame(game.game.id).then(data => {
+        console.log(data);  // Affiche le résultat une fois la promesse résolue
+        print_data_game(data, game);
+    });
 }
 
 async function display_graph(){
@@ -103,7 +186,7 @@ async function display_graph(){
         }
         if (stats.history[i].game.type === 'Pong 1v1' && stats.history[i].game.tournament === false) {
             games_pong_casu_solo++;
-            print_game(stats.history[i]);
+            await print_game(stats.history[i]);
             games_pong_casu_solo_score += stats.history[i].score;
             games_space_score_all.push(stats.history[i].score);
             if (stats.history[i].score === 5) {
