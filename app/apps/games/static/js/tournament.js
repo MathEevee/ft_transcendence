@@ -27,8 +27,50 @@ async function getUserName() {
 	return data.username;
 }
 
+function checkdiff(player, tabplayers)
+{
+	for (let i = 0; i < tabplayers.rows.length; i++)
+	{
+		if (player.username === tabplayers.rows[i].cells[0].innerText && player.team_name === tabplayers.rows[i].cells[1].innerText)
+			return true;
+	}
+	return false;
+}
+
+async function playeradded(tabplayers)
+{
+	const response = await fetch('/authe/api/tournaments/');
+	const data = await response.json();
+	if (data.length === 0)
+		return false;
+	if (data[0].type_pong === tournamentId)
+	{
+		if (data[0].player_entries.length !== tabplayers.rows.length - 1)
+			return false;
+		for (let i = 0; i < data[0].player_entries.length; i++)
+		{
+			if (checkdiff(data[0].player_entries[i].player, tabplayers))
+				return false;
+		}
+	}
+	return true;
+}
+
+async function clearPlayerList()
+{
+	const tabplayers = document.getElementById('games-table');
+	for (let i = tabplayers.rows.length - 1; i > 0; i--)
+	{
+		tabplayers.deleteRow(i);
+		players.clear();
+	}
+}
+
 async function displayPlayerTournament()
 {
+	// if (await playeradded(document.getElementById('games-table')))
+	// 	return;
+	await clearPlayerList();
 	const response = await fetch('/authe/api/tournaments/');
 	const data = await response.json();
 	const tabplayers = document.getElementById('games-table');
@@ -40,14 +82,14 @@ async function displayPlayerTournament()
 			for (let j = 0; j < data[i].player_entries.length; j++)
 				players.add(data[i].player_entries[j]);
 
-			players = Array.from(players);
-			for (let j = 0; j < players.length; j++)
+			let playerss = Array.from(players);
+			for (let j = 0; j < playerss.length; j++)
 			{
 				const row = document.createElement('tr');
 				const cell = document.createElement('td');
-				const text = document.createTextNode(players[j].player.username);
+				const text = document.createTextNode(playerss[j].player.username);
 				const teamcell = document.createElement('td');
-				const team = document.createTextNode(players[j].team_name);
+				const team = document.createTextNode(playerss[j].team_name);
 
 				cell.appendChild(text);
 				teamcell.appendChild(team);
@@ -55,42 +97,96 @@ async function displayPlayerTournament()
 				row.appendChild(teamcell);
 				tabplayers.appendChild(row);
 
-				if (players[j].is_host)
+				if (playerss[j].is_host)
 				{
 					cell.style.color = 'yellow';
 					teamcell.style.color = 'yellow';
-					if (players[j].player.username === await getUserName())
+					if (playerss[j].player.username === await getUserName())
 						startButton.style.display = 'block';
+				}
+				if (playerss[j].player.username === await getUserName())
+				{
+					inviteButton.style.display = 'block';
+					inviteButton.disabled = false;
 				}
 			}
 		}
 	}
 }
 
+function startmatchmaking()
+{
+	const playersList = Array.from(players);
+	console.log(playersList);
+	const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+	fetch('/authe/api/tournaments/matchmaking/', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'X-CSRFToken': csrftoken,
+		},
+		body: JSON.stringify(
+			{
+				players: playersList,
+				tournament_id: tournamentId,
+			}
+		),
+	}).then(response => response.json())
+	.then(response => {
+		if (response.error)
+			console.warn(`Error starting matchmaking: ${response.error}`);
+		else
+		{
+			console.log('Matchmaking started');
+		}
+	})
+	.catch(err => {
+		console.error(`Error starting matchmaking: ${err}`);
+	});
+}
+
+function filltournament(playersList)
+{
+	let nbplayers = playersList.length;
+
+	const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+	fetch('/authe/api/tournaments/fill/', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			'X-CSRFToken': csrftoken,
+		},
+		body: JSON.stringify(
+			{
+				tournament_id: tournamentId,
+				nb_players: nbplayers,
+			}
+		),
+	}).then(response => response.json()).then(response => {
+		if (response.error)
+			console.warn(`Error filling tournament: ${response.error}`);
+		else
+		{
+			displayPlayerTournament();
+			players.clear();
+			for (let i = 0; i < response.players.length; i++)
+				players.add(response.players[i]);
+		}
+	console.log('Tournament filled', playersList);
+	})
+	.catch(err => {
+		console.error(`Error filling tournament: ${err}`);
+	});
+}
+
 function startTournoi()
 {
 	const playersList = Array.from(players);
-	if (playersList.length < 8)
-	{
-		console.log('Not enough players');
-		return;
-	}
-	const matchList = [];
-	const winnerList = [];
-	const finalList = [];
-	let finalWinner;
 
-	for (let i = 0; i < playersList.length; i++)
-	{
-		for (let j = i + 1; j < playersList.length; j++)
-		{
-			matchList.push({
-				'player1': playersList[i].player.username,
-				'player2': playersList[j].player.username,
-				'winner': null,
-			});
-		}
-	}
+	if (playersList.length < 8)
+		filltournament(playersList);
+	startmatchmaking();
+
 }
 
 async function checkPlayer(playername)
@@ -120,7 +216,8 @@ async function setupPlayerList()
 	const startButton = document.getElementById('start-tournament');
 
 	startButton.style.display = 'none';
-	displayPlayerTournament();
+
+	await displayPlayerTournament();
 
 	let username = await getUserName();
 	setTimeout(() => {
@@ -136,7 +233,6 @@ async function setupPlayerList()
 
 	//put the player in the tournament db
 	joinButton.addEventListener('click', () => {
-			console.log(tournamentId);
 			const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 			fetch('/authe/api/tournaments/', {
 				method: 'POST',
@@ -163,6 +259,12 @@ async function setupPlayerList()
 					const teamcell = document.createElement('td');
 					const team = document.createTextNode(teamName);
 	
+					if (tabplayers.rows.length === 1)
+					{
+						cell.style.color = 'yellow';
+						teamcell.style.color = 'yellow';
+						startButton.style.display = 'block';
+					}
 					cell.appendChild(text);
 					teamcell.appendChild(team);
 					row.appendChild(cell);
@@ -172,8 +274,10 @@ async function setupPlayerList()
 					joinButton.disabled = true;
 					joinButton.style.backgroundColor = 'grey';
 
-					console.log(players);
+					inviteButton.style.display = 'block';
+					inviteButton.disabled = false;
 
+					console.log(players);
 				}
 			})
 			.catch(err => {
@@ -207,7 +311,6 @@ async function setupPlayerList()
 		if (e.key === 'Enter')
 		{
 			let playername = inviteButton.value;
-			console.log((playername));
 			if (await checkPlayer(playername))
 			{
 				inviteButton.value = '';
@@ -233,6 +336,14 @@ async function setupPlayerList()
 
 setupPlayerList();
 
-}
+// setInterval(async () => {
+// 	if (document.location.pathname.split('/').length < 3 || document.location.pathname.split('/')[3] !== 'tournament')
+// 		return;
+// 	if (document.getElementById('games-table').rows.length === 1 || document.getElementById('games-table').rows.length === 0)
+// 		return;
+// 	console.log('refresh');
+// 	await displayPlayerTournament();
+// }, 2500);
 
+}
 export { loadTournament };

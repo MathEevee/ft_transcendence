@@ -829,7 +829,6 @@ function loadPong() {
 		}
 	}
 
-	console.log(joinagame);
 	if (gamemode === "online" && joinagame)
 	{
 		if (bebousocket == undefined)

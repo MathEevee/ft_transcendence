@@ -125,6 +125,7 @@ body {
 }
 
 #player-name {
+	display: none;
 	background-color: #1a0033;
 	color: #29c7c4;
 	border: 1px solid #ffffff;

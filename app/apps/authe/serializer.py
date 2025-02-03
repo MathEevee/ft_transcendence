@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, Tournament, PlayerEntry
+from .models import CustomUser, Tournament, PlayerEntry , Match
 
 class CustomUserSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -20,5 +20,17 @@ class TournamentSerializer(serializers.ModelSerializer):
         model = Tournament
         fields = [
             'id', 'type_pong', 'players', 'player_entries', 'status', 
-            'started', 'created_at', 'started_at', 'ended_at', 'winner'
+            'started', 'created_at', 'started_at', 'ended_at', 'winner',
+			'matchmaking', 'matchlist'
         ]
+
+class MatchSerializer(serializers.ModelSerializer):
+	team1 = PlayerEntrySerializer()
+	team2 = PlayerEntrySerializer()
+	winner = PlayerEntrySerializer()
+
+	class Meta:
+		model = Match
+		fields = [
+			'tournament', 'team1', 'team2', 'winner', 'created_at', 'ended_at'
+		]

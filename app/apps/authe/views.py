@@ -14,9 +14,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.exceptions import NotFound
-from .models import CustomUser, Message, Tournament, PlayerEntry
+from .models import CustomUser, Message, Tournament, PlayerEntry, Match
 from .forms import RegistrationForm, LoginForm, UserSettingsForm
-from .serializer import CustomUserSerializer, TournamentSerializer
+from .serializer import CustomUserSerializer, TournamentSerializer, MatchSerializer
+from random import randint
 from .decorators import logout_required
 
 logger = logging.getLogger(__name__)
@@ -263,10 +264,104 @@ class TournamentAPIView(APIView):
 		# Réponse réussie
 		return Response(
 			{
-				"message": "Player added to tournament successfully.",
+				"message": "Player added to the tournament.",
 				"tournament_id": tournament.id,
-				"player": player.username,
-				"team_name": player_entry.team_name,
+				"players": [entry.player.username for entry in tournament.player_entries.all()],
 			},
 			status=status.HTTP_200_OK,
-		)
+	)	
+class MatchmakingAPIView(APIView):
+	permission_classes = [AllowAny]
+
+	def get(self, request):
+		# Récupérer les matchs
+		matchs = Match.objects.all()
+		serializer = MatchSerializer(matchs, many=True)
+		return Response(serializer.data)
+	
+	def post(self, request, *args, **kwargs):
+		# Récupérer les données envoyées par le POST
+		tournament_id = request.data.get('tournament_id')
+
+		# Récupérer le tournoi
+		tournament = get_object_or_404(Tournament, type_pong=tournament_id)
+
+		# Vérifier si le tournoi est plein
+		if tournament.player_entries.count() < 8:
+			return Response(
+				{"error": "Tournament is not full yet."},
+				status=status.HTTP_400_BAD_REQUEST,
+			)
+		
+		# Récupérer les joueurs du tournoi
+		players = [entry.player for entry in tournament.player_entries.all()]
+		print(f"\033[1;32mMatchmaking for tournament {tournament_id}...\033[0m")
+		for player in players:
+			print(f"\033[1;32m- {player}\033[0m")
+
+		# Créer les matchs aléatoirement
+		matchs = []
+		for i in range(4):
+			player1 = players.pop(randint(0, len(players) - 1))
+			player2 = players.pop(randint(0, len(players) - 1))
+			match = Match.objects.create(tournament=tournament, player1=player1, player2=player2)
+			matchs.append(match)
+			print(f"\033[1;32mMatch {i + 1}: {player1} vs {player2}\033[0m")
+
+
+		# add match to tournament
+		for match in matchs:
+			tournament.matches.add(match)
+		tournament.save()
+
+		# Réponse réussie
+		return Response(
+			{
+				"message": "Matchmaking successful.",
+				"tournament_id": tournament.id,
+				"matchs": [match.id for match in matchs],
+			},
+			status=status.HTTP_200_OK,
+	)
+
+class FillTournamentAPIView(APIView):
+	permission_classes = [AllowAny]
+
+	def get(self, request):
+		# Récupérer les tournois
+		tournaments = Tournament.objects.all()
+		serializer = TournamentSerializer(tournaments, many=True)
+		return Response(serializer.data)
+	
+	def post(self, request, *args, **kwargs):
+		# Récupérer les données envoyées par le POST
+		tournament_id = request.data.get('tournament_id')
+		nb_players = request.data.get('nb_players')
+
+		# Récupérer le tournoi
+		tournament = get_object_or_404(Tournament, type_pong=tournament_id)
+
+		# Vérifier si le tournoi est plein
+		if tournament.player_entries.count() >= 8:
+			return Response(
+				{"error": "Tournament is already full."},
+				status=status.HTTP_400_BAD_REQUEST,
+			)
+		
+		# ajouter des ia
+		print(f"\033[1;32mAdding {8 - nb_players} AI players to the tournament...\033[0m")
+		for i in range(8 - nb_players):
+			player = CustomUser.objects.create(username=f"AI_{i + nb_players}", email=f"ia@{i + nb_players}.com")
+			player.save()
+			tournament.add_player(player, team_name=f"AI_of_the_doom_{i + nb_players}")
+		tournament.save()
+
+		# Réponse réussie
+		return Response(
+			{
+				"message": "Tournament filled with AI players.",
+				"tournament_id": tournament.id,
+				"nb_players": nb_players,
+			},
+			status=status.HTTP_200_OK,
+	)

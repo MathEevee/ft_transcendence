@@ -19,4 +19,6 @@ urlpatterns = [
 	path('api/messages/', views.MessageAPIView.as_view(), name='api-message'),
 	path('api/me/', views.MeAPIView.as_view(), name='api-me'),
 	path('api/tournaments/', views.TournamentAPIView.as_view(), name='api-tournaments'),
+	path('api/tournaments/matchmaking/', views.MatchmakingAPIView.as_view(), name='api-matchmaking'),
+	path('api/tournaments/fill/', views.FillTournamentAPIView.as_view(), name='api-fill'),
 ]
