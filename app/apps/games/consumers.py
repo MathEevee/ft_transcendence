@@ -53,7 +53,12 @@ class PongConsumer(AsyncWebsocketConsumer):
 
 	async def disconnect(self, close_code):
 		await self.send_to_all(f'{self.user.username} disconnected')
+		await self.send(text_data=json.dumps({
+			'message': f"{self.user.username} disconnected",
+		}))
+		print("\033[31m" + f'{self.user.username} disconnected' + "\033[0m")
 		user_sockets.remove(self)
+		await self.close()
 
 	async def receive(self, text_data):
 		data = json.loads(text_data)
