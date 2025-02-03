@@ -7,6 +7,11 @@ if (!window.location.pathname.startsWith('/authe/')) {
 	var joinagame = false;
 }
 
+function setjoinagame(bool)
+{
+	joinagame = bool;
+}
+
 var allconversations = [];
 let link;
 
@@ -210,51 +215,32 @@ async function printallConversations(of) {
 			newMessage.classList.add('message');
 			newMessage.classList.add('btn');
 			newMessage.classList.add('btn-primary');
+			newMessage.setAttribute('id', 'joinGameButton');
 			newMessage.textContent = 'JOIN';
 			chat.appendChild(newMessage);
 			chat.scrollTop = chat.scrollHeight;
 
-			newMessage.addEventListener('click', function(event) {
-				// const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-				// if (bebousocket == undefined)
-				// 	bebousocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/`);
+			if (joinagame)
+			{
+				newMessage.disabled = true;
+				newMessage.style.backgroundColor = 'grey';
+				newMessage.style.color = 'black';
+				newMessage.style.borderColor = 'black';
+				newMessage.style.borderWidth = '1px';
+				newMessage.style.borderStyle = 'solid';
+				newMessage.style.cursor = 'default';
+				return;
+			}
 
-				// bebousocket.onopen = function() {
-				// 	console.log('WebSocket connection opened on game');
+			newMessage.addEventListener('click', function(event) {
+					this.disabled = true;
+					this.style.backgroundColor = 'grey';
+					this.style.color = 'black';
 					if (allconversations[of][i].message.includes('pong'))
 						changePage('/games/pong/online', false);
 					else
 						changePage('/games/spaceinvaders/', false);
 					joinagame = true;
-				// }
-
-				// bebousocket.onclose = function(event) {
-				// 	console.log('WebSocket game connection closed');
-				// }
-
-				// bebousocket.onerror = function(error) {
-				// 	console.error('WebSocket game error:', error);
-				// }
-
-			// 	bebousocket.onmessage = function(event)
-			// 	{
-			// 		console.log("coucou");
-			// 		const data = JSON.parse(event.data);
-			// 		console.log(data);
-		
-			// 		if (data.message.includes('connected'))
-			// 		{
-			// 			setTimeout(() => {
-			// 			{
-			// 				putnameinbox(data.message.split(' ')[0]);
-			// 				document.getElementById('game-info-player').style.display = "flex";
-			// 				document.getElementById('playername').style.display = "flex";
-			// 				document.getElementById('invite').style.display = "none";
-		
-			// 			}}, 200);
-			// 		}
-			// 	}
-
 			});
 			continue;
 		}
@@ -578,4 +564,4 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 });
 
-export {link , liveChat, allconversations, joinagame};
+export {link , liveChat, allconversations, joinagame, setjoinagame};

@@ -1,6 +1,6 @@
 import { allconversations } from "/static/js/chatbox.js";
 import { joinagame } from "/static/js/chatbox.js";
-// import { bebousocket } from "/static/js/chatbox.js";
+import { setjoinagame } from "/static/js/chatbox.js";
 
 function loadPong() {
 	let interval = null;
@@ -15,6 +15,7 @@ function loadPong() {
 	const wsURL = `${wsProtocol}//${window.location.host}/ws/chat/`;
 	const socket = new WebSocket(wsURL);
 	let gamesocket;
+	let bebousocket;
 	chatbox.style.display = "none";
 	
 	async function getUserName() {
@@ -25,6 +26,8 @@ function loadPong() {
 	
 	function putnameinbox(name)
 	{
+		if (divofbox.childElementCount >= 2)
+			return ;
 		const playernamebox = document.createElement('h1');
 		playernamebox.setAttribute('id', 'playername');
 		playernamebox.textContent = name;
@@ -84,7 +87,6 @@ function loadPong() {
 	
 	let start = 0;
 	let option = 0;
-	let gameId;
 	
 	//options
 	const colorpalette = ["#FFFFFF", "#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"];
@@ -448,7 +450,7 @@ function loadPong() {
 	{
 		ball.y += ball.dy * ball.speed;
 		ball.x += ball.dx * ball.speed;
-		if(gamesocket)
+		if(gamesocket && start === 1)
 		{
 			gamesocket.send(JSON.stringify({
 				'message': 'move',
@@ -691,7 +693,7 @@ function loadPong() {
 	
 	function startPong()
 	{
-		if (start === 1 || option === 1)
+		if (start === 1 || (option === 1 && gamemode !== "online"))
 			return ;
 		initvariables();
 		countdown();
@@ -755,13 +757,34 @@ function loadPong() {
 			{
 				if (gamesocket == undefined)
 					gamesocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/`);
+				inviteinput.style.display = "none";
+				divofbox.style.display = "block";
+				putnameinbox(await getUserName());
 
 				gamesocket.onmessage = function(event)
 				{
 					const data = JSON.parse(event.data);
 					// console.log(data);
 
-					if (data.message.includes('connected'))
+					if (data.message.includes('disconnected'))
+					{
+						start = 0;
+						let playerdisconnect = data.message.split(' ')[0];
+						context.clearRect(0, 0, canvas.width, canvas.height);
+						context.fillStyle = colorset.backgroundcolor;
+						context.fillRect(0, 0, canvas.width, canvas.height);
+						context.fillStyle = colorset.fontcolor;
+						context.font = "50px Arial";
+						context.fillText(playerdisconnect + " disconnected", canvas.width / 2 - sizeofstringdisplayed(playerdisconnect + " disconnected").width / 2, canvas.height / 2);
+						while (divofbox.firstChild)
+							divofbox.removeChild(divofbox.firstChild);
+						inviteinput.style.display = "block";
+						gamesocket.close();
+						gamesocket = undefined;
+						setTimeout(wait, 2000);
+						return ;
+					}
+					else if (data.message.includes('connected'))
 						putnameinbox(data.message.split(' ')[0]);
 					else if (data.message === 'start')
 						startPong();
@@ -806,16 +829,38 @@ function loadPong() {
 		}
 	}
 
+	console.log(joinagame);
 	if (gamemode === "online" && joinagame)
 	{
-		var bebousocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/`);
+		if (bebousocket == undefined)
+			bebousocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/`)
 		beplayer = player2;
 		bebousocket.onmessage = function(event)
 		{
 			const data = JSON.parse(event.data);
 			// console.log("data", data);
 
-			if (data.message.includes('connected'))
+			if (data.message.includes('disconnected'))
+			{
+				start = 0;
+				let playerdisconnect = data.message.split(' ')[0];
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				context.fillStyle = colorset.backgroundcolor;
+				context.fillRect(0, 0, canvas.width, canvas.height);
+				context.fillStyle = colorset.fontcolor;
+				context.font = "50px Arial";
+				context.fillText(playerdisconnect + " disconnected", canvas.width / 2 - sizeofstringdisplayed(playerdisconnect + " disconnected").width / 2, canvas.height / 2);
+				while (divofbox.firstChild)
+					divofbox.removeChild(divofbox.firstChild);
+				inviteinput.style.display = "block";
+				bebousocket.close();
+				bebousocket = undefined;
+				beplayer = player1;
+				setjoinagame(false);
+				setTimeout(wait, 2000);
+				return ;
+			}
+			else if (data.message.includes('connected'))
 			{
 				setTimeout(() => {
 				{
@@ -848,6 +893,7 @@ function loadPong() {
 				{
 					clearendgame();
 					start = 0;
+					setTimeout(wait, 2000);
 				}
 			}
 		}
