@@ -705,7 +705,7 @@ function loadPong() {
 					'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content')
 				},
 				body: JSON.stringify({
-					'type' : 'Pong 1v1',
+					'type' : 'Pong 1v1 IA',
 					'started_at': Date.now(),
 				})
 			})
@@ -863,6 +863,10 @@ function loadPong() {
 			{
 				if (gamesocket && gamesocket.readyState === WebSocket.OPEN)
 				{
+					for (let i = 0; i < divofbox.childElementCount; i++)
+					{
+						console.log(divofbox.childNodes[i]);
+					}
 					gamesocket.send(JSON.stringify({
 						'message': 'start',
 					}));

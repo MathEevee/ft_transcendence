@@ -1,6 +1,8 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .globals import user_sockets
+from apps.authe.models import CustomUser
+from apps.games.models import Game, Player
 
 class PongConsumer(AsyncWebsocketConsumer):
 
@@ -87,6 +89,7 @@ class PongConsumer(AsyncWebsocketConsumer):
 
 		if message == 'start':
 			print(message, data)
+			# print(message, data['player'])
 		elif message == 'end':
 			print(message, data)
 		

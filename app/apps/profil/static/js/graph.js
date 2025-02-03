@@ -86,7 +86,7 @@ function create_score(data) {
 }
 
 function print_data_game(data, game) {
-    const tableBody = document.querySelector('#PongClassicHistory tbody');
+    const tableBody = document.querySelector('#PongIAHistory tbody');
     // On parcourt chaque jeu et on crée une ligne pour chaque
     const row = document.createElement('tr');
 
@@ -140,7 +140,7 @@ async function print_game(game) {
 }
 
 async function display_graph(){
-    const canvas = document.getElementById('PongClassic');
+    const canvas = document.getElementById('PongIA');
     var context = canvas.getContext('2d');
     context.fillStyle = 'rgb(200, 0, 0)';
     var user = window.location.pathname.split("/")[2];
@@ -184,6 +184,15 @@ async function display_graph(){
                 games_space_win++;
             }
         }
+        if (stats.history[i].game.type === 'Pong 1v1 IA' && stats.history[i].game.tournament === false) {
+            games_pong_casu_solo++;
+            await print_game(stats.history[i]);
+            games_pong_casu_solo_score += stats.history[i].score;
+            games_space_score_all.push(stats.history[i].score);
+            if (stats.history[i].score === 5) {
+                games_pong_casu_solo_win++;
+            }
+        }
         if (stats.history[i].game.type === 'Pong 1v1' && stats.history[i].game.tournament === false) {
             games_pong_casu_solo++;
             await print_game(stats.history[i]);
@@ -217,5 +226,6 @@ async function display_graph(){
 
     
 }
+
 
 export { display_graph };
