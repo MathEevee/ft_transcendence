@@ -16,6 +16,7 @@ function loadPong() {
 	const socket = new WebSocket(wsURL);
 	let gamesocket;
 	let bebousocket;
+	var gameId = null;
 	chatbox.style.display = "none";
 	
 	async function getUserName() {
@@ -508,8 +509,64 @@ function loadPong() {
 		if (score1 === 5 || score2 === 5)
 		{
 			clearendgame();
-			//send end game score + set gameid = NULL
-			if (gamemode === "solo")
+			if (gamemode === "online")
+			{
+				if (gamesocket)
+				{
+					gamesocket.send(JSON.stringify({
+						'message': 'end',
+						// 'player1':divofbox.childNodes[0].textContent,
+						// 'player2':divofbox.childNodes[1].textContent,
+						// 'ended_at': Date.now(),
+						// 'typegame': 'Pong 1v1',
+					}));
+					fetch('/games/pong_online/', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+						},
+						body: JSON.stringify({
+							'id' : gameId,
+							'ended_at': Date.now(),
+							'score1': score1,
+							'score2': score2,
+						})
+					})
+					.then(response => response.json())
+					.then(data => {
+						gameId = null;
+					})
+				}
+				else if (bebousocket)
+				{
+					bebousocket.send(JSON.stringify({
+						'message': 'end',
+						// 'player1':divofbox.childNodes[0].textContent,
+						// 'player2':divofbox.childNodes[1].textContent,
+						// 'ended_at': Date.now(),
+						// 'typegame': 'Pong 1v1',
+					}));
+					fetch('/games/pong_online/', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+						},
+						body: JSON.stringify({
+							'id' : gameId,
+							'ended_at': Date.now(),
+							'score1': score1,
+							'score2': score2,
+						})
+					})
+					.then(response => response.json())
+					.then(data => {
+						gameId = null;
+					})
+				}
+			}
+			else if (gamemode === "solo")
 			{
 				fetch('/games/local-ia-end/', {
 					method: 'POST',
@@ -526,11 +583,10 @@ function loadPong() {
 				})
 				.then(response => response.json())
 				.then(data => {
-					console.log(data);
 					gameId = null;
 				})
 			}
-			// else if (gamemode === "online")
+			//send end game score + set gameid = NULL
 			start = 0;
 			return 1;
 		}
@@ -707,7 +763,7 @@ function loadPong() {
 					'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content')
 				},
 				body: JSON.stringify({
-					'type' : 'Pong 1v1',
+					'type' : 'Pong 1v1 IA',
 					'started_at': Date.now(),
 				})
 			})
@@ -718,6 +774,10 @@ function loadPong() {
 			setTimeout(() => {
 				interval = setInterval(updateAI, 1000);
 			}, 5000);
+		}
+		if (gamemode === "online" && start === 1)
+		{
+
 		}
 		setTimeout(sendmove, 5000);
 		setTimeout(loop, 5000);
@@ -901,30 +961,66 @@ function loadPong() {
 	wait();
 
 	if (gamemode === "online")
-	{
-		redbutton.addEventListener("click", () =>
 		{
-			if (start === 0)
+			redbutton.addEventListener("click", () =>
 			{
-				if (gamesocket && gamesocket.readyState === WebSocket.OPEN)
+				if (start === 0)
 				{
-					gamesocket.send(JSON.stringify({
-						'message': 'start',
-					}));
+					if (gamesocket && gamesocket.readyState === WebSocket.OPEN)
+					{
+						gamesocket.send(JSON.stringify({
+							'message': 'start',
+						}));
+						fetch('/games/pong_online/', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content')
+							},
+							body: JSON.stringify({
+								'type' : 'Pong 1v1',
+								'started_at': Date.now(),
+								'ended_at': null,
+								'player1': divofbox.childNodes[0].textContent,
+								'player2': divofbox.childNodes[1].textContent,
+							})
+						})
+						.then(async response => await response.json())
+						.then(data => {
+							gameId = data.id;
+						})
+					}
+					else if (bebousocket)
+					{
+						bebousocket.send(JSON.stringify({
+							'message': 'start',
+						}));
+						fetch('/games/pong_online/', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content')
+							},
+							body: JSON.stringify({
+								'type' : 'Pong 1v1',
+								'started_at': Date.now(),
+								'ended_at': null,
+								'player1': divofbox.childNodes[0].textContent,
+								'player2': divofbox.childNodes[1].textContent,
+							})
+						})
+						.then(async response => await response.json())
+						.then(data => {
+							gameId = data.id;
+						})
+					}
 				}
-				else if (bebousocket)
-				{
-					bebousocket.send(JSON.stringify({
-						'message': 'start',
-					}));
-				}
-			}
-		});
-	}
-	else
-		redbutton.addEventListener("click", startPong);
-	bluebutton.addEventListener("click", startOption);
-	inviteinput.addEventListener("keypress", sendInvite);
+			});
+		}
+		else
+			redbutton.addEventListener("click", startPong);
+		bluebutton.addEventListener("click", startOption);
+		inviteinput.addEventListener("keypress", sendInvite);
 }
 
 export { loadPong }

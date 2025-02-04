@@ -5,6 +5,7 @@ from apps.authe.models import CustomUser
 class Game(models.Model):
 	GAME_TYPE_CHOICES = [
 		('Pong 1v1', 'Pong 1v1'),
+		('Pong 1v1 IA', 'Pong 1v1 IA'),
 		('Pong team', 'Pong team'),
 		('Space 1v1', 'Space 1v1'),
 	]
@@ -15,6 +16,7 @@ class Game(models.Model):
 	started_at = models.DateTimeField(null=True, blank=True)
 	ended_at = models.DateTimeField(null=True, blank=True)
 	tournament = models.BooleanField(default=False)
+
 
 	def __str__(self):
 		return f"Game {self.id} ({self.type})"
@@ -52,7 +54,7 @@ class Player(models.Model):
 			'is_IA': self.is_IA,
 			'score': self.score,
 		}
-		
+	
 
 # class GameStats(models.Model):
 	# game = models.ForeignKey(Game, on_delete=models.CASCADE, unique=True)

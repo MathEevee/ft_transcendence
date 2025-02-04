@@ -30,7 +30,7 @@ body {
     max-width: 600px;
 }
 
-#PongClassic{
+#PongIA{
     border: 4px solid black;
 }
 
@@ -96,4 +96,30 @@ body {
 
 .status-icon.offline {
     background-color: red;
+}
+
+.table-container {
+    width: 100%;
+    max-height: 200px; /* Tu peux ajuster cette valeur selon ton besoin */
+    overflow-y: auto;  /* Active le défilement vertical */
+    margin: 1rem auto;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem auto;
+    box-shadow: 0px 0px 10px #5820a1, 0px 0px 25px #ff00ff;
+    border: 1px solid white;
+
+}
+th, td {
+    border: 1px solid #5820a1;
+    padding: 8px;
+    text-align: center;
+    color: #ffffff;
+}
+
+th {
+    background-color: #120052;
 }
