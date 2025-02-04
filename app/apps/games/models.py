@@ -17,6 +17,7 @@ class Game(models.Model):
 	ended_at = models.DateTimeField(null=True, blank=True)
 	tournament = models.BooleanField(default=False)
 
+
 	def __str__(self):
 		return f"Game {self.id} ({self.type})"
 

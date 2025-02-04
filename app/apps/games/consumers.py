@@ -3,6 +3,10 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .globals import user_sockets
 from apps.authe.models import CustomUser
 from apps.games.models import Game, Player
+from asgiref.sync import sync_to_async
+import datetime
+from django.http import JsonResponse
+
 
 class PongConsumer(AsyncWebsocketConsumer):
 
@@ -63,6 +67,17 @@ class PongConsumer(AsyncWebsocketConsumer):
 	async def receive(self, text_data):
 		data = json.loads(text_data)
 		message = data['message']
+		print("\033[31m" + f'{data}' + "\033[0m")
+		if message == 'start':
+			print('test')
+			# game = await sync_to_async(Game.objects.create)(type=data['typegame'], nb_players_required=2, started_at = datetime.datetime.fromtimestamp(data['started_at'] / 1000))
+			# username1 = await sync_to_async(CustomUser.objects.get)(username=data['player1'])
+			# player1 = await sync_to_async(Player.objects.create)(user=username1, game=game, team=None, is_host=True, is_IA=False)
+			# username2 = await sync_to_async(CustomUser.objects.get)(username=data['player2'])
+			# player2 = await sync_to_async(Player.objects.create)(user=username2, game=game, team=None, is_host=False, is_IA=False)
+		if message == 'end':
+			print('test')
+
 		if 'player' in data:
 			player = data['player']
 		else:
@@ -91,11 +106,4 @@ class PongConsumer(AsyncWebsocketConsumer):
 			score2 = data['score2']
 		else:
 			score2 = None
-
-		if message == 'start':
-			print(message, data)
-			# print(message, data['player'])
-		elif message == 'end':
-			print(message, data)
-		
 		await self.send_to_all(message, player, ball, playery, ballx, bally, score1, score2)

@@ -86,4 +86,44 @@ def search_player_gameID(request, id):
     except Exception as e:
         # Log l'erreur et renvoie un message d'erreur
         return JsonResponse({'error': str(e)}, status=500)
+    
+@login_required
+def game_pong_online(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            if (data['ended_at'] == None):
+                game = Game.objects.create(type = data['type'], nb_players_required = 2, started_at = datetime.datetime.fromtimestamp(data['started_at'] / 1000))
+                game.save()
+                user1 = CustomUser.objects.get(username = data['player1'])
+                user2 = CustomUser.objects.get(username = data['player2'])
+                player1 = Player.objects.create(user = user1, game = game, team = None, is_host = True, is_IA = False)
+                player1.save()
+                player2 = Player.objects.create(user = user2, game = game, team = None, is_host = False, is_IA = False)
+                player2.save()
+                return JsonResponse({"id": game.id})
+            else:
+                game = Game.objects.get(id=data['id'])
+                player1 = Player.objects.get(game = game, is_host = True)
+                player2 = Player.objects.get(game = game, is_host = False)
+                game.ended_at = datetime.datetime.fromtimestamp(data['ended_at'] / 1000)
+                player1.score = data['score1']
+                player2.score = data['score2']
+                player1.save()
+                player2.save()
+                game.save()
+                return JsonResponse({'error':False})
+
+
+        except Exception as e:
+        # Log l'erreur et renvoie un message d'erreur
+            return JsonResponse({'error': str(e)}, status=500)
+    if request.method == 'GET':
+        try:
+            game = Game.objects.get(id=request.GET.get('id'))
+            return JsonResponse({'game':game})
+
+        except Exception as e:
+        # Log l'erreur et renvoie un message d'erreur
+            return JsonResponse({'error': str(e)}, status=500)
 
