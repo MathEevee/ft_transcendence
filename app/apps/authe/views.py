@@ -140,17 +140,21 @@ def register_view(request):
 
 @login_required
 def settings_view(request):
-	if request.method == 'POST':
-		form = UserSettingsForm(request.POST, instance=request.user)
-		if form.is_valid():
-			form.save()
-			username = form.cleaned_data.get('username')
-			messages.success(request, "Modifications réussies !")
-			return redirect(reverse('profil:profil', kwargs={'username': username}))
-	else:
-		form = UserSettingsForm(instance=request.user)
-	
-	return render(request, 'settings.html', {'form': form})
+    if request.method == 'POST':
+        form = UserSettingsForm(request.POST, instance=request.user)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.profil_picture = request.POST.get('profil_picture', user.profil_picture)
+            user.save()
+            messages.success(request, "Modifications réussies !")
+            return redirect(reverse('profil:profil', kwargs={'username': user.username}))
+    else:
+        form = UserSettingsForm(instance=request.user)
+
+    avatars_dir = os.path.join(settings.BASE_DIR, 'static/pictures/')
+    avatars = [f"/static/pictures/{img}" for img in os.listdir(avatars_dir) if img.endswith(('.png', '.jpg', '.jpeg'))]
+
+    return render(request, 'settings.html', {'form': form, 'avatars': avatars})
 
 @logout_required
 def login_view(request):
