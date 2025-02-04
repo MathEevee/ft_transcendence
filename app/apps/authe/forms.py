@@ -32,7 +32,7 @@ class LoginForm(forms.Form):
 #             'email'  : forms.EmailInput(attrs={'class': 'form-control'}),
 #         }
 
-from . import CustomUser
+from .models import CustomUser
 from django.conf import settings
 class UserSettingsForm(forms.ModelForm):
     profil_picture = forms.ChoiceField(choices=[], required=False)
