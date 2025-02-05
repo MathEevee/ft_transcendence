@@ -22,13 +22,14 @@ Settings
         <div id="avatar-selection" class="avatar-selection">
             {% for avatar in avatars %}
             <label>
-                <input type="radio" name="profil_picture" value="{{ avatar }}"></input>
+                <input type="radio" name="profil_picture" value="{{ avatar }}" hidden
+                    {% if avatar == selected_avatar %} checked {% endif %}></input>
                 <img src="{{ avatar }}" class="avatar" alt="Avatar"></img>
             </label>
             {% endfor %}
         </div>
 
-        <button class="btn-settings" type="submit">Valider</button>
+        <button class="btn-settings" type="submit">Save</button>
     </form>
 </div>
 {% endblock %}

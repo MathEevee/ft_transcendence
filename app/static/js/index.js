@@ -19,7 +19,7 @@ function loadPage(path) {
         allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
     else if (path.split("/")[1] == 'profil')
         display_graph();
-    if (window.location.pathname.startsWith('/authe/')) {
+    if (window.location.pathname.startsWith('/authe/') && window.location.pathname != "/authe/settings/") {
         var chatBtn = document.getElementById('chat')
         if (chatBtn)
             chatBtn.style.display = 'none';
@@ -33,7 +33,7 @@ async function changePage(path, disableHistory) {
         if (!disableHistory)
             history.pushState({}, '', response.url);
         document.body.innerHTML = content;
-        if (!window.location.pathname.startsWith("/authe/"))
+        if (!window.location.pathname.startsWith("/authe/") || window.location.pathname == "/authe/settings/")
             liveChat();
         loadPage(path);
     }
