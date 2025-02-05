@@ -293,7 +293,7 @@ class MatchmakingAPIView(APIView):
 		# Vérifier si le tournoi est plein
 		if tournament.player_entries.count() < 8:
 			return Response(
-				{"error": "Tournament is not full yet."},
+				{"error": "Tournament is not full."},
 				status=status.HTTP_400_BAD_REQUEST,
 			)
 		
@@ -351,13 +351,20 @@ class FillTournamentAPIView(APIView):
 				{"error": "Tournament is already full."},
 				status=status.HTTP_400_BAD_REQUEST,
 			)
-		
+
+		if tournament_id:
+			tournamentName = "Pong"
+		else:
+			tournamentName = "SpaceBattle"
+
 		# ajouter des ia
 		print(f"\033[1;32mAdding {8 - nb_players} AI players to the tournament...\033[0m")
 		for i in range(8 - nb_players):
-			player = CustomUser.objects.create(username=f"AI_{i + nb_players}", email=f"ia@{i + nb_players}.com")
+			# player = CustomUser.objects.create(username=f"AI_{i + nb_players}_{tournament_id}", email=f"ia@{i + nb_players}_{tournament_id}.com")
+			player = CustomUser.objects.create(username=f"AI_{i + nb_players}_{tournamentName}", email=f"ia@{i + nb_players}_{tournamentName}.com")
 			player.save()
-			tournament.add_player(player, team_name=f"AI_of_the_doom_{i + nb_players}")
+			if tournament.player_entries.count() <= 7:
+				tournament.add_player(player, team_name=f"AI_of_the_doom_{i + nb_players}")
 		tournament.save()
 
 		# Réponse réussie

@@ -1,3 +1,4 @@
+import { changePage } from "/static/js/index.js";
 import { allconversations } from "/static/js/chatbox.js";
 
 function loadTournament()
@@ -68,8 +69,8 @@ async function clearPlayerList()
 
 async function displayPlayerTournament()
 {
-	// if (await playeradded(document.getElementById('games-table')))
-	// 	return;
+	if (window.location.pathname !== '/games/pong/tournament/' && window.location.pathname !== '/games/spaceinvaders/tournament/')
+		return;
 	await clearPlayerList();
 	const response = await fetch('/authe/api/tournaments/');
 	const data = await response.json();
@@ -114,12 +115,12 @@ async function displayPlayerTournament()
 	}
 }
 
-function startmatchmaking()
+async function startmatchmaking()
 {
 	const playersList = Array.from(players);
 	console.log(playersList);
 	const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-	fetch('/authe/api/tournaments/matchmaking/', {
+	await fetch('/authe/api/tournaments/matchmaking/', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -143,14 +144,15 @@ function startmatchmaking()
 	.catch(err => {
 		console.error(`Error starting matchmaking: ${err}`);
 	});
+	displayPlayerTournament();
 }
 
-function filltournament(playersList)
+async function filltournament(playersList)
 {
 	let nbplayers = playersList.length;
 
 	const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-	fetch('/authe/api/tournaments/fill/', {
+	await fetch('/authe/api/tournaments/fill/', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -167,25 +169,25 @@ function filltournament(playersList)
 			console.warn(`Error filling tournament: ${response.error}`);
 		else
 		{
-			displayPlayerTournament();
-			players.clear();
-			for (let i = 0; i < response.players.length; i++)
-				players.add(response.players[i]);
+			playersList = response.players;
+			console.log('Tournament filled', playersList);
 		}
 	console.log('Tournament filled', playersList);
 	})
 	.catch(err => {
 		console.error(`Error filling tournament: ${err}`);
 	});
+	await startmatchmaking();
 }
 
-function startTournoi()
+async function startTournoi()
 {
 	const playersList = Array.from(players);
 
 	if (playersList.length < 8)
-		filltournament(playersList);
-	startmatchmaking();
+		await filltournament(playersList);
+	else
+		await startmatchmaking();
 
 }
 
@@ -288,7 +290,6 @@ async function setupPlayerList()
 	
 	startButton.addEventListener('click', () => {
 
-		// console.log(players.length);
 		if (!allconversations["other"])
 			allconversations["other"] = [];
 		allconversations["other"].push({
@@ -302,6 +303,7 @@ async function setupPlayerList()
 				'message': 'The tournament is starting',
 			}));
 		}
+		changePage('/games/'+(tournamentId ? 'pong' : 'spaceinvaders')+ '/online/tournament/');
 		//todo send request to start the tournament
 		//todo send request to add in db the match history
 		startTournoi();
@@ -335,15 +337,6 @@ async function setupPlayerList()
 }
 
 setupPlayerList();
-
-// setInterval(async () => {
-// 	if (document.location.pathname.split('/').length < 3 || document.location.pathname.split('/')[3] !== 'tournament')
-// 		return;
-// 	if (document.getElementById('games-table').rows.length === 1 || document.getElementById('games-table').rows.length === 0)
-// 		return;
-// 	console.log('refresh');
-// 	await displayPlayerTournament();
-// }, 2500);
 
 }
 export { loadTournament };
