@@ -143,14 +143,18 @@ def settings_view(request):
 	if request.method == 'POST':
 		form = UserSettingsForm(request.POST, instance=request.user)
 		if form.is_valid():
-			form.save()
-			username = form.cleaned_data.get('username')
+			user = form.save(commit=False)
+			user.profil_picture = form.cleaned_data.get('profil_picture', user.profil_picture)
+			user.save()
 			messages.success(request, "Modifications réussies !")
-			return redirect(reverse('profil:profil', kwargs={'username': username}))
+			return redirect(reverse('profil:profil', kwargs={'username': user.username}))
 	else:
 		form = UserSettingsForm(instance=request.user)
-	
-	return render(request, 'settings.html', {'form': form})
+
+	avatars_dir = os.path.join(settings.BASE_DIR, 'static/pictures/')
+	avatars = [f"/static/pictures/{img}" for img in os.listdir(avatars_dir) if img.endswith(('.png', '.jpg', '.jpeg'))]
+
+	return render(request, 'settings.html', {'form': form, 'avatars': avatars, 'selected_avatar': request.user.profil_picture})
 
 @logout_required
 def login_view(request):
