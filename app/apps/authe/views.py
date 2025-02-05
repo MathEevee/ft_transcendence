@@ -144,7 +144,7 @@ def settings_view(request):
 		form = UserSettingsForm(request.POST, instance=request.user)
 		if form.is_valid():
 			user = form.save(commit=False)
-			user.profil_picture = form.cleaned_data.get('profil_picture', user.profil_picture)
+			user.profil_picture = request.POST.get('profil_picture', user.profil_picture)
 			user.save()
 			messages.success(request, "Modifications réussies !")
 			return redirect(reverse('profil:profil', kwargs={'username': user.username}))
