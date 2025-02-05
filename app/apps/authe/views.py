@@ -5,7 +5,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from django.urls import reverse
+from django.contrib.auth.views import PasswordChangeView
+from django.urls import reverse, reverse_lazy
 from django.conf import settings
 from django.utils.timezone import now
 from django.db.utils import IntegrityError
@@ -155,6 +156,14 @@ def settings_view(request):
 	avatars = [f"/static/pictures/{img}" for img in os.listdir(avatars_dir) if img.endswith(('.png', '.jpg', '.jpeg'))]
 
 	return render(request, 'settings.html', {'form': form, 'avatars': avatars, 'selected_avatar': request.user.profil_picture})
+
+class CustomPasswordChangeView(PasswordChangeView):
+	template_name = 'password_change.html'
+	success_url = reverse_lazy('profil:profil')
+
+	def form_valid(self, form):
+		messages.success(self.request, "Passord correctly updating !")
+		return super().form_valid(form)
 
 @logout_required
 def login_view(request):
