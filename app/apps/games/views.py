@@ -106,6 +106,8 @@ def game_pong_online(request):
                 game = Game.objects.get(id=data['id'])
                 player1 = Player.objects.get(game = game, is_host = True)
                 player2 = Player.objects.get(game = game, is_host = False)
+                if (game.ended_at != None):
+                    return JsonResponse({'error': True, 'message':'Game already end'})
                 game.ended_at = datetime.datetime.fromtimestamp(data['ended_at'] / 1000)
                 player1.score = data['score1']
                 player2.score = data['score2']
@@ -115,9 +117,12 @@ def game_pong_online(request):
                 return JsonResponse({'error':False})
 
 
-        except Exception as e:
-        # Log l'erreur et renvoie un message d'erreur
-            return JsonResponse({'error': str(e)}, status=500)
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'error': True, 'message':'Invalid User'})
+        except Game.DoesNotExist:
+            return JsonResponse({'error': True, 'message':'Invalid ID'})
+        except Player.DoesNotExist:
+            return JsonResponse({'error': True, 'message':'Invalid Player ID'})
     if request.method == 'GET':
         try:
             game = Game.objects.get(id=request.GET.get('id'))
