@@ -94,13 +94,84 @@ function loadPongMulti(){
 		t_game.ball.draw(context);
 	}
 
+	function setballafterpoint(canvas, ball)
+	{
+		//faire en sorte que la balle parte dans une direction aléatoire
+		var ballplassement = new point(0, 0);
+		ballplassement.x = Math.floor(Math.random() * 10);
+		if (ballplassement.x % 3 === 0)
+		{
+			ballplassement.x = 0;
+			ballplassement.y = Math.floor(Math.random() * 10);
+			if (ballplassement.y % 2 === 0)
+				ballplassement.y = 50;
+			else
+				ballplassement.y = -50;
+		}
+		else if (ballplassement.x % 3 === 1)
+			ballplassement.x = 50;
+		else
+			ballplassement.x = -50;
+		t_game.ball = new Ball(canvas.width / 2 + ballplassement.x, canvas.height / 2 + ballplassement.y, 0, 0, 5, colorset.ballcolor, speed / 4);
+		if (ballplassement.x === 0)
+			t_game.ball.dx = Math.random() * 0.5;
+		else if (ballplassement.x === 50)
+			t_game.ball.dx = -1;
+		else
+			t_game.ball.dx = -1;
+		if (ballplassement.y === 0)
+			t_game.ball.dy = Math.random() * 0.5;
+		else if (ballplassement.y === 50)
+			t_game.ball.dy = 1;
+		else
+			t_game.ball.dy = -1;
+		ball.x = canvas.width / 2;
+		ball.y = canvas.height / 2;
+		ball.speed = 5;
+	}
+
+	function setplayerafterpoint(canvas, player1, player2, player3, player4)
+	{
+		player1.x = 5;
+		player1.y = 312.5;
+		player2.x = 690;
+		player2.y = 312.5;
+		player3.x = 312.5;
+		player3.y = 5;
+		player4.x = 312.5;
+		player4.y = 690;
+	}
+
+	function setafterpoint(canvas, player1, player2, player3, player4, ball)
+	{
+		if (ball.lasttouch == 1)
+			player1.score += 1;
+		else if (ball.lasttouch == 2)
+			player2.score += 1;
+		else if (ball.lasttouch == 3)
+			player3.score += 1;
+		else if (ball.lasttouch == 4)
+			player4.score += 1;
+		ball.lasttouch = null;
+		if (player1.score === 5 || player2.score === 5 || player3.score === 5 || player4.score === 5)
+			start = 0;
+		setballafterpoint(canvas, ball);
+		setplayerafterpoint(canvas, player1, player2, player3, player4);
+	}
+
 	function update()
 	{
 		t_game.player1.update(canvas);
 		t_game.player2.update(canvas);
 		t_game.player3.update(canvas);
 		t_game.player4.update(canvas);
-		t_game.ball.update(canvas, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball);
+		if (t_game.ball.update(canvas, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball))
+		{
+			if (t_game.ball.y - t_game.ball.radius <= 0 || t_game.ball.y + t_game.ball.radius >= canvas.height)
+				setafterpoint(canvas, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball);
+			else if (t_game.ball.x - t_game.ball.radius <= 0 || t_game.ball.x + t_game.ball.radius >= canvas.width)
+				setafterpoint(canvas, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball);
+		}
 	}
 	
 	function keyhookdownforgame(event)
