@@ -62,6 +62,7 @@ class Player
 	}
 
 	constructor(x, y, width, height, color, team, speed) {
+		this.lasttouch = undefined;
 		this.x = x;
 		this.y = y;
 		this.dx = 0;

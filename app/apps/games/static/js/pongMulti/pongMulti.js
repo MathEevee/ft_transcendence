@@ -12,7 +12,7 @@ function loadPongMulti(){
 	const inviteinput = document.getElementById('invite');
 	const divofbox = document.getElementById('game-info-player');
 	chatbox.style.display = "none";
-	
+
 	let speed = 5;
 	let start = 0;
 	const paddleHeight = 75;
@@ -38,6 +38,8 @@ function loadPongMulti(){
 		ballcolor: colorpalette.cyan,
 		team1: colorpalette.red,
 		team2: colorpalette.blue,
+		team3: colorpalette.green,
+		team4: colorpalette.white,
 		netcolor: colorpalette.white,
 		scorecolor: colorpalette.white,
 	};
@@ -48,8 +50,8 @@ function loadPongMulti(){
 	var t_game = {
 		player1: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team1, 1),
 		player2: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team2, 2),
-		player3: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team1, 1),
-		player4: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team2, 2),
+		player3: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team3, 1),
+		player4: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team4, 2),
 		ball: new Ball(canvas.width / 2, canvas.height / 2, 0, 0, 5, colorset.ballcolor, speed),
 	};
 	
@@ -216,9 +218,9 @@ function loadPongMulti(){
 	function initvariables()
 	{
 		t_game.player1 = new Player(paddleWidth, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team1, 1, speed);
-		t_game.player2 = new Player(canvas.width - paddleWidth * 2, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team1, 1, speed);
-		t_game.player3 = new Player(canvas.width / 2 - paddleHeight / 2, paddleWidth, paddleHeight, paddleWidth, colorset.team2, 2, speed);
-		t_game.player4 = new Player(canvas.width / 2 - paddleHeight / 2, canvas.height - paddleWidth * 2, paddleHeight, paddleWidth, colorset.team2, 2, speed);
+		t_game.player2 = new Player(canvas.width - paddleWidth * 2, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team2, 1, speed);
+		t_game.player3 = new Player(canvas.width / 2 - paddleHeight / 2, paddleWidth, paddleHeight, paddleWidth, colorset.team3, 2, speed);
+		t_game.player4 = new Player(canvas.width / 2 - paddleHeight / 2, canvas.height - paddleWidth * 2, paddleHeight, paddleWidth, colorset.team4, 2, speed);
 		var ballplassement = new point(0, 0);
 		ballplassement.x = Math.floor(Math.random() * 10);
 		if (ballplassement.x % 3 === 0)
