@@ -132,3 +132,23 @@ def game_pong_online(request):
         # Log l'erreur et renvoie un message d'erreur
             return JsonResponse({'error': str(e)}, status=500)
 
+@login_required
+def pong_multi(request):#a tester
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            game = Game.objects.create(type = data['type'], nb_players_required = 2, started_at = datetime.datetime.fromtimestamp(data['started_at'] / 1000))
+            game.save()
+            #loop for 4 players
+            for i in range(4):
+                if (data['is_IA'+str(i+1)] == False):
+                    user = CustomUser.objects.get(username = data['player'+str(i+1)])
+                    player = Player.objects.create(user = user, game = game, team = None, is_host = data['is_host'+str(i+1)], is_IA = False)
+                else:
+                    player = Player.objects.create(user = None, game = game, team = None, is_host = False, is_IA = True)
+                player.save()
+            return JsonResponse({"id": game.id})
+        except CustomUser.DoesNotExist:
+            return JsonResponse({'error': True, 'message':'Invalid User'})
+        except Game.DoesNotExist:
+            return JsonResponse({'error': True, 'message':'Invalid ID'})
