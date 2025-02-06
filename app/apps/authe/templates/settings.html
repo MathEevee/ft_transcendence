@@ -13,18 +13,20 @@ Settings
 {% include "navbar.html" %}
 
 <div class="body-container">
-    <h2>Parametres</h2> 
+    <h2>Settings</h2> 
 
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
+
+        <a href="{% url 'authe:password_change' %}">Change my password</a>
     
         <div id="avatar-selection" class="avatar-selection">
             {% for avatar in avatars %}
             <label>
                 <input type="radio" name="profil_picture" value="{{ avatar }}" hidden
-                    {% if avatar == selected_avatar %} checked {% endif %}></input>
-                <img src="{{ avatar }}" class="avatar" alt="Avatar"></img>
+                    {% if avatar == selected_avatar %} checked {% endif %}>
+                <img src="{{ avatar }}" class="avatar" {% if avatar == selected_avatar %} selected {% endif %}" alt="Avatar">
             </label>
             {% endfor %}
         </div>
@@ -32,4 +34,34 @@ Settings
         <button class="btn-settings" type="submit">Save</button>
     </form>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let avatars = document.querySelectorAll("#avatar-selection label img");
+        avatars.forEach(img => {
+            img.addEventListener("click", function () {
+                // reset selected
+                avatars.forEach(i => i.classList.remove("selected"));
+                this.classList.add("selected");
+
+                // check the new select
+                this.previousElementSibling.checked = true;
+            });
+        });
+    });
+</script>
+
+<style>
+    .avatar {
+        cursor: pointer;
+        border: 3px solid transparent;
+        padding: 5px;
+        border-radius: 10px;
+        transition: border 0.2s ease-in-out;
+    }
+    .avatar.selected {
+        border: 3px solid cyan;
+    }
+</style>
+
 {% endblock %}
