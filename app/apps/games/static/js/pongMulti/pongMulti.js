@@ -2,6 +2,7 @@ import { Ball } from "/static/js/pongMulti/ball.js";
 import { Player } from "/static/js/pongMulti/player.js";
 import { point } from "/static/js/pongMulti/point.js";
 import { sizeofstringdisplayed } from "/static/js/pongMulti/utils.js";
+import { lasthit } from "/static/js/pongMulti/player.js";
 
 function loadPongMulti(){
 	let interval = null;
@@ -38,6 +39,8 @@ function loadPongMulti(){
 		ballcolor: colorpalette.cyan,
 		team1: colorpalette.red,
 		team2: colorpalette.blue,
+		team3: colorpalette.green,
+		team4: colorpalette.white,
 		netcolor: colorpalette.white,
 		scorecolor: colorpalette.white,
 	};
@@ -46,10 +49,10 @@ function loadPongMulti(){
 
 	/*t_game*/
 	var t_game = {
-		player1: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team1, 1),
-		player2: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team2, 2),
-		player3: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team1, 1),
-		player4: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team2, 2),
+		player1: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team1),
+		player2: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team2),
+		player3: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team3),
+		player4: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team4),
 		ball: new Ball(canvas.width / 2, canvas.height / 2, 0, 0, 5, colorset.ballcolor, speed),
 	};
 	
@@ -92,13 +95,83 @@ function loadPongMulti(){
 		t_game.ball.draw(context);
 	}
 
+	function setballafterpoint(canvas, ball)
+	{
+		console.log("ballbefore", ball);
+		var ballplassement = new point(0, 0);
+		ballplassement.x = Math.floor(Math.random() * 10);
+		if (ballplassement.x % 3 === 0)
+		{
+			ballplassement.x = 0;
+			ballplassement.y = Math.floor(Math.random() * 10);
+			if (ballplassement.y % 2 === 0)
+				ballplassement.y = 50;
+			else
+				ballplassement.y = -50;
+		}
+		else if (ballplassement.x % 3 === 1)
+			ballplassement.x = 50;
+		else
+			ballplassement.x = -50;
+		t_game.ball = new Ball(canvas.width / 2 + ballplassement.x, canvas.height / 2 + ballplassement.y, 0, 0, 5, colorset.ballcolor, speed / 4);
+		if (ballplassement.x === 0)
+			t_game.ball.dx = Math.random() * 0.5;
+		else if (ballplassement.x === 50)
+			t_game.ball.dx = -1;
+		else
+			t_game.ball.dx = -1;
+		if (ballplassement.y === 0)
+			t_game.ball.dy = Math.random() * 0.5;
+		else if (ballplassement.y === 50)
+			t_game.ball.dy = 1;
+		else
+			t_game.ball.dy = -1;
+		console.log("ballafter", ball);
+	}
+	function setplayerafterpoint(canvas, player1, player2, player3, player4)
+	{
+		player1.x = 5;
+		player1.y = 312.5;
+		player3.x = 690;
+		player3.y = 312.5;
+		player2.x = 312.5;
+		player2.y = 5;
+		player4.x = 312.5;
+		player4.y = 690;
+	}
+	function setafterpoint(canvas, player1, player2, player3, player4, ball)
+	{
+		if (lasthit.lasthit)
+		{
+			if (lasthit.lasthit === 1)
+				player1.score++;
+			else if (lasthit.lasthit === 2)
+				player2.score++;
+			else if (lasthit.lasthit === 3)
+				player3.score++;
+			else if (lasthit.lasthit === 4)
+				player4.score++;
+			lasthit.lasthit = null;
+		}
+		setballafterpoint(canvas, ball);
+		setplayerafterpoint(canvas, player1, player2, player3, player4);
+		if (player1.score === 5 || player2.score === 5 || player3.score === 5 || player4.score === 5)
+			start = 0;
+	}
+
 	function update()
 	{
 		t_game.player1.update(canvas);
 		t_game.player2.update(canvas);
 		t_game.player3.update(canvas);
 		t_game.player4.update(canvas);
-		t_game.ball.update(canvas, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball);
+		if (t_game.ball.update(canvas, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball))
+		{
+			if (t_game.ball.y - t_game.ball.radius <= 0 || t_game.ball.y + t_game.ball.radius >= canvas.height)
+				setafterpoint(canvas, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball);
+			else if (t_game.ball.x - t_game.ball.radius <= 0 || t_game.ball.x + t_game.ball.radius >= canvas.width)
+				setafterpoint(canvas, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball);
+		}
 	}
 	
 	function keyhookdownforgame(event)
@@ -215,10 +288,10 @@ function loadPongMulti(){
 	
 	function initvariables()
 	{
-		t_game.player1 = new Player(paddleWidth, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team1, 1, speed);
-		t_game.player2 = new Player(canvas.width - paddleWidth * 2, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team1, 1, speed);
-		t_game.player3 = new Player(canvas.width / 2 - paddleHeight / 2, paddleWidth, paddleHeight, paddleWidth, colorset.team2, 2, speed);
-		t_game.player4 = new Player(canvas.width / 2 - paddleHeight / 2, canvas.height - paddleWidth * 2, paddleHeight, paddleWidth, colorset.team2, 2, speed);
+		t_game.player1 = new Player(paddleWidth, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team1,speed);
+		t_game.player2 = new Player(canvas.width / 2 - paddleHeight / 2, paddleWidth, paddleHeight, paddleWidth, colorset.team2, speed);
+		t_game.player3 = new Player(canvas.width - paddleWidth * 2, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team3, speed);
+		t_game.player4 = new Player(canvas.width / 2 - paddleHeight / 2, canvas.height - paddleWidth * 2, paddleHeight, paddleWidth, colorset.team4, speed);
 		var ballplassement = new point(0, 0);
 		ballplassement.x = Math.floor(Math.random() * 10);
 		if (ballplassement.x % 3 === 0)

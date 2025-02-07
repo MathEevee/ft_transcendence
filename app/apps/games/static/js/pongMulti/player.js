@@ -1,6 +1,10 @@
 import { drawdiamond, drawRect } from './utils.js';
 import { point } from './point.js';
 
+var lasthit = {
+	lasthit: null,
+}
+
 class Player
 {
 	update(canvas)
@@ -61,7 +65,7 @@ class Player
 		return (hitbox);
 	}
 
-	constructor(x, y, width, height, color, team, speed) {
+	constructor(x, y, width, height, color, speed) {
 		this.x = x;
 		this.y = y;
 		this.dx = 0;
@@ -79,8 +83,8 @@ class Player
 		]
 		this.up = false;
 		this.down = false;
-		team = team;
 	}
 }
 
 export { Player };
+export { lasthit };
