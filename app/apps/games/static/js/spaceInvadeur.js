@@ -14,6 +14,101 @@ chatbox.style.display = "none";
 let lasshootplayer1 = 0;
 let lasshootplayer2 = 0;
 
+let gameId = 0;
+
+/*============================================INITIALIZATION============================================*/
+
+async function getUserName() {
+	const response = await fetch('/authe/api/me/');
+	const data = await response.json();
+	return data.username;
+}
+
+function putplayerinmatch(player1, player2)
+{
+	const currentmatch = document.getElementsByClassName("tournament-player");
+	const player1name = document.createElement("h3");
+	const player2name = document.createElement("h3");
+	const playscore = document.createElement("p");
+	const playscore2 = document.createElement("p");
+
+	// delete allcurrentmatch;
+	for (let i = 0; i < currentmatch.length; i++)
+	{
+		while (currentmatch[i].firstChild)
+			currentmatch[i].removeChild(currentmatch[i].firstChild);
+	}
+
+	player1name.textContent = player1;
+	playscore.textContent = "0";
+	currentmatch[0].appendChild(player1name);
+	currentmatch[0].appendChild(playscore);
+
+	player2name.textContent = player2;
+	playscore2.textContent = "0";
+	currentmatch[1].appendChild(player2name);
+	currentmatch[1].appendChild(playscore2);
+}
+
+async function startMatch(match)
+{
+	const matchlist = document.getElementById("match-list");
+	const player1 = match.player1;
+	const player2 = match.player2;
+
+	if (player1 === undefined || player2 === undefined)
+		return ;
+
+	matchlist.removeChild(matchlist.firstChild);
+	putplayerinmatch(player1, player2);
+	if (player1 === await getUserName())
+	{
+	}
+}
+
+function putMatchList(match)
+{
+	const matchlist = document.getElementById("match-list");
+	const matchli = document.createElement("li");
+	const span = document.createElement("span");
+
+	span.textContent = `${match.player1} vs ${match.player2}`;
+	matchli.appendChild(span);
+	matchlist.appendChild(matchli);
+}
+
+async function displayTournamentGame()
+{
+	const response = await fetch('/authe/api/tournaments/');
+	const data = await response.json();
+	let tournament;
+	
+	for (let i = 0; i < data.length; i++)
+	{
+		if (data[i].type_pong === false)
+		{
+			tournament = data[i];
+			break;
+		}
+	}
+
+	if (tournament === undefined)
+		return ;
+
+	for (let i = 0; i < tournament.match_entries.length; i++)
+		putMatchList(tournament.match_entries[i]);
+
+	await startMatch(tournament.match_entries[0]);
+	tournament.match_entries.pop();
+}
+
+if (document.location.pathname === "/games/spaceinvaders/online/tournament/")
+{
+	document.getElementById("redButton").disabled = true;
+	document.getElementById("tournamentbox").style.display = "block";
+	displayTournamentGame();
+}
+
 class Player
 {
 	constructor(x, y, width, height, dx, dy, speed, left, right, up, down, hitbox, life)
@@ -421,45 +516,45 @@ function keyhookdownforgame(event)
 	if (start === 0 || forcountdown === 1)
 		return ;
 	const now = Date.now();
-	if (event.key === "ArrowLeft" && t_game.player2.left === 0)
-	{
-		t_game.player2.dx -= 7;
-		t_game.player2.left = 1;
-	}
-	else if (event.key === "ArrowRight" && t_game.player2.right === 0)
-	{
-		t_game.player2.dx += 7;
-		t_game.player2.right = 1;
-	}
-	else if (event.key === "ArrowUp" && t_game.player2.up === 0)
-	{
-		t_game.player2.dy -= 7;
-		t_game.player2.up = 1;
-	}
-	else if (event.key === "ArrowDown" && t_game.player2.down === 0)
-	{
-		t_game.player2.dy += 7;
-		t_game.player2.down = 1;
-	}
-	else if ((event.key === "a" || event.key === "q") && t_game.player1.left === 0)
+	if (event.key === "ArrowLeft" && t_game.player1.left === 0)
 	{
 		t_game.player1.dx -= 7;
 		t_game.player1.left = 1;
 	}
-	else if (event.key === "d" && t_game.player1.right === 0)
+	else if (event.key === "ArrowRight" && t_game.player1.right === 0)
 	{
 		t_game.player1.dx += 7;
 		t_game.player1.right = 1;
 	}
-	else if ((event.key === "w" || event.key === "z") && t_game.player1.up === 0)
+	else if (event.key === "ArrowUp" && t_game.player1.up === 0)
 	{
 		t_game.player1.dy -= 7;
 		t_game.player1.up = 1;
 	}
-	else if (event.key === "s" && t_game.player1.down === 0)
+	else if (event.key === "ArrowDown" && t_game.player1.down === 0)
 	{
 		t_game.player1.dy += 7;
 		t_game.player1.down = 1;
+	}
+	else if ((event.key === "a" || event.key === "q") && t_game.player2.left === 0)
+	{
+		t_game.player2.dx -= 7;
+		t_game.player2.left = 1;
+	}
+	else if (event.key === "d" && t_game.player2.right === 0)
+	{
+		t_game.player2.dx += 7;
+		t_game.player2.right = 1;
+	}
+	else if ((event.key === "w" || event.key === "z") && t_game.player2.up === 0)
+	{
+		t_game.player2.dy -= 7;
+		t_game.player2.up = 1;
+	}
+	else if (event.key === "s" && t_game.player2.down === 0)
+	{
+		t_game.player2.dy += 7;
+		t_game.player2.down = 1;
 	}
 	if (event.key === "f")
 	{
@@ -491,45 +586,45 @@ function keyhookupforgame(event)
 {
 	if (start === 0 || forcountdown === 1)
 		return ;
-	if (event.key === "ArrowLeft" && t_game.player2.left === 1)
-	{
-		t_game.player2.dx += 7;
-		t_game.player2.left = 0;
-	}
-	else if (event.key === "ArrowRight" && t_game.player2.right === 1)
-	{
-		t_game.player2.dx -= 7;
-		t_game.player2.right = 0;
-	}
-	else if (event.key === "ArrowUp" && t_game.player2.up === 1)
-	{
-		t_game.player2.dy += 7;
-		t_game.player2.up = 0;
-	}
-	else if (event.key === "ArrowDown" && t_game.player2.down === 1)
-	{
-		t_game.player2.dy -= 7;
-		t_game.player2.down = 0;
-	}
-	else if ((event.key === "a" || event.key === "q") && t_game.player1.left === 1)
+	if (event.key === "ArrowLeft" && t_game.player1.left === 1)
 	{
 		t_game.player1.dx += 7;
 		t_game.player1.left = 0;
 	}
-	else if (event.key === "d" && t_game.player1.right === 1)
+	else if (event.key === "ArrowRight" && t_game.player1.right === 1)
 	{
 		t_game.player1.dx -= 7;
 		t_game.player1.right = 0;
 	}
-	else if ((event.key === "w" || event.key === "z") && t_game.player1.up === 1)
+	else if (event.key === "ArrowUp" && t_game.player1.up === 1)
 	{
 		t_game.player1.dy += 7;
 		t_game.player1.up = 0;
 	}
-	else if (event.key === "s" && t_game.player1.down === 1)
+	else if (event.key === "ArrowDown" && t_game.player1.down === 1)
 	{
 		t_game.player1.dy -= 7;
 		t_game.player1.down = 0;
+	}
+	else if ((event.key === "a" || event.key === "q") && t_game.player2.left === 1)
+	{
+		t_game.player2.dx += 7;
+		t_game.player2.left = 0;
+	}
+	else if (event.key === "d" && t_game.player2.right === 1)
+	{
+		t_game.player2.dx -= 7;
+		t_game.player2.right = 0;
+	}
+	else if ((event.key === "w" || event.key === "z") && t_game.player2.up === 1)
+	{
+		t_game.player2.dy += 7;
+		t_game.player2.up = 0;
+	}
+	else if (event.key === "s" && t_game.player2.down === 1)
+	{
+		t_game.player2.dy -= 7;
+		t_game.player2.down = 0;
 	}
 
 }

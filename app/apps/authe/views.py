@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.exceptions import NotFound
-from .models import CustomUser, Message, Tournament, PlayerEntry, Match
+from .models import CustomUser, Message, Tournament, PlayerEntry, Match, MatchEntry
 from .forms import RegistrationForm, LoginForm, UserSettingsForm
 from .serializer import CustomUserSerializer, TournamentSerializer, MatchSerializer
 from random import randint
@@ -283,6 +283,7 @@ class TournamentAPIView(APIView):
 			},
 			status=status.HTTP_200_OK,
 	)	
+
 class MatchmakingAPIView(APIView):
 	permission_classes = [AllowAny]
 
@@ -306,6 +307,13 @@ class MatchmakingAPIView(APIView):
 				status=status.HTTP_400_BAD_REQUEST,
 			)
 		
+		# Vérifier si le matchmaking est déjà fait
+		if tournament.matchmaking:
+			return Response(
+				{"error": "Matchmaking already done."},
+				status=status.HTTP_400_BAD_REQUEST,
+			)
+		
 		# Récupérer les joueurs du tournoi
 		players = [entry.player for entry in tournament.player_entries.all()]
 		print(f"\033[1;32mMatchmaking for tournament {tournament_id}...\033[0m")
@@ -315,16 +323,20 @@ class MatchmakingAPIView(APIView):
 		# Créer les matchs aléatoirement
 		matchs = []
 		for i in range(4):
-			player1 = players.pop(randint(0, len(players) - 1))
-			player2 = players.pop(randint(0, len(players) - 1))
-			match = Match.objects.create(tournament=tournament, player1=player1, player2=player2)
+			team1 = players.pop(randint(0, len(players) - 1))
+			team2 = players.pop(randint(0, len(players) - 1))
+			match = Match.objects.create(player1=team1, player2=team2)
 			matchs.append(match)
-			print(f"\033[1;32mMatch {i + 1}: {player1} vs {player2}\033[0m")
+			if tournament.match_entries.count() <= 3:
+				print(f"\033[1;32mMatch between {team1} and {team2}\033[0m")
+				tournament.add_match(team1, team2)
+			print(f"\033[1;32mMatch between {team1} and {team2}\033[0m")
 
-
-		# add match to tournament
-		for match in matchs:
-			tournament.matches.add(match)
+		# Marquer le tournoi comme en matchmaking
+		tournament.matchmaking = True
+		tournament.started_at = now()
+		tournament.status = "started"
+		tournament.started = True
 		tournament.save()
 
 		# Réponse réussie
@@ -369,7 +381,6 @@ class FillTournamentAPIView(APIView):
 		# ajouter des ia
 		print(f"\033[1;32mAdding {8 - nb_players} AI players to the tournament...\033[0m")
 		for i in range(8 - nb_players):
-			# player = CustomUser.objects.create(username=f"AI_{i + nb_players}_{tournament_id}", email=f"ia@{i + nb_players}_{tournament_id}.com")
 			player = CustomUser.objects.create(username=f"AI_{i + nb_players}_{tournamentName}", email=f"ia@{i + nb_players}_{tournamentName}.com")
 			player.save()
 			if tournament.player_entries.count() <= 7:

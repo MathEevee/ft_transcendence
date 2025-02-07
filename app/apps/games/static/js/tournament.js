@@ -76,6 +76,7 @@ async function displayPlayerTournament()
 	const data = await response.json();
 	const tabplayers = document.getElementById('games-table');
 
+	console.log("data", data);
 	for (let i = 0; i < data.length; i++)
 	{
 		if (data[i].type_pong === tournamentId)
@@ -115,12 +116,14 @@ async function displayPlayerTournament()
 	}
 }
 
-async function startmatchmaking()
+function startmatchmaking()
 {
+	if (window.location.pathname !== '/games/pong/tournament/' && window.location.pathname !== '/games/spaceinvaders/tournament/')
+		return;
 	const playersList = Array.from(players);
 	console.log(playersList);
 	const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-	await fetch('/authe/api/tournaments/matchmaking/', {
+	fetch('/authe/api/tournaments/matchmaking/', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -144,7 +147,6 @@ async function startmatchmaking()
 	.catch(err => {
 		console.error(`Error starting matchmaking: ${err}`);
 	});
-	displayPlayerTournament();
 }
 
 async function filltournament(playersList)
@@ -303,10 +305,10 @@ async function setupPlayerList()
 				'message': 'The tournament is starting',
 			}));
 		}
-		changePage('/games/'+(tournamentId ? 'pong' : 'spaceinvaders')+ '/online/tournament/');
+		startTournoi();
+		changePage('/games/'+(tournamentId ? 'pong' : 'spaceinvaders')+ '/online/tournament/', false);
 		//todo send request to start the tournament
 		//todo send request to add in db the match history
-		startTournoi();
 	});
 
 	inviteButton.addEventListener('keypress', async (e) => {

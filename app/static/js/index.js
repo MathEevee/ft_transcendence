@@ -4,7 +4,7 @@ import { display_graph } from "/static/js/graph.js";
 const allPage = {
     "/games/pong/local/": () => import("/static/js/pong.js").then(module => module.loadPong()),
     "/games/pong/online/": () => import("/static/js/pong.js").then(module => module.loadPong()),
-    "/games/pong/online/tournament": () => import("/static/js/pong.js").then(module => module.loadPong()),
+    "/games/pong/online/tournament/": () => import("/static/js/pong.js").then(module => module.loadPong()),
     "/games/pong/solo/": () => import("/static/js/pong.js").then(module => module.loadPong()),
     "/games/pong/multiplayer/": () => import("/static/js/pongMulti/pongMulti.js").then(module => module.loadPongMulti()),
     "/games/spaceinvaders/": () => import("/static/js/spaceInvadeur.js").then(module => module.loadSpaceInvadersGame()),
