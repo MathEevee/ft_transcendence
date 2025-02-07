@@ -27,6 +27,26 @@ SpaceInvader
 				<div class="joystick"></div>
 			</div>
 		</div>
+		<div id="tournamentbox" class="tournament">
+			<div class="tournament-header">
+				<h2>Match</h2>
+			</div>
+			<div class="tournament-body">
+				<div class="tournament-player">
+					<h3>Player 1</h3>
+					<p id="player1">0</p>
+				</div>
+				<div class="tournament-player">
+					<h3>Player 2</h3>
+					<p id="player2">0</p>
+				</div>
+			</div>
+			
+			<div id="tournament-matches">
+				<h3>Ongoing Matches</h3>
+				<ul class="match-list" id="match-list"></ul>
+			</div>
+		</div>
 	</div>
 {% endblock %}
 {% block js %}

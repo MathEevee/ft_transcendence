@@ -53,12 +53,42 @@ class Message(models.Model):
 	def __str__(self):
 		return f"Message from {self.author.username}"
 	
+class Match(models.Model):
+	""" Modèle pour gérer les matchs dans un tournoi. """
+	player1 = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="team1")
+	player2 = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="team2")
+	score_team1 = models.PositiveIntegerField(default=0)
+	score_team2 = models.PositiveIntegerField(default=0)
+	winner = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+	ended_at = models.DateTimeField(null=True, blank=True)
+
+	def __str__(self):
+		return f"Match between {self.player1.username} and {self.player2.username}"
+	
+	def get_winner(self):
+		return self.winner
+	
+	def set_end(self):
+		self.ended_at = now()
+		self.save()
+	
+	def set_winner(self):
+		if self.score_team1 > self.score_team2:
+			self.winner = self.player1
+		elif self.score_team1 < self.score_team2:
+			self.winner = self.player2
+		else:
+			self.winner = None
+		self.ended_at = now()
+		self.save()
+		return self.winner
+	
 class Tournament(models.Model):
 	id = models.AutoField(primary_key=True)
 	type_pong = models.BooleanField(default=True)
 	players = models.ManyToManyField(CustomUser, through='PlayerEntry', related_name='tournament_players')
+	matchlist = models.ManyToManyField(Match, through='MatchEntry', related_name='tournament_matchlist')
 	matchmaking = models.BooleanField(default=False)
-	matchlist = models.JSONField(null=True, blank=True)
 	status = models.CharField(max_length=255, default='pending')
 	started = models.BooleanField(default=False)
 	created_at = models.DateTimeField(default=now)
@@ -79,13 +109,11 @@ class Tournament(models.Model):
 		entry.delete()
 
 	def add_match(self, team1, team2):
-		if self.matches.count() >= 4:
-			raise ValueError("Tournament is already full.")
-		Match.objects.create(tournament=self, team1=team1, team2=team2)
+		MatchEntry.objects.create(tournament=self, match=Match.objects.create(player1=team1, player2=team2))
 
 	def remove_match(self, team1, team2):
-		match = self.get_match(team1, team2)
-		match.delete()
+		entry = self.get_match(team1, team2)
+		entry.delete()
 
 	def start(self):
 		if self.players.count() < 8:
@@ -107,7 +135,7 @@ class Tournament(models.Model):
 		return self.winner
 	
 	def get_match(self, team1, team2):
-		return self.matches.get(team1=team1, team2=team2)
+		return self.match_entries.get(team1=team1, team2=team2)
 	
 	def get_player_entry(self, player):
 		return self.player_entries.get(player=player)
@@ -116,7 +144,14 @@ class Tournament(models.Model):
 		return self.player_entries.all()
 	
 	def get_matches(self):
-		return self.matches.all()
+		return  self.match_entries.all()
+	
+	def get_winner(self):
+		return self.winner
+	
+	def create_next_match(self, team1, team2):
+		self.add_match(team1, team2)
+		self.save()
 
 class PlayerEntry(models.Model):
 	""" Modèle intermédiaire pour gérer les joueurs et noms d'équipe dans un tournoi. """
@@ -132,26 +167,18 @@ class PlayerEntry(models.Model):
 		return f"{self.player.username} in {self.tournament.id} (Team: {self.team_name or 'N/A'})"
 	
 
-class Match(models.Model):
-	""" Modèle pour gérer les matchs dans un tournoi. """
-	tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="matches")
-	player1 = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="team1")
-	player2 = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="team2")
+class MatchEntry(models.Model):
+	""" Modèle intermédiaire pour gérer les matchs dans un tournoi. """
+	tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="match_entries")
+	match = models.ForeignKey(Match, on_delete=models.CASCADE)
 	score_team1 = models.PositiveIntegerField(default=0)
 	score_team2 = models.PositiveIntegerField(default=0)
-	winner = models.ForeignKey(PlayerEntry, on_delete=models.SET_NULL, related_name="winner", null=True, blank=True)
-	ended_at = models.DateTimeField(null=True, blank=True)
+	status = models.CharField(max_length=255, default='pending')
+
+	class Meta:
+		unique_together = ('tournament', 'match')  # Un match ne peut être associé qu'une fois à un tournoi.
 
 	def __str__(self):
-		return f"Match between {self.team1.player.username} and {self.team2.player.username} in tournament {self.tournament.id}"
+		return f"Match between {self.match.player1.username} and {self.match.player2.username} in {self.tournament.id}"
 	
-	def set_winner(self):
-		if self.score_team1 > self.score_team2:
-			self.winner = self.team1
-		elif self.score_team2 > self.score_team1:
-			self.winner = self.team2
-		else:
-			raise ValueError("Match can't have a draw.")
-		self.ended_at = now()
-		self.save()
-		return self.winner
+
