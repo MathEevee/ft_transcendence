@@ -106,8 +106,6 @@ def game_pong_online(request):
                 game = Game.objects.get(id=data['id'])
                 player1 = Player.objects.get(game = game, is_host = True)
                 player2 = Player.objects.get(game = game, is_host = False)
-                if (game.ended_at != None):
-                    return JsonResponse({'error': True, 'message':'Game already end'})
                 game.ended_at = datetime.datetime.fromtimestamp(data['ended_at'] / 1000)
                 player1.score = data['score1']
                 player2.score = data['score2']
@@ -117,12 +115,9 @@ def game_pong_online(request):
                 return JsonResponse({'error':False})
 
 
-        except CustomUser.DoesNotExist:
-            return JsonResponse({'error': True, 'message':'Invalid User'})
-        except Game.DoesNotExist:
-            return JsonResponse({'error': True, 'message':'Invalid ID'})
-        except Player.DoesNotExist:
-            return JsonResponse({'error': True, 'message':'Invalid Player ID'})
+        except Exception as e:
+        # Log l'erreur et renvoie un message d'erreur
+            return JsonResponse({'error': str(e)}, status=500)
     if request.method == 'GET':
         try:
             game = Game.objects.get(id=request.GET.get('id'))
@@ -132,23 +127,3 @@ def game_pong_online(request):
         # Log l'erreur et renvoie un message d'erreur
             return JsonResponse({'error': str(e)}, status=500)
 
-@login_required
-def pong_multi(request):#a tester
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            game = Game.objects.create(type = data['type'], nb_players_required = 2, started_at = datetime.datetime.fromtimestamp(data['started_at'] / 1000))
-            game.save()
-            #loop for 4 players
-            for i in range(4):
-                if (data['is_IA'+str(i+1)] == False):
-                    user = CustomUser.objects.get(username = data['player'+str(i+1)])
-                    player = Player.objects.create(user = user, game = game, team = None, is_host = data['is_host'+str(i+1)], is_IA = False)
-                else:
-                    player = Player.objects.create(user = None, game = game, team = None, is_host = False, is_IA = True)
-                player.save()
-            return JsonResponse({"id": game.id})
-        except CustomUser.DoesNotExist:
-            return JsonResponse({'error': True, 'message':'Invalid User'})
-        except Game.DoesNotExist:
-            return JsonResponse({'error': True, 'message':'Invalid ID'})

@@ -1,6 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .globals import user_sockets, players_ready, players_winner_by_match, multi_sockets
+from .globals import user_sockets, players_ready, players_winner_by_match
 from apps.authe.models import CustomUser, Tournament, PlayerEntry, MatchEntry, Match
 from apps.games.models import Game, Player
 from asgiref.sync import sync_to_async
@@ -70,6 +70,11 @@ class PongConsumer(AsyncWebsocketConsumer):
 		print("\033[31m" + f'{data}' + "\033[0m")
 		if message == 'start':
 			print('test')
+			# game = await sync_to_async(Game.objects.create)(type=data['typegame'], nb_players_required=2, started_at = datetime.datetime.fromtimestamp(data['started_at'] / 1000))
+			# username1 = await sync_to_async(CustomUser.objects.get)(username=data['player1'])
+			# player1 = await sync_to_async(Player.objects.create)(user=username1, game=game, team=None, is_host=True, is_IA=False)
+			# username2 = await sync_to_async(CustomUser.objects.get)(username=data['player2'])
+			# player2 = await sync_to_async(Player.objects.create)(user=username2, game=game, team=None, is_host=False, is_IA=False)
 		if message == 'end':
 			print('test')
 
