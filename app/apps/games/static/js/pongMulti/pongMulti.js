@@ -12,13 +12,27 @@ function loadPongMulti(){
 	const inviteinput = document.getElementById('invite');
 	const divofbox = document.getElementById('game-info-player');
 	chatbox.style.display = "none";
-
 	let speed = 5;
 	let start = 0;
 	const paddleHeight = 75;
 	const paddleWidth = 5;
 
 	const colorpalette = { white: "#FFFFFF", black: "#000000", red: "#FF0000", green: "#00FF00", blue: "#0000FF", yellow: "#FFFF00", cyan: "#00FFFF", magenta: "#FF00FF", silver: "#C0C0C0", gray: "#808080", maroon: "#800000", olive: "#808000", purple: "#800080", teal: "#008080", navy: "#000080", orange: "#FFA500", lime: "#00FF00", aqua: "#00FFFF", fuchsia: "#FF00FF", brown: "#A52A2A", papayawhip: "#FFEFD5", peachpuff: "#FFDAB9", peru: "#CD853F", pink: "#FFC0CB", plum: "#DDA0DD", powderblue: "#B0E0E6", purple: "#800080", red: "#FF0000", rosybrown: "#BC8F8F", royalblue: "#4169E1", saddlebrown: "#8B4513", salmon: "#FA8072", sandybrown: "#F4A460", seagreen: "#2E8B57", seashell: "#FFF5EE", sienna: "#A0522D", silver: "#C0C0C0", skyblue: "#87CEEB", slateblue: "#6A5ACD", slategray: "#708090", snow: "#FFFAFA", springgreen: "#00FF7F", steelblue: "#4682B4", tan: "#D2B48C", teal: "#008080", thistle: "#D8BFD8", tomato: "#FF6347", turquoise: "#40E0D0", violet: "#EE82EE", wheat: "#F5DEB3", white: "#FFFFFF", whitesmoke: "#F5F5F5", yellow: "#FFFF00", yellowgreen: "#9ACD32" };
+
+	//websocket
+	const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+	const wsURL = `${wsProtocol}//${window.location.host}/ws/multipong/`;
+	console.log(wsURL);
+	const socketCli = new WebSocket(wsURL);
+	socketCli.onopen = function (e) {
+		console.log("[open] Connection established");
+		console.log("Sending to server");
+		socketCli.send("Hello Server");
+	};
+	socketCli.onmessage = function (event) {
+		console.log(`[message] Data received from server: ${event.data}`);
+	};
+
 
 
 	if (window.location.pathname === "/games/pong/multiplayer/")
@@ -37,8 +51,8 @@ function loadPongMulti(){
 		backgroundcolor: colorpalette.black,
 		ballcolor: colorpalette.cyan,
 		team1: colorpalette.red,
-		team2: colorpalette.blue,
-		team3: colorpalette.green,
+		team2: colorpalette.green,
+		team3: colorpalette.blue,
 		team4: colorpalette.white,
 		netcolor: colorpalette.white,
 		scorecolor: colorpalette.white,
@@ -48,10 +62,10 @@ function loadPongMulti(){
 
 	/*t_game*/
 	var t_game = {
-		player1: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team1, 1),
-		player2: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team2, 2),
-		player3: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team3, 1),
-		player4: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team4, 2),
+		player1: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team1),
+		player2: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team2),
+		player3: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team3),
+		player4: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team4),
 		ball: new Ball(canvas.width / 2, canvas.height / 2, 0, 0, 5, colorset.ballcolor, speed),
 	};
 	
@@ -288,10 +302,10 @@ function loadPongMulti(){
 	
 	function initvariables()
 	{
-		t_game.player1 = new Player(paddleWidth, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team1, 1, speed);
-		t_game.player2 = new Player(canvas.width - paddleWidth * 2, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team2, 1, speed);
-		t_game.player3 = new Player(canvas.width / 2 - paddleHeight / 2, paddleWidth, paddleHeight, paddleWidth, colorset.team3, 2, speed);
-		t_game.player4 = new Player(canvas.width / 2 - paddleHeight / 2, canvas.height - paddleWidth * 2, paddleHeight, paddleWidth, colorset.team4, 2, speed);
+		t_game.player1 = new Player(paddleWidth, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team1, speed);
+		t_game.player2 = new Player(canvas.width / 2 - paddleHeight / 2, paddleWidth, paddleHeight, paddleWidth, colorset.team2, speed);
+		t_game.player3 = new Player(canvas.width - paddleWidth * 2, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team3, speed);
+		t_game.player4 = new Player(canvas.width / 2 - paddleHeight / 2, canvas.height - paddleWidth * 2, paddleHeight, paddleWidth, colorset.team4, speed);
 		var ballplassement = new point(0, 0);
 		ballplassement.x = Math.floor(Math.random() * 10);
 		if (ballplassement.x % 3 === 0)

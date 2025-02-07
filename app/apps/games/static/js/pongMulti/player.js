@@ -62,7 +62,7 @@ class Player
 		return (hitbox);
 	}
 
-	constructor(x, y, width, height, color, team, speed) {
+	constructor(x, y, width, height, color, speed) {
 		this.x = x;
 		this.y = y;
 		this.dx = 0;
@@ -80,7 +80,6 @@ class Player
 		]
 		this.up = false;
 		this.down = false;
-		team = team;
 	}
 }
 

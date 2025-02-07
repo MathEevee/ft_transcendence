@@ -1,6 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .globals import user_sockets
+from .globals import user_sockets, multi_sockets
 from apps.authe.models import CustomUser
 from apps.games.models import Game, Player
 from asgiref.sync import sync_to_async
@@ -102,3 +102,41 @@ class PongConsumer(AsyncWebsocketConsumer):
 		else:
 			score2 = None
 		await self.send_to_all(message, player, ball, playery, ballx, bally, score1, score2)
+
+
+
+
+class MultiPongConsumer(AsyncWebsocketConsumer):
+
+
+	async def connect(self):
+		self.user = self.scope['user']
+		if self.user.is_authenticated:
+			for socket in multi_sockets:
+				if socket.user.username == self.user.username:
+					await self.send(text_data=json.dumps({
+						'message': 'You are already connected',
+					}))
+					return
+			if len(user_sockets) > 4:
+				await self.send(text_data=json.dumps({
+					'message': 'too many players',
+				}))
+			print("\033[31m" + f'{self.user.username} connected game' + "\033[0m")
+			await self.accept()
+			user_sockets.append(self)
+			await self.send_username_to_all()
+		else:
+			await self.close()
+
+
+	async def disconnect(self):
+		await self.send_to_all(f'{self.user.username} disconnected')
+		await self.send(text_data=json.dumps({
+			'message': f"{self.user.username} disconnected",
+		}))
+		print("\033[31m" + f'{self.user.username} disconnected' + "\033[0m")
+		user_sockets.remove(self)
+		await self.close()
+
+	# async def receive(self, text_data):
