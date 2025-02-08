@@ -149,6 +149,11 @@ def settings_view(request):
 			user.save()
 			messages.success(request, "Modifications réussies !")
 			return redirect(reverse('profil:profil', kwargs={'username': user.username}))
+		else:
+			# Ajouter un message avec les erreurs du formulaire
+			for field, errors in form.errors.items():
+				for error in errors:
+					messages.info(request, f"{field.capitalize()}: {error}")
 	else:
 		form = UserSettingsForm(instance=request.user)
 
