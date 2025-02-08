@@ -4,7 +4,7 @@ import { point } from "/static/js/pongMulti/point.js";
 import { sizeofstringdisplayed } from "/static/js/pongMulti/utils.js";
 import { lasthit } from "/static/js/pongMulti/player.js";
 
-function loadPongMulti(){
+async function loadPongMulti(){
 	let interval = null;
 	const canvas = document.getElementById('pong');
 	const context = canvas.getContext('2d');
@@ -14,10 +14,62 @@ function loadPongMulti(){
 	const divofbox = document.getElementById('game-info-player');
 	chatbox.style.display = "none";
 	
+	var all_players = [];
+	
 	let speed = 5;
 	let start = 0;
 	const paddleHeight = 75;
 	const paddleWidth = 5;
+	
+	//wbsocket
+	
+	// fetch api/me
+	var playername = "";
+	
+	async function getUserName() {
+		const response = await fetch('/authe/api/me/');
+		const data = await response.json();
+		return data.username;
+	}
+	
+	playername = await getUserName();
+	console.log(playername);
+	all_players.push(playername);
+
+	const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+	const wsURL = `${wsProtocol}//${window.location.host}/ws/pong/multiplayer/`;
+	const socket = new WebSocket(wsURL);
+
+	var sendmessage = false;
+
+
+	if (socket.readyState === WebSocket.OPEN)
+	{
+		socket.send(JSON.stringify({ 'join': "join", player: playername }));
+	}
+
+	socket.onopen = function (e) {
+		console.log("Connected to server");
+		if (sendmessage === false)
+		{
+			socket.send(JSON.stringify({ 'join': "join", player: playername }));
+			sendmessage = true;
+		}
+
+	};
+
+	socket.onmessage = function (e) {
+		const data = JSON.parse(e.data);
+		console.log(data);
+		if (data.player !== playername)
+		{
+			if (data.join === "join")
+			{
+				all_players.push(data.player);
+				console.log(all_players);
+			}
+		}
+	};
 
 	const colorpalette = { white: "#FFFFFF", black: "#000000", red: "#FF0000", green: "#00FF00", blue: "#0000FF", yellow: "#FFFF00", cyan: "#00FFFF", magenta: "#FF00FF", silver: "#C0C0C0", gray: "#808080", maroon: "#800000", olive: "#808000", purple: "#800080", teal: "#008080", navy: "#000080", orange: "#FFA500", lime: "#00FF00", aqua: "#00FFFF", fuchsia: "#FF00FF", brown: "#A52A2A", papayawhip: "#FFEFD5", peachpuff: "#FFDAB9", peru: "#CD853F", pink: "#FFC0CB", plum: "#DDA0DD", powderblue: "#B0E0E6", purple: "#800080", red: "#FF0000", rosybrown: "#BC8F8F", royalblue: "#4169E1", saddlebrown: "#8B4513", salmon: "#FA8072", sandybrown: "#F4A460", seagreen: "#2E8B57", seashell: "#FFF5EE", sienna: "#A0522D", silver: "#C0C0C0", skyblue: "#87CEEB", slateblue: "#6A5ACD", slategray: "#708090", snow: "#FFFAFA", springgreen: "#00FF7F", steelblue: "#4682B4", tan: "#D2B48C", teal: "#008080", thistle: "#D8BFD8", tomato: "#FF6347", turquoise: "#40E0D0", violet: "#EE82EE", wheat: "#F5DEB3", white: "#FFFFFF", whitesmoke: "#F5F5F5", yellow: "#FFFF00", yellowgreen: "#9ACD32" };
 

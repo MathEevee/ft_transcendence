@@ -1,6 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .globals import user_sockets, players_ready, players_winner_by_match
+from .globals import user_sockets, players_ready, players_winner_by_match, multi_player_games
 from apps.authe.models import CustomUser, Tournament, PlayerEntry, MatchEntry, Match
 from apps.games.models import Game, Player
 from asgiref.sync import sync_to_async
@@ -357,4 +357,50 @@ class SpaceTournoiConsumer(AsyncWebsocketConsumer):
 
 		await self.send_to_all(message)
 
+		
+class MultiPlayerConsumer(AsyncWebsocketConsumer):
+
+	async def connect(self):
+		self.user = self.scope['user']
+		if self.user.is_authenticated:
+			for socket in user_sockets:
+				if socket.user.username == self.user.username:
+					await self.send(text_data=json.dumps({
+						'message': 'You are already connected',
+					}))
+					return
+			# if len(user_sockets) > 4:
+			# 	await self.send(text_data=json.dumps({
+			# 		'message': 'Too many players',
+			# 	}))
+			# 	return
+			print("\033[31m" + f'{self.user.username} connected game' + "\033[0m")
+			await self.accept()
+			user_sockets.append(self)
+		else:
+			await self.close()
+
+	async def receive(self, text_data):
+		data = json.loads(text_data)
+		message = data['join']
+		print("\033[31m" + f'{data}' + "\033[0m")
+		await self.send_to_all(message)
+
+	async def disconnect(self, close_code):
+		await self.send_to_all(f'{self.user.username} disconnected')
+		await self.send(text_data=json.dumps({
+			'message': f"{self.user.username} disconnected",
+		}))
+		print("\033[31m" + f'{self.user.username} disconnected' + "\033[0m")
+		user_sockets.remove(self)
+		await self.close()
+
+	async def send_to_all(self, message):
+		for socket in user_sockets:
+			if socket == self:
+				continue
+			await socket.send(text_data=json.dumps({
+				'join': message,
+				'player': self.user.username,
+			}))
 		

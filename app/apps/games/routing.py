@@ -6,4 +6,5 @@ websocket_urlpatterns = [
     path('ws/spacebattle/', consumers.SpaceConsumer.as_asgi()),
 	path('ws/pong/tournament/', consumers.PongTournoiConsumer.as_asgi()),
 	path('ws/spacebattle/tournament/', consumers.SpaceTournoiConsumer.as_asgi()),
+    path('ws/pong/multiplayer/', consumers.MultiPlayerConsumer.as_asgi()),
 ]
