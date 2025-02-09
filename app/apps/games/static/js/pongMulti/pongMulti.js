@@ -37,9 +37,6 @@ async function loadPongMulti(){
 	const wsURL = `${wsProtocol}//${window.location.host}/ws/pong/multiplayer/`;
 	const socket = new WebSocket(wsURL);
 
-	var sendmessage = false;
-
-
 	if (socket.readyState === WebSocket.OPEN)
 	{
 		socket.send(JSON.stringify({ 'join': "join", player: playername }));
@@ -47,24 +44,25 @@ async function loadPongMulti(){
 
 	socket.onopen = function (e) {
 		console.log("Connected to server");
-		if (sendmessage === false)
-		{
-			socket.send(JSON.stringify({ 'join': "join", player: playername }));
-			sendmessage = true;
-		}
-
+		socket.send(JSON.stringify({ 'join': "join", player: playername }));
 	};
 
 	socket.onmessage = function (e) {
 		const data = JSON.parse(e.data);
-		console.log(data);
-		if (data.player !== playername)
+		if (data['join'] === "join")
 		{
-			if (data.join === "join")
+			if (all_players.includes(data.player) === false)
 			{
 				all_players.push(data.player);
-				console.log(all_players);
+				socket.send(JSON.stringify({ 'join': "join", player: playername }));
 			}
+		}
+		console.log(data)
+		if (data['start'] === "start")
+		{
+			start = 1;
+			countdown();
+			startPong();
 		}
 	};
 
@@ -214,6 +212,17 @@ async function loadPongMulti(){
 		t_game.player2.update(canvas);
 		t_game.player3.update(canvas);
 		t_game.player4.update(canvas);
+		// socket.send(JSON.stringify({ 'ball': "move ball" , 'player':cplayer,'ballx':t_game.ball.x, 'bally':t_game.ball.y, 'balldx':t_game.ball.dx, 'balldy':t_game.ball.dy }));
+		// socket.onmessage = function (e) {
+		// 	const data = JSON.parse(e.data);
+		// 	if (data['ball'] === "move ball")
+		// 	{
+		// 		t_game.ball.x = data.ballx;
+		// 		t_game.ball.y = data.bally;
+		// 		t_game.ball.dx = data.balldx;
+		// 		t_game.ball.dy = data.balldy;
+		// 	}
+		// };
 		if (t_game.ball.update(canvas, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball))
 		{
 			if (t_game.ball.y - t_game.ball.radius <= 0 || t_game.ball.y + t_game.ball.radius >= canvas.height)
@@ -370,15 +379,18 @@ async function loadPongMulti(){
 		else
 			t_game.ball.dy = -1;
 		start = 1;
+		// socket.send(JSON.stringify({ 'ball': "ball move" , 'ballx':t_game.ball.x, 'bally':t_game.ball.y, 'balldx':t_game.ball.dx, 'balldy':t_game.ball.dy }));
 		cplayer = t_game.player4;
 	}
 	
 	function startPong()
 	{
-		if (start === 1)
-			return ;
+		if (start === 0)
+		{
+			initvariables();
+			socket.send(JSON.stringify({ 'start': "start"}));
+		}
 		// countdown();
-		initvariables();
 		// setTimeout(loop, 5000);
 		loop();
 	}
