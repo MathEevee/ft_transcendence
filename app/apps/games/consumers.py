@@ -363,20 +363,25 @@ class MultiPlayerConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		self.user = self.scope['user']
 		if self.user.is_authenticated:
-			for socket in user_sockets:
+			for socket in multi_player_games:
 				if socket.user.username == self.user.username:
 					await self.send(text_data=json.dumps({
 						'message': 'You are already connected',
 					}))
 					return
-			# if len(user_sockets) > 4:
+				else:
+					await self.send(text_data=json.dumps({
+						'join': 'new player',
+						'player': self.user.username,
+					}))
+			# if len(multi_player_games) > 4:
 			# 	await self.send(text_data=json.dumps({
 			# 		'message': 'Too many players',
 			# 	}))
 			# 	return
 			print("\033[31m" + f'{self.user.username} connected game' + "\033[0m")
 			await self.accept()
-			user_sockets.append(self)
+			multi_player_games.append(self)
 		else:
 			await self.close()
 
@@ -392,11 +397,11 @@ class MultiPlayerConsumer(AsyncWebsocketConsumer):
 			'message': f"{self.user.username} disconnected",
 		}))
 		print("\033[31m" + f'{self.user.username} disconnected' + "\033[0m")
-		user_sockets.remove(self)
+		multi_player_games.remove(self)
 		await self.close()
 
 	async def send_to_all(self, message):
-		for socket in user_sockets:
+		for socket in multi_player_games:
 			if socket == self:
 				continue
 			await socket.send(text_data=json.dumps({

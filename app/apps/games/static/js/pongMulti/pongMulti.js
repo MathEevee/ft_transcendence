@@ -21,9 +21,6 @@ async function loadPongMulti(){
 	const paddleHeight = 75;
 	const paddleWidth = 5;
 	
-	//wbsocket
-	
-	// fetch api/me
 	var playername = "";
 	
 	async function getUserName() {
