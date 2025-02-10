@@ -41,12 +41,16 @@ services:
     restart: on-failure
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl  # certificats SSL
+      - ./nginx/entrypoint.sh:/entrypoint.sh  # script d'initialisation
     ports:
       - "8080:80"
+      - "443:443"
     networks:
       - transcendence
     depends_on:
       - backend
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
 
 
 volumes:
