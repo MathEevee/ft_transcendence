@@ -4,7 +4,6 @@ from .globals import user_sockets, players_ready, players_winner_by_match, multi
 from apps.authe.models import CustomUser, Tournament, PlayerEntry, MatchEntry, Match
 from apps.games.models import Game, Player
 from asgiref.sync import sync_to_async
-import datetime
 from django.http import JsonResponse
 
 
@@ -360,81 +359,46 @@ class SpaceTournoiConsumer(AsyncWebsocketConsumer):
 		
 class MultiPlayerConsumer(AsyncWebsocketConsumer):
 	
-	async def send_to_all(self, message, start=None, ball=None, player=None, ballx=None, bally=None, balldx=None, balldy=None):
+	async def send_to_all(self, message, start=None, player=None,playerid=None,playerx=None, playery=None,ballx=None, bally=None, balldx=None, balldy=None):
 		for socket in multi_player_games:
-			if socket == self:
-				continue
-			if start == 'start':
-				if start:
-					# Envoie d'un message de départ avec les informations du ballon
-					await socket.send(text_data=json.dumps({
-						'start': 'start',
-					}))
-				elif ball:
-					# Envoie d'un message de départ avec les informations du ballon
-					await socket.send(text_data=json.dumps({
-						'start': message,
-						'player': self.user.username,
-						'ball': ball,
-						'ballx': ballx,
-						'bally': bally,
-						'balldx': balldx,
-						'balldy': balldy,
-					}))
-				else:
-					# Envoie d'un message de départ sans les informations du ballon
-					await socket.send(text_data=json.dumps({
-						'start': message,
-						'player': self.user.username,
-					}))
-			elif message == 'join':
-				await socket.send(text_data=json.dumps({
-					'join': message,
-					'player': self.user.username,
-				}))
+			await socket.send(text_data=json.dumps({
+				'message': message,
+				'start': start,
+				'player': player,
+				'playerid': playerid,
+				'playerx': playerx,
+				'playery': playery,
+				'ballx': ballx,
+				'bally': bally,
+				'balldx': balldx,
+				'balldy': balldy,
+			}))
 
 	async def connect(self, *args, **kwargs):
 		self.user = self.scope['user']
 		if self.user.is_authenticated:
-			for socket in multi_player_games:
-				if socket.user.username == self.user.username:
-					await self.send(text_data=json.dumps({
-						'message': 'You are already connected',
-					}))
-					return
+			await self.accept()
+			print("\033[31m" + f'{self.user.username} connected game' + "\033[0m")
 			# if len(multi_player_games) > 4:
 			# 	await self.send(text_data=json.dumps({
 			# 		'message': 'Too many players',
 			# 	}))
 			# 	return
 			print("\033[31m" + f'{self.user.username} connected game' + "\033[0m")
-			await self.accept()
 			multi_player_games.append(self)
+			if (self.user.username == multi_player_games[0].user.username):
+				await self.send(text_data=json.dumps({
+					'message': 'player_id',
+					'value': len(multi_player_games),
+				}))
+			else:
+				await self.send(text_data=json.dumps({
+					'message': 'player_id',
+					'value': len(multi_player_games),
+				}))
 			await self.send_to_all(f'{self.user.username} connected')
 		else:
 			await self.close()
-
-	async def receive(self, text_data):
-		data = json.loads(text_data)
-
-    	# Initialisation des variables avec des valeurs par défaut
-		message = data.get('join') or data.get('start')
-		player = data.get('player')
-		ballx = data.get('ballx', None)  # Valeur par défaut None
-		bally = data.get('bally', None)  # Valeur par défaut None
-		balldx = data.get('balldx', None)  # Valeur par défaut None
-		balldy = data.get('balldy', None)  # Valeur par défaut None
-
-		# Initialisation de 'start' à None par défaut, ou à 'start' si le message est 'start'
-		start = None
-		if message == 'start':
-			start = 'start'
-
-		# Afficher les données reçues pour déboguer
-		print("\033[31m" + f'receive : {data}' + "\033[0m")
-
-		# Appeler send_to_all avec les variables extraites
-		await self.send_to_all(message, start, player, ballx, bally, balldx, balldy)
 
 	async def disconnect(self, close_code):
 		await self.send_to_all(f'{self.user.username} disconnected')
@@ -444,6 +408,58 @@ class MultiPlayerConsumer(AsyncWebsocketConsumer):
 		print("\033[31m" + f'{self.user.username} disconnected' + "\033[0m")
 		multi_player_games.remove(self)
 		await self.close()
+
+	async def receive(self, text_data):
+		data = json.loads(text_data)
+
+    	# Initialisation des variables avec des valeurs par défaut
+		if 'message' in data:
+			message = data['message']
+		else:
+			message = None
+		if 'start' in data:
+			start = data['start']
+		else:
+			start = None
+		if 'player' in data:
+			player = data['player']
+		else:
+			player = None
+		if 'playerid' in data:
+			playerid = data['playerid']
+		else:
+			playerid = None
+		if 'playerx' in data:
+			playerx = data['playerx']
+		else:
+			playerx = None
+		if 'playery' in data:
+			playery = data['playery']
+		else:
+			playery = None
+		if 'ballx' in data:
+			ballx = data['ballx']
+		else:
+			ballx = None
+		if 'bally' in data:
+			bally = data['bally']
+		else:
+			bally = None
+		if 'balldx' in data:
+			balldx = data['balldx']
+		else:
+			balldx = None
+		if 'balldy' in data:
+			balldy = data['balldy']
+		else:
+			balldy = None
+		# Initialisation de 'start' à None par défaut, ou à 'start' si le message est 'start'
+		# Afficher les données reçues pour déboguer
+		# print("\033[31m" + f'receive : {data}' + "\033[0m")
+
+		# Appeler send_to_all avec les variables extraites
+		await self.send_to_all(message,start, player,playerid, playerx, playery,ballx, bally, balldx, balldy)
+
 
 
 		

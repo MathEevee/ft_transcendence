@@ -13,6 +13,7 @@ async function loadPongMulti(){
 	const inviteinput = document.getElementById('invite');
 	const divofbox = document.getElementById('game-info-player');
 	chatbox.style.display = "none";
+	let playerid = 1;
 	
 	var all_players = [];
 	
@@ -20,6 +21,7 @@ async function loadPongMulti(){
 	let start = 0;
 	const paddleHeight = 75;
 	const paddleWidth = 5;
+	let is_host = true;
 	
 	var playername = "";
 	
@@ -30,38 +32,45 @@ async function loadPongMulti(){
 	}
 	
 	playername = await getUserName();
-	console.log(playername);
 	all_players.push(playername);
-
+	
 	const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 	const wsURL = `${wsProtocol}//${window.location.host}/ws/pong/multiplayer/`;
-	const socket = new WebSocket(wsURL);
+	let socket;
+
+
+	if (socket === undefined)
+		socket = new WebSocket(wsURL);
 
 	if (socket.readyState === WebSocket.OPEN)
 	{
-		socket.send(JSON.stringify({ 'join': "join", player: playername }));
+		socket.send(JSON.stringify({ 'message': "join", 'player': playername }));
 	}
-
+	
 	socket.onopen = function (e) {
 		console.log("Connected to server");
-		socket.send(JSON.stringify({ 'join': "join", player: playername }));
+		socket.send(JSON.stringify({ 'message': "join", 'player': playername }));
 	};
 
 	socket.onmessage = function (e) {
 		const data = JSON.parse(e.data);
-		if (data['join'] === "join")
+		console.log(data);
+		if (data['message'] === "join")
 		{
 			if (all_players.includes(data.player) === false)
 			{
 				all_players.push(data.player);
-				socket.send(JSON.stringify({ 'join': "join", player: playername }));
+				socket.send(JSON.stringify({ 'message': "join", 'player': playername }));
 			}
 		}
-		console.log(data)
-		if (data['start'] === "start")
+		if (data['message'] === "player_id") {
+			playerid = data['value'];
+			is_host = playerid === 1;
+			console.log("am i host", is_host);
+		}
+		if (data['message'] === "start")
 		{
-			start = 1;
-			countdown();
+			console.log(all_players);
 			startPong();
 		}
 	};
@@ -84,10 +93,10 @@ async function loadPongMulti(){
 		fontcolor: colorpalette.white,
 		backgroundcolor: colorpalette.black,
 		ballcolor: colorpalette.cyan,
-		team1: colorpalette.red,
+		team1: colorpalette.white,
 		team2: colorpalette.blue,
 		team3: colorpalette.green,
-		team4: colorpalette.white,
+		team4: colorpalette.red,
 		netcolor: colorpalette.white,
 		scorecolor: colorpalette.white,
 	};
@@ -99,7 +108,7 @@ async function loadPongMulti(){
 		player1: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team1),
 		player2: new Player(0, canvas.height / 2 - 50, 10, 100, colorset.team2),
 		player3: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team3),
-		player4: new Player(canvas.width - 10, canvas.height / 2 - 50, 10, 100, colorset.team4),
+		player4: new Player(canvas.width - 10, canvas.height / 2 - 50,10,100, colorset.team4),
 		ball: new Ball(canvas.width / 2, canvas.height / 2, 0, 0, 5, colorset.ballcolor, speed),
 	};
 	
@@ -144,7 +153,7 @@ async function loadPongMulti(){
 
 	function setballafterpoint(canvas, ball)
 	{
-		console.log("ballbefore", ball);
+		// console.log("ballbefore", ball);
 		var ballplassement = new point(0, 0);
 		ballplassement.x = Math.floor(Math.random() * 10);
 		if (ballplassement.x % 3 === 0)
@@ -173,19 +182,21 @@ async function loadPongMulti(){
 			t_game.ball.dy = 1;
 		else
 			t_game.ball.dy = -1;
-		console.log("ballafter", ball);
+		// console.log("ballafter", ball);
 	}
+
 	function setplayerafterpoint(canvas, player1, player2, player3, player4)
 	{
-		player1.x = 5;
-		player1.y = 312.5;
+		player1.x = 312.5;
+		player1.y = 690;
 		player3.x = 690;
 		player3.y = 312.5;
 		player2.x = 312.5;
 		player2.y = 5;
-		player4.x = 312.5;
-		player4.y = 690;
+		player4.x = 5;
+		player4.y = 312.5;
 	}
+
 	function setafterpoint(canvas, player1, player2, player3, player4, ball)
 	{
 		if (lasthit.lasthit)
@@ -208,21 +219,57 @@ async function loadPongMulti(){
 
 	function update()
 	{
-		t_game.player1.update(canvas);
-		t_game.player2.update(canvas);
-		t_game.player3.update(canvas);
-		t_game.player4.update(canvas);
-		// socket.send(JSON.stringify({ 'ball': "move ball" , 'player':cplayer,'ballx':t_game.ball.x, 'bally':t_game.ball.y, 'balldx':t_game.ball.dx, 'balldy':t_game.ball.dy }));
-		// socket.onmessage = function (e) {
-		// 	const data = JSON.parse(e.data);
-		// 	if (data['ball'] === "move ball")
-		// 	{
-		// 		t_game.ball.x = data.ballx;
-		// 		t_game.ball.y = data.bally;
-		// 		t_game.ball.dx = data.balldx;
-		// 		t_game.ball.dy = data.balldy;
-		// 	}
-		// };
+		console.log('player2', t_game.player2);
+		if (is_host === true)
+			socket.send(JSON.stringify({'message':"move ball",
+			'ballx':t_game.ball.x, 'bally':t_game.ball.y ,'balldx':t_game.ball.dx, 'balldy':t_game.ball.dy}));
+		if (is_host === false){
+			socket.onmessage = function (e) {
+			const data = JSON.parse(e.data);
+			console.log('data',data);
+			if (data['message'] === "move ball")
+			{
+				t_game.ball.x = data['ballx'];
+				t_game.ball.y = data['bally'];
+				t_game.ball.dx = data['balldx'];
+				t_game.ball.dy = data['balldy'];
+			}
+			if (data['message'] === "move player")
+			{
+				if (data['playerid'] === 1)
+				{
+					t_game.player1.x = data['playerx'];
+					t_game.player1.y = data['playery'];
+				}
+				else if (data['playerid'] === 2)
+				{
+					t_game.player2.x = data['playerx'];
+					t_game.player2.y = data['playery'];
+				}
+				else if (data['playerid'] === 3)
+				{
+					t_game.player3.x = data['playerx'];
+					t_game.player3.y = data['playery'];
+				}
+				else if (data['playerid'] === 4)
+				{
+					t_game.player4.x = data['playerx'];
+					t_game.player4.y = data['playery'];
+				}
+			}
+		};
+	}
+	if (is_host === true)
+		{
+			t_game.player1.update(canvas);
+			t_game.player2.update(canvas);
+			t_game.player3.update(canvas);
+			t_game.player4.update(canvas);
+			socket.send(JSON.stringify({ 'message': "move player", 'playerid': 1, 'playerx': t_game.player1.x, 'playery': t_game.player1.y }));
+			socket.send(JSON.stringify({ 'message': "move player", 'playerid': 2, 'playerx': t_game.player2.x, 'playery': t_game.player2.y }));
+			socket.send(JSON.stringify({ 'message': "move player", 'playerid': 3, 'playerx': t_game.player3.x, 'playery': t_game.player3.y }));
+			socket.send(JSON.stringify({ 'message': "move player", 'playerid': 4, 'playerx': t_game.player4.x, 'playery': t_game.player4.y }));
+		}
 		if (t_game.ball.update(canvas, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball))
 		{
 			if (t_game.ball.y - t_game.ball.radius <= 0 || t_game.ball.y + t_game.ball.radius >= canvas.height)
@@ -234,7 +281,21 @@ async function loadPongMulti(){
 	
 	function keyhookdownforgame(event)
 	{
-		if (event.key === "ArrowLeft")
+		if (playerid === 1)
+		{
+			if (event.key === "ArrowLeft")
+				t_game.player1.goLeft();
+			else if (event.key === "ArrowRight")
+				t_game.player1.goRight();
+		}
+		// if (playerid === 1)
+		// {
+		// 	if (event.key === "ArrowLeft")
+		// 		t_game.player1.goLeft();
+		// 	else if (event.key === "ArrowRight")
+		// 		t_game.player1.goRight();
+		// }
+		/*if (event.key === "ArrowLeft")
 		{
 			if (cplayer === t_game.player3)
 				t_game.player3.goLeft();
@@ -261,7 +322,7 @@ async function loadPongMulti(){
 				t_game.player1.goDown();
 			else if (cplayer === t_game.player2)
 				t_game.player2.goDown();
-		}
+		}*/
 	}
 	
 	/* Mouvement des raquettes */
@@ -276,20 +337,28 @@ async function loadPongMulti(){
 	
 	function keyhookupforgame(event)
 	{
-		if (event.key === "ArrowLeft" || event.key === "ArrowRight")
+		if (playerid === 1 || playerid === 2)
 		{
-			if (cplayer === t_game.player3)
-				t_game.player3.stop();
-			else if (cplayer === t_game.player4)
-				t_game.player4.stop();
-		}
-		else if (event.key === "ArrowUp" || event.key === "ArrowDown")
-		{
-			if (cplayer === t_game.player1)
+			if (event.key === "ArrowLeft" || event.key === "ArrowRight")
+			{
 				t_game.player1.stop();
-			else if (cplayer === t_game.player2)
 				t_game.player2.stop();
+			}
 		}
+		// if (event.key === "ArrowLeft" || event.key === "ArrowRight")
+		// {
+		// 	if (cplayer === t_game.player3)
+		// 		t_game.player3.stop();
+		// 	else if (cplayer === t_game.player4)
+		// 		t_game.player4.stop();
+		// }
+		// else if (event.key === "ArrowUp" || event.key === "ArrowDown")
+		// {
+		// 	if (cplayer === t_game.player1)
+		// 		t_game.player1.stop();
+		// 	else if (cplayer === t_game.player2)
+		// 		t_game.player2.stop();
+		// }
 	}
 	
 	document.body.addEventListener("keyup", (event) =>
@@ -346,10 +415,11 @@ async function loadPongMulti(){
 	
 	function initvariables()
 	{
-		t_game.player1 = new Player(paddleWidth, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team1,speed);
+		console.log("init");
+		t_game.player4 = new Player(paddleWidth, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team1,speed);
 		t_game.player2 = new Player(canvas.width / 2 - paddleHeight / 2, paddleWidth, paddleHeight, paddleWidth, colorset.team2, speed);
 		t_game.player3 = new Player(canvas.width - paddleWidth * 2, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team3, speed);
-		t_game.player4 = new Player(canvas.width / 2 - paddleHeight / 2, canvas.height - paddleWidth * 2, paddleHeight, paddleWidth, colorset.team4, speed);
+		t_game.player1 = new Player(canvas.width / 2 - paddleHeight / 2, canvas.height - paddleWidth * 2, paddleHeight, paddleWidth, colorset.team4, speed);
 		var ballplassement = new point(0, 0);
 		ballplassement.x = Math.floor(Math.random() * 10);
 		if (ballplassement.x % 3 === 0)
@@ -379,19 +449,49 @@ async function loadPongMulti(){
 		else
 			t_game.ball.dy = -1;
 		start = 1;
-		// socket.send(JSON.stringify({ 'ball': "ball move" , 'ballx':t_game.ball.x, 'bally':t_game.ball.y, 'balldx':t_game.ball.dx, 'balldy':t_game.ball.dy }));
-		cplayer = t_game.player4;
+		if (playerid === 1)
+		{
+			cplayer = t_game.player1;
+			t_game.player1.color = colorset.team1;
+			t_game.player2.color = colorset.team2;
+			t_game.player3.color = colorset.team3;
+			t_game.player4.color = colorset.team4;
+		}
+		else if (playerid === 2)
+		{
+			cplayer = t_game.player2;
+			t_game.player1.color = colorset.team2;
+			t_game.player2.color = colorset.team3;
+			t_game.player3.color = colorset.team4;
+			t_game.player4.color = colorset.team1;
+		}
+		else if (playerid === 3)
+		{
+			cplayer = t_game.player3;
+			t_game.player1.color = colorset.team3;
+			t_game.player2.color = colorset.team4;
+			t_game.player3.color = colorset.team1;
+			t_game.player4.color = colorset.team2;
+		}
+		else if (playerid === 4)
+		{
+			cplayer = t_game.player4;
+			t_game.player1.color = colorset.team4;
+			t_game.player2.color = colorset.team1;
+			t_game.player3.color = colorset.team2;
+			t_game.player4.color = colorset.team3;
+		}
 	}
 	
 	function startPong()
 	{
-		if (start === 0)
-		{
-			initvariables();
-			socket.send(JSON.stringify({ 'start': "start"}));
-		}
+		if (start === 1)
+			return ;
+		start = 1;
 		// countdown();
 		// setTimeout(loop, 5000);
+		if (is_host === true)
+			initvariables();
 		loop();
 	}
 	
@@ -408,7 +508,11 @@ async function loadPongMulti(){
 	}
 	
 	wait();
-	redbutton.addEventListener("click", startPong);
+	redbutton.addEventListener("click", () =>
+	{
+		socket.send(JSON.stringify({ 'message': "start"}));
+		startPong();
+	});
 }
 
 export { loadPongMulti }

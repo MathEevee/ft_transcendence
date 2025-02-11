@@ -6,7 +6,7 @@ class Game(models.Model):
 	GAME_TYPE_CHOICES = [
 		('Pong 1v1', 'Pong 1v1'),
 		('Pong 1v1 IA', 'Pong 1v1 IA'),
-		('Pong team', 'Pong team'),
+		('Pong multi', 'Pong multi'),
 		('Space 1v1', 'Space 1v1'),
 	]
 

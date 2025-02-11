@@ -22,8 +22,8 @@ class Ball
 		}
 		else if (ispointinrectangle(trajectory, player1.hitbox))
 		{
-			ball.dx = -ball.dx;
 			lasthit.lasthit = 1;
+			ball.dy = -ball.dy;
 			return (1);
 		} // player2 
 		else if (ispointinrectangle(trajectory, player2.hitbox))
@@ -41,7 +41,7 @@ class Ball
 		} // player4
 		else if (ispointinrectangle(trajectory, player4.hitbox))
 		{
-			ball.dy = -ball.dy;
+			ball.dx = -ball.dx;
 			lasthit.lasthit = 4;
 			return (1);
 		}
