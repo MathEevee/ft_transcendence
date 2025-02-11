@@ -92,6 +92,7 @@ def game_pong_online(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
+            print("\033[92m" + str(data) + "\033[0m")
             if (data['ended_at'] == None):
                 game = Game.objects.create(type = data['type'], nb_players_required = 2, started_at = datetime.datetime.fromtimestamp(data['started_at'] / 1000))
                 game.save()
@@ -102,7 +103,7 @@ def game_pong_online(request):
                 player2 = Player.objects.create(user = user2, game = game, team = None, is_host = False, is_IA = False)
                 player2.save()
                 return JsonResponse({"id": game.id})
-            else:
+            elif ((data['ended_at'] != None) and Game.get(id=data['id']).ended_at == None):
                 game = Game.objects.get(id=data['id'])
                 player1 = Player.objects.get(game = game, is_host = True)
                 player2 = Player.objects.get(game = game, is_host = False)
@@ -113,6 +114,9 @@ def game_pong_online(request):
                 player2.save()
                 game.save()
                 return JsonResponse({'error':False})
+            
+            elif ((data['ended_at'] != None) and Game.get(id=data['id']).ended_at != None):
+                return JsonResponse({'error': False, 'message':'Game already end'})
 
 
         except Exception as e:

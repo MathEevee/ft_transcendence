@@ -372,6 +372,7 @@ class FillTournamentAPIView(APIView):
 		tournament = get_object_or_404(Tournament, type_pong=tournament_id)
 
 		# Vérifier si le tournoi est plein
+		print(f"\033[1;32mFilling tournament {tournament.player_entries.count()}...\033[0m")
 		if tournament.player_entries.count() >= 8:
 			return Response(
 				{"error": "Tournament is already full."},
@@ -382,6 +383,16 @@ class FillTournamentAPIView(APIView):
 			tournamentName = "Pong"
 		else:
 			tournamentName = "SpaceBattle"
+
+		tournament.matchmaking = False
+		# delete all IA
+		for player in tournament.player_entries.all():
+			print(f"\033[1;32mRemoving AI player {player.player.username}...\033[0m")
+			if player.player.username.startswith("AI_"):
+				tournament.remove_player(player.player)
+				nb_players -= 1
+		CustomUser.objects.filter(username__startswith="AI_").delete()
+		tournament.save()
 
 		# ajouter des ia
 		print(f"\033[1;32mAdding {8 - nb_players} AI players to the tournament...\033[0m")

@@ -244,6 +244,23 @@ async function printallConversations(of) {
 			});
 			continue;
 		}
+		else if (allconversations[of][i].from === 'Tournament')
+		{
+			const gottotournamentbutton = document.createElement('a');
+			gottotournamentbutton.classList.add('message');
+			gottotournamentbutton.classList.add('btn');
+			gottotournamentbutton.classList.add('btn-primary');
+			gottotournamentbutton.textContent = 'HERE';
+			chat.appendChild(gottotournamentbutton);
+			chat.scrollTop = chat.scrollHeight;
+
+			gottotournamentbutton.addEventListener('click', function(event) {
+				if (allconversations[of][i].message.includes('Pong'))
+					changePage('/games/pong/online/tournament/', false);
+				else
+					changePage('/games/spaceinvaders/online/tournament/', false);
+			} );
+		}
 		const newMessage = document.createElement('div');
 		newMessage.classList.add('message');
 		newMessage.textContent = allconversations[of][i].from + ': ' + allconversations[of][i].message;
