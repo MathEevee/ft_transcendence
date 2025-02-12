@@ -60,7 +60,10 @@ class Ball
 		]
 		const collision = this.ballcollision(canvas, player1, player2, player3, player4, ball);
 		if (collision == 1)
+		{
 			ball.speed *= 1.3;
+			return 1;
+		}
 		else if (collision == 2)
 			return (2);
 	}

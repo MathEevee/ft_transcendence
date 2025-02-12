@@ -359,7 +359,7 @@ class SpaceTournoiConsumer(AsyncWebsocketConsumer):
 		
 class MultiPlayerConsumer(AsyncWebsocketConsumer):
 	
-	async def send_to_all(self, message, start=None, player=None,playerid=None,playerx=None, playery=None,ballx=None, bally=None, balldx=None, balldy=None):
+	async def send_to_all(self, message, start=None, player=None,playerid=None,playerx=None, playery=None,ballx=None, bally=None, balldx=None, balldy=None, ballspeed=None):
 		for socket in multi_player_games:
 			await socket.send(text_data=json.dumps({
 				'message': message,
@@ -372,6 +372,7 @@ class MultiPlayerConsumer(AsyncWebsocketConsumer):
 				'bally': bally,
 				'balldx': balldx,
 				'balldy': balldy,
+				'ballspeed': ballspeed,
 			}))
 
 	async def connect(self, *args, **kwargs):
@@ -453,12 +454,16 @@ class MultiPlayerConsumer(AsyncWebsocketConsumer):
 			balldy = data['balldy']
 		else:
 			balldy = None
+		if 'ballspeed' in data:
+			ballspeed = data['ballspeed']
+		else:
+			ballspeed = None
 		# Initialisation de 'start' à None par défaut, ou à 'start' si le message est 'start'
 		# Afficher les données reçues pour déboguer
 		# print("\033[31m" + f'receive : {data}' + "\033[0m")
 
 		# Appeler send_to_all avec les variables extraites
-		await self.send_to_all(message,start, player,playerid, playerx, playery,ballx, bally, balldx, balldy)
+		await self.send_to_all(message,start, player,playerid, playerx, playery,ballx, bally, balldx, balldy, ballspeed)
 
 
 
