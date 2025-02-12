@@ -29,8 +29,9 @@ def auth_with_42(request):
 	# redirect_uri = '<VOTRE_REDIRECT_URI>'
 	redirect_uri = request.build_absolute_uri(reverse('authe:auth_callback'))
 	tmpsplit = redirect_uri.split('/')
-	tmpsplit[2] += ':8080'
+	tmpsplit[0] = 'https:'
 	redirect_uri = '/'.join(tmpsplit)
+	print("\033[1;32mredirect_uri: ", redirect_uri, "\033[0m")
 	scope = 'public'  # Demande d'accès aux informations publiques de l'utilisateur
 	auth_url = f'https://api.intra.42.fr/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}'
 	return redirect(auth_url)
@@ -44,8 +45,9 @@ def auth_callback(request):
 		return redirect('/')  # Rediriger vers page home
 	redirect_uri = request.build_absolute_uri(reverse('authe:auth_callback'))
 	tmpsplit = redirect_uri.split('/')
-	tmpsplit[2] += ':8080'
+	tmpsplit[0] = 'https:'
 	redirect_uri = '/'.join(tmpsplit)
+	print("\033[1;32mredirect_uri: ", redirect_uri, "\033[0m")
 
 	# Préparer la requête pour obtenir un token
 	token_url = 'https://api.intra.42.fr/oauth/token'

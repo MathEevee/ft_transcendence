@@ -239,6 +239,8 @@ class PongTournoiConsumer(AsyncWebsocketConsumer):
 		await self.send_to_all(message, player, ball, playery, ballx, bally, score1, score2)
 
 
+#SPACE BATTLE==========================================================================================================
+
 class SpaceConsumer(AsyncWebsocketConsumer):
 
 	async def send_username_to_all(self):
@@ -252,17 +254,16 @@ class SpaceConsumer(AsyncWebsocketConsumer):
 				'message': f'{self.user.username} connected',
 			}))
 
-	async def send_to_all(self, message, player=None, ball=None, playery=None, ballx=None, bally=None, score1=None, score2=None):
+	async def send_to_all(self, message, player=None, bullets=None, playerx=None, playery=None, bulletx=None, life=None, bullet=None):
 		for socket in user_sockets:
 			await socket.send(text_data=json.dumps({
 				'message': message,
 				'player': player,
-				'ball': ball,
+				'bullets': bullets,
+				'x': playerx,
 				'y': playery,
-				'ballx': ballx,
-				'bally': bally,
-				'score1': score1,
-				'score2': score2,
+				'life': life,
+				'bullet': bullet,
 			}))
 
 	async def connect(self):
@@ -298,11 +299,7 @@ class SpaceConsumer(AsyncWebsocketConsumer):
 	async def receive(self, text_data):
 		data = json.loads(text_data)
 		message = data['message']
-		print("\033[31m" + f'{data}' + "\033[0m")
-		if message == 'start':
-			print('test')
-			# game = await sync_to_async
-
+		await self.send_to_all(message, data.get('player'), data.get('bullets'), data.get('playerx'), data.get('playery'), data.get('bulletx'), data.get('life'), data.get('bullet'))
 
 class SpaceTournoiConsumer(AsyncWebsocketConsumer):
 
@@ -317,17 +314,16 @@ class SpaceTournoiConsumer(AsyncWebsocketConsumer):
 				'message': f'{self.user.username} connected',
 			}))
 
-	async def send_to_all(self, message, player=None, ball=None, playery=None, ballx=None, bally=None, score1=None, score2=None):
+	async def send_to_all(self, message, player=None, bullets=None, playerx=None, playery=None, bulletx=None, life=None, bullet=None):
 		for socket in user_sockets:
 			await socket.send(text_data=json.dumps({
 				'message': message,
 				'player': player,
-				'ball': ball,
+				'bullets': bullets,
+				'x': playerx,
 				'y': playery,
-				'ballx': ballx,
-				'bally': bally,
-				'score1': score1,
-				'score2': score2,
+				'life': life,
+				'bullet': bullet,
 			}))
 
 	async def connect(self):
@@ -363,8 +359,6 @@ class SpaceTournoiConsumer(AsyncWebsocketConsumer):
 	async def receive(self, text_data):
 		data = json.loads(text_data)
 		message = data['message']
-		print("\033[31m" + f'{data}' + "\033[0m")
-
-		await self.send_to_all(message)
+		await self.send_to_all(message, data.get('player'), data.get('bullets'), data.get('playerx'), data.get('playery'), data.get('bulletx'), data.get('life'), data.get('bullet'))
 
 		

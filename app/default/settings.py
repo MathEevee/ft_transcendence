@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
     'les-requetes-mystiques.fr',
     'localhost',
     '127.0.0.1',
+    '172.0.18.1',
     'backend',
     'nginx'
 ]

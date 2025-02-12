@@ -1,3 +1,7 @@
+import { allconversations } from "/static/js/chatbox.js";
+import { joinagame } from "/static/js/chatbox.js";
+import { setjoinagame } from "/static/js/chatbox.js";
+
 function loadSpaceInvadersGame(){
 	
 /*============================================VARAIBLES============================================*/
@@ -7,14 +11,49 @@ const canvas = document.getElementById('space-invadeur');
 const context = canvas.getContext('2d');
 const redButton = document.getElementById('redButton');
 const chatbox = document.getElementById('box');
+const inviteinput = document.getElementById('invite');
+const divofbox = document.getElementById('game-info-player');
+const redbutton = document.getElementById('redButton');
 chatbox.style.display = "none";
+
+/*socket*/
+const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const wsURL = `${wsProtocol}//${window.location.host}/ws/chat/`;
+const socket = new WebSocket(wsURL);
+let gamesocket;
+let bebousocket;
+let spacetournamentsocket;
 
 /*player*/
 
 let lasshootplayer1 = 0;
 let lasshootplayer2 = 0;
 
-let gameId = 0;
+let is_host = true;
+let beplayer;
+
+/*ia*/
+let isdoubleia = 0;
+let iaisactive = 0;
+
+/*Game*/
+let gamemode;
+let gameId = null;
+let interval;
+let gameName = "SpaceBattle";
+
+/*tournament*/
+let tournament_id;
+
+if (document.location.pathname === "/games/spaceinvaders/online/tournament/")
+{
+	readybutton = document.getElementById("ready-btn");
+	tournament_id = document.getElementById("tournament-id").textContent;
+	spacetournamentsocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/games/spaceinvaders/tournament/${tournament_id}/`);
+	gamemode = "online_tournament";
+}
+else if (document.location.pathname === "/games/spaceinvaders/")
+	gamemode = "online";
 
 /*============================================INITIALIZATION============================================*/
 
@@ -104,9 +143,15 @@ async function displayTournamentGame()
 
 if (document.location.pathname === "/games/spaceinvaders/online/tournament/")
 {
+	document.getElementById("redButton").style.display = "none";
 	document.getElementById("redButton").disabled = true;
 	document.getElementById("tournamentbox").style.display = "block";
+	inviteinput.style.display = "none";
 	displayTournamentGame();
+}
+else if (document.location.pathname === "/games/spaceinvaders/")
+{
+	gamemode = "online";
 }
 
 class Player
@@ -160,6 +205,11 @@ class Bullet
 		this.shoot = shoot;
 		this.playersbullet = playersbullet;
 		this.hitbox = hitbox;
+	}
+
+	static copy(bullet)
+	{
+		return new Bullet(bullet.x, bullet.y, bullet.width, bullet.height, bullet.dx, bullet.dy, bullet.speed, bullet.shoot, bullet.playersbullet, bullet.hitbox);
 	}
 }
 
@@ -221,9 +271,15 @@ for (let i = 0; i < 100; i++)
 /*============================================FUNCTIONS============================================*/
 /*============================================FUNCTIONS============================================*/
 
+function sizeofstringdisplayed(string)
+{
+	return (context.measureText(string));
+}
 
 // Fonction pour gérer le basculement en mode plein écran
 function toggleFullscreen(element) {
+	if (start === 0)
+		return ;
 	if (!document.fullscreenElement) {
 		// Passer en plein écran
 		if (element.requestFullscreen) {
@@ -249,10 +305,45 @@ function toggleFullscreen(element) {
 	}
 }
 
+/*============================================CHECK FUNCTION============================================*/
+
+function isIA(player)
+{
+	if (player.includes("AI"))
+		return true;
+	return false;
+}
+
+async function checkPlayer(playername)
+{
+	if (playername === await getUserName())
+		return false;
+	const response = await fetch('/authe/api/users/');
+	const data = await response.json();
+	for (let i = 0; i < data.length; i++)
+	{
+		if (data[i].username === playername)
+			return true;
+	}
+	return false;
+}
 
 /*============================================DRAWING============================================*/
 
 /*draw functions for the game*/
+
+function putnameinbox(name)
+{
+	if (divofbox.childElementCount >= 2)
+		return ;
+	const playernamebox = document.createElement('h1');
+	playernamebox.setAttribute('id', 'playername');
+	playernamebox.textContent = name;
+	playernamebox.style.display = "flex";
+	divofbox.appendChild(playernamebox);
+	if (divofbox.childElementCount >= 2)
+			inviteinput.style.display = "none";
+}
 
 function drawRect(x, y, width, height, color) {
 	context.fillStyle = color;
@@ -382,6 +473,18 @@ function prinsmg(context, text, x, y)
 
 function gamefinished(canvas, context, t_game)
 {
+	if (bebousocket)
+		return (0);
+	else
+	{
+		if (gamesocket && t_game.player1.life <= 0 || t_game.player2.life <= 0) 
+		{
+			console.log('end');
+			gamesocket.send(JSON.stringify({
+				'message': 'end',
+			}));
+		}
+	}
 	if (t_game.player1.life <= 0)
 	{
 		prinsmg(context, "Player 2 wins", canvas.width / 2 - 150, canvas.height / 2);
@@ -409,11 +512,31 @@ function updatebullets(canvas, context, t_game)
 		{
 			t_game.player2.life--;
 			t_game.bullets.splice(i, 1);
+			setTimeout(() => {
+				if (gamesocket)
+				{
+					gamesocket.send(JSON.stringify({
+						'message': 'touch',
+						'player': 'player2',
+						'life': t_game.player2.life,
+					}));
+				}
+			}, 100);
 		}
 		else if (t_game.bullets[i].playersbullet === "player2" && hitboxcollision(t_game.bullets[i].hitbox, t_game.player1.hitbox))
 		{
 			t_game.player1.life--;
 			t_game.bullets.splice(i, 1);
+			setTimeout(() => {
+				if (gamesocket)
+				{
+					gamesocket.send(JSON.stringify({
+						'message': 'touch',
+						'player': 'player1',
+						'life': t_game.player1.life,
+					}));
+				}
+			}, 100);
 		}
 		else if (t_game.bullets[i].playersbullet === "player1")
 		{
@@ -442,6 +565,8 @@ function update()
 		
 function gameloop()
 {
+	if (start === 0)
+		return ;
 	if (update(canvas, context, t_game))
 	{
 		start = 0;
@@ -481,6 +606,12 @@ function initvariables()
 		bullets: [],
 		colorset: colorset,
 	};
+	if (gamesocket)
+		beplayer = t_game.player2;
+	else if (bebousocket)
+		beplayer = t_game.player1;
+	else
+		beplayer = t_game.player2;
 	bullets = [];
 }
 
@@ -491,6 +622,7 @@ function startGame()
 	countdown();
 	initvariables();
 	start = 1;
+	setTimeout(sendmove, 4000);
 	setTimeout(gameloop, 4000);
 }
 
@@ -516,59 +648,73 @@ function keyhookdownforgame(event)
 	if (start === 0 || forcountdown === 1)
 		return ;
 	const now = Date.now();
-	if (event.key === "ArrowLeft" && t_game.player1.left === 0)
+	if (event.key === "ArrowLeft" && t_game.player1.left === 0 && beplayer === t_game.player1)
 	{
 		t_game.player1.dx -= 7;
 		t_game.player1.left = 1;
 	}
-	else if (event.key === "ArrowRight" && t_game.player1.right === 0)
+	else if (event.key === "ArrowRight" && t_game.player1.right === 0 && beplayer === t_game.player1)
 	{
 		t_game.player1.dx += 7;
 		t_game.player1.right = 1;
 	}
-	else if (event.key === "ArrowUp" && t_game.player1.up === 0)
+	else if (event.key === "ArrowUp" && t_game.player1.up === 0 && beplayer === t_game.player1)
 	{
 		t_game.player1.dy -= 7;
 		t_game.player1.up = 1;
 	}
-	else if (event.key === "ArrowDown" && t_game.player1.down === 0)
+	else if (event.key === "ArrowDown" && t_game.player1.down === 0 && beplayer === t_game.player1)
 	{
 		t_game.player1.dy += 7;
 		t_game.player1.down = 1;
 	}
-	else if ((event.key === "a" || event.key === "q") && t_game.player2.left === 0)
+	else if ((event.key === "a" || event.key === "q") && t_game.player2.left === 0 && beplayer === t_game.player2)
 	{
 		t_game.player2.dx -= 7;
 		t_game.player2.left = 1;
 	}
-	else if (event.key === "d" && t_game.player2.right === 0)
+	else if (event.key === "d" && t_game.player2.right === 0 && beplayer === t_game.player2)
 	{
 		t_game.player2.dx += 7;
 		t_game.player2.right = 1;
 	}
-	else if ((event.key === "w" || event.key === "z") && t_game.player2.up === 0)
+	else if ((event.key === "w" || event.key === "z") && t_game.player2.up === 0 && beplayer === t_game.player2)
 	{
 		t_game.player2.dy -= 7;
 		t_game.player2.up = 1;
 	}
-	else if (event.key === "s" && t_game.player2.down === 0)
+	else if (event.key === "s" && t_game.player2.down === 0 && beplayer === t_game.player2)
 	{
 		t_game.player2.dy += 7;
 		t_game.player2.down = 1;
 	}
-	if (event.key === "f")
+	if (event.key === "f" && beplayer === t_game.player1)
 	{
 		if (now - lasshootplayer1 < 100)
 			return ;
 		lasshootplayer1 = now;
-		t_game.bullets.push(new Bullet(t_game.player1.x - t_game.player1.width / 2 + (modelebullet.length / 2) * 10 , t_game.player1.y + t_game.player1.height, 10, 10, 0, -1, 20, 1, "player1", [t_game.player1.x + t_game.player1.width / 2, t_game.player1.y + t_game.player1.height, 10, 10]));
+		if (bebousocket)
+			bebousocket.send(JSON.stringify({
+				'message': 'shoot',
+				'bullet': new Bullet(t_game.player1.x - t_game.player1.width / 2 + (modelebullet.length / 2) * 10, t_game.player1.y + t_game.player1.height, 10, 10, 0, -1, 20, 1, "player1", [t_game.player1.x + t_game.player1.width / 2, t_game.player1.y + t_game.player1.height, 10, 10]),
+			}));
+		else
+			t_game.bullets.push(new Bullet(t_game.player1.x - t_game.player1.width / 2 + (modelebullet.length / 2) * 10 , t_game.player1.y + t_game.player1.height, 10, 10, 0, -1, 20, 1, "player1", [t_game.player1.x + t_game.player1.width / 2, t_game.player1.y + t_game.player1.height, 10, 10]));
 	}
-	if (event.key === " ")
+	if (event.key === " " && beplayer === t_game.player2)
 	{
 		if (now - lasshootplayer2 < 100)
 			return ;
 		lasshootplayer2 = now;
-		t_game.bullets.push(new Bullet(t_game.player2.x - t_game.player2.width / 2 + (modelebullet.length / 2) * 10, t_game.player2.y - t_game.player2.height, 10, 10, 0, 1, 20, 1, "player2", [t_game.player2.x + t_game.player2.width / 2, t_game.player2.y - t_game.player2.height, 10, 10]));
+		if (gamesocket)
+		{
+			gamesocket.send(JSON.stringify({
+				'message': 'shoot',
+				'bullet': new Bullet(t_game.player2.x - t_game.player2.width / 2 + (modelebullet.length / 2) * 10, t_game.player2.y - t_game.player2.height, 10, 10, 0, 1, 20, 1, "player2", [t_game.player2.x + t_game.player2.width / 2, t_game.player2.y - t_game.player2.height, 10, 10]),
+			}));
+		}
+		else
+			t_game.bullets.push(new Bullet(t_game.player2.x - t_game.player2.width / 2 + (modelebullet.length / 2) * 10, t_game.player2.y - t_game.player2.height, 10, 10, 0, 1, 20, 1, "player2", [t_game.player2.x + t_game.player2.width / 2, t_game.player2.y - t_game.player2.height, 10, 10]));
 	}
 }
 					
@@ -586,42 +732,42 @@ function keyhookupforgame(event)
 {
 	if (start === 0 || forcountdown === 1)
 		return ;
-	if (event.key === "ArrowLeft" && t_game.player1.left === 1)
+	if (event.key === "ArrowLeft" && t_game.player1.left === 1 && beplayer === t_game.player1)
 	{
 		t_game.player1.dx += 7;
 		t_game.player1.left = 0;
 	}
-	else if (event.key === "ArrowRight" && t_game.player1.right === 1)
+	else if (event.key === "ArrowRight" && t_game.player1.right === 1 && beplayer === t_game.player1)
 	{
 		t_game.player1.dx -= 7;
 		t_game.player1.right = 0;
 	}
-	else if (event.key === "ArrowUp" && t_game.player1.up === 1)
+	else if (event.key === "ArrowUp" && t_game.player1.up === 1 && beplayer === t_game.player1)
 	{
 		t_game.player1.dy += 7;
 		t_game.player1.up = 0;
 	}
-	else if (event.key === "ArrowDown" && t_game.player1.down === 1)
+	else if (event.key === "ArrowDown" && t_game.player1.down === 1 && beplayer === t_game.player1)
 	{
 		t_game.player1.dy -= 7;
 		t_game.player1.down = 0;
 	}
-	else if ((event.key === "a" || event.key === "q") && t_game.player2.left === 1)
+	else if ((event.key === "a" || event.key === "q") && t_game.player2.left === 1 && beplayer === t_game.player2)
 	{
 		t_game.player2.dx += 7;
 		t_game.player2.left = 0;
 	}
-	else if (event.key === "d" && t_game.player2.right === 1)
+	else if (event.key === "d" && t_game.player2.right === 1 && beplayer === t_game.player2)
 	{
 		t_game.player2.dx -= 7;
 		t_game.player2.right = 0;
 	}
-	else if ((event.key === "w" || event.key === "z") && t_game.player2.up === 1)
+	else if ((event.key === "w" || event.key === "z") && t_game.player2.up === 1 && beplayer === t_game.player2)
 	{
 		t_game.player2.dy += 7;
 		t_game.player2.up = 0;
 	}
-	else if (event.key === "s" && t_game.player2.down === 1)
+	else if (event.key === "s" && t_game.player2.down === 1 && beplayer === t_game.player2)
 	{
 		t_game.player2.dy -= 7;
 		t_game.player2.down = 0;
@@ -641,7 +787,239 @@ document.addEventListener('keyup', function(event)
 		keyhookupforgame(event);
 });
 
-redButton.addEventListener('click', startGame);
+
+/*============================================CHAT============================================*/
+
+async function sendInvite(event)
+{
+	if (event.key === "Enter")
+	{
+		let playername = inviteinput.value;
+		if (await checkPlayer(playername))
+		{
+			if (gamesocket == undefined)
+				gamesocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/spacebattle/`);
+			inviteinput.style.display = "none";
+			divofbox.style.display = "block";
+			// putnameinbox(await getUserName());
+
+			gamesocket.onmessage = function(event)
+			{
+				const data = JSON.parse(event.data);
+				// console.log(data);
+
+				if (data.message.includes('disconnected'))
+				{
+					start = 0;
+					let playerdisconnect = data.message.split(' ')[0];
+					context.clearRect(0, 0, canvas.width, canvas.height);
+					context.fillStyle = colorset.backgroundcolor;
+					context.fillRect(0, 0, canvas.width, canvas.height);
+					context.fillStyle = colorset.fontcolor;
+					context.font = "50px Arial";
+					context.fillText(playerdisconnect + " disconnected", canvas.width / 2 - sizeofstringdisplayed(playerdisconnect + " disconnected").width / 2, canvas.height / 2);
+					while (divofbox.firstChild)
+						divofbox.removeChild(divofbox.firstChild);
+					inviteinput.style.display = "block";
+					gamesocket.close();
+					gamesocket = undefined;
+					setTimeout(wait, 2000);
+					return ;
+				}
+				else if (data.message.includes('connected'))
+				{
+					putnameinbox(data.message.split(' ')[0]);
+				}
+				else if (data.message === 'start')
+					startGame();
+				else if (data.message.includes('move'))
+				{
+					if (data.player === 'player1')
+					{
+						t_game.player1.y = data.y;
+						t_game.player1.x = data.x;
+					}
+				}
+				else if (data.message === 'shoot')
+				{
+					t_game.bullets.push(Bullet.copy(data.bullet));
+				}
+			}
+		
+			gamesocket.onopen = function(event)
+			{
+				console.log('websocket open on spacebattle');
+			}
+	
+			setTimeout(() =>{
+				if (document.getElementById('game-info-player'))
+					document.getElementById('game-info-player').style.display = "flex";
+				if (document.getElementById('playername'))
+					document.getElementById('playername').style.display = "flex";
+			}, 200);
+
+			inviteinput.value = '';
+
+			if (!allconversations[playername])
+				allconversations[playername] = [];
+			allconversations[playername].push({
+				'from': 'You',
+				'message': 'Invite ' + playername + ' to join a game of ' + gameName,
+			});
+			socket.send(JSON.stringify({
+				'to': playername,
+				'message': 'Invating you to play : ' + gameName,
+				'is_invite': true,
+				'tournament': false,
+			}));
+		}
+		else
+			console.log('Player not found');
+	}
+}
+
+inviteinput.addEventListener('keydown', sendInvite);
+
+/*============================================ONLINE============================================*/
+
+function sendmove()
+{
+	if (gamemode === "online" && start === 1)
+	{
+		setInterval(() => {
+			if (start === 0)
+				return ;
+			if (bebousocket)
+			{
+				bebousocket.send(JSON.stringify({
+					'message': 'move',
+					'player': 'player1',
+					'playerx': t_game.player1.x,
+					'playery': t_game.player1.y,
+					'bullets': t_game.bullets,
+				}));
+			}
+			else if (gamesocket)
+			{
+				gamesocket.send(JSON.stringify({
+					'message': 'move',
+					'player': 'player2',
+					'playerx': t_game.player2.x,
+					'playery': t_game.player2.y,
+					'bullets': t_game.bullets,
+				}));
+			}
+		}, 1000 / 20);
+	}
+	else if (gamemode === "online_tournament" && start === 1)
+	{
+		if (is_host === true || doubleia === 1)
+		{
+			setInterval(async () =>
+			{
+				if (start === 0)
+					return ;
+			} , 1000 / 20);
+		}
+	}
+}
+
+if (gamemode === "online" && joinagame)
+	{
+		is_host = false;
+		if (bebousocket == undefined)
+			bebousocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/spacebattle/`)
+		bebousocket.onmessage = function(event)
+		{
+			const data = JSON.parse(event.data);
+			// console.log("data", data);
+
+			if (data.message.includes('disconnected'))
+			{
+				start = 0;
+				let playerdisconnect = data.message.split(' ')[0];
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				context.fillStyle = colorset.backgroundcolor;
+				context.fillRect(0, 0, canvas.width, canvas.height);
+				context.fillStyle = colorset.fontcolor;
+				context.font = "50px Arial";
+				context.fillText(playerdisconnect + " disconnected", canvas.width / 2 - sizeofstringdisplayed(playerdisconnect + " disconnected").width / 2, canvas.height / 2);
+				while (divofbox.firstChild)
+					divofbox.removeChild(divofbox.firstChild);
+				inviteinput.style.display = "block";
+				bebousocket.close();
+				bebousocket = undefined;
+				setjoinagame(false);
+				setTimeout(wait, 2000);
+				return ;
+			}
+			else if (data.message.includes('connected'))
+			{
+				setTimeout(() => {
+				{
+					putnameinbox(data.message.split(' ')[0]);
+					document.getElementById('game-info-player').style.display = "flex";
+					document.getElementById('playername').style.display = "flex";
+					document.getElementById('invite').style.display = "none";
+
+				}}, 200);
+			}
+			else if (data.message === 'start')
+				startGame();
+			else if (data.message.includes('move'))
+			{
+				if (data.player === 'player2')
+				{
+					t_game.player2.y = data.y;
+					t_game.player2.x = data.x;
+				}
+			}
+			// else if (data.message === 'touch')
+			// {
+			// 	if (data.player === 'player1')
+			// 		t_game.player1.life = data.life;
+			// 	else if (data.player === 'player2')
+			// 		t_game.player2.life = data.life;
+			// }
+			else if (data.message === 'shoot')
+			{
+				t_game.bullets.push(Bullet.copy(data.bullet));
+			}
+			else if (data.message === 'end')
+			{
+				start = 0;
+				if (t_game.player1.life <= 0)
+					prinsmg(context, "Player 2 wins", canvas.width / 2 - 150, canvas.height / 2);
+				else if (t_game.player2.life <= 0)
+					prinsmg(context, "Player 1 wins", canvas.width / 2 - 150, canvas.height / 2);
+				setTimeout(wait, 2000);
+			}
+		}
+	}
+
+if (gamemode === "online")
+	{
+		redbutton.addEventListener("click", () =>
+		{
+			if (start === 0)
+			{
+				console.log('start');
+				if (gamesocket)
+				{
+					gamesocket.send(JSON.stringify({
+						'message': 'start',
+					}));
+				}
+				else if (bebousocket)
+				{
+					bebousocket.send(JSON.stringify({
+						'message': 'start',
+					}));
+				}
+				startGame();
+			}
+		});
+	}
 
 }
 

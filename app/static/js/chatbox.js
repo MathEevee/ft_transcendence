@@ -377,7 +377,7 @@ function liveChat() {
 			{
 				allconversations[data.from].push({
 					'from': data.from,
-					'message': '<game>' + (data.invitation ? 'pong' : 'spaceinvaders') + '</game>',
+					'message': '<game>' + (data.message.includes('pong') ? 'pong' : 'spaceinvaders') + '</game>',
 				});
 			}
 		}
