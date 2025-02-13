@@ -4,6 +4,22 @@ import { point } from "/static/js/pongMulti/point.js";
 import { sizeofstringdisplayed } from "/static/js/pongMulti/utils.js";
 import { lasthit } from "/static/js/pongMulti/player.js";
 
+function create_scoreboard(username, playerid)
+{
+
+	// const currentmatch = document.getElementsByClassName("tournament-player");
+	// const player1name = document.createElement("h3");
+
+	// player1name.setAttribute("id", "player1");
+
+	// player1name.textContent = username;
+	// currentmatch[0].appendChild(player1name);
+
+	// console.log(currentmatch);
+	// console.log(player1name);
+	// refaire un bout d'html pour afficher les scores
+}
+
 async function loadPongMulti(){
 	let interval = null;
 	const canvas = document.getElementById('pong');
@@ -77,6 +93,7 @@ async function loadPongMulti(){
 
 	const colorpalette = { white: "#FFFFFF", black: "#000000", red: "#FF0000", green: "#00FF00", blue: "#0000FF", yellow: "#FFFF00", cyan: "#00FFFF", magenta: "#FF00FF", silver: "#C0C0C0", gray: "#808080", maroon: "#800000", olive: "#808000", purple: "#800080", teal: "#008080", navy: "#000080", orange: "#FFA500", lime: "#00FF00", aqua: "#00FFFF", fuchsia: "#FF00FF", brown: "#A52A2A", papayawhip: "#FFEFD5", peachpuff: "#FFDAB9", peru: "#CD853F", pink: "#FFC0CB", plum: "#DDA0DD", powderblue: "#B0E0E6", purple: "#800080", red: "#FF0000", rosybrown: "#BC8F8F", royalblue: "#4169E1", saddlebrown: "#8B4513", salmon: "#FA8072", sandybrown: "#F4A460", seagreen: "#2E8B57", seashell: "#FFF5EE", sienna: "#A0522D", silver: "#C0C0C0", skyblue: "#87CEEB", slateblue: "#6A5ACD", slategray: "#708090", snow: "#FFFAFA", springgreen: "#00FF7F", steelblue: "#4682B4", tan: "#D2B48C", teal: "#008080", thistle: "#D8BFD8", tomato: "#FF6347", turquoise: "#40E0D0", violet: "#EE82EE", wheat: "#F5DEB3", white: "#FFFFFF", whitesmoke: "#F5F5F5", yellow: "#FFFF00", yellowgreen: "#9ACD32" };
 
+	create_scoreboard(playername, playerid);
 
 	if (window.location.pathname === "/games/pong/multiplayer/")
 	{
@@ -86,6 +103,7 @@ async function loadPongMulti(){
 		// 	document.getElementById('game-info-player').style.display = "block";
 		// 	document.getElementById('playername').style.display = "block";
 		// }, 1000);
+		//add score
 	}
 
 	const colorset =
@@ -204,22 +222,13 @@ async function loadPongMulti(){
 
 	function setafterpoint(canvas, player1, player2, player3, player4, ball)
 	{
-		if (lasthit.lasthit)
+		if (is_host === true)
 		{
-			if (lasthit.lasthit === 1)
-				player1.score++;
-			else if (lasthit.lasthit === 2)
-				player2.score++;
-			else if (lasthit.lasthit === 3)
-				player3.score++;
-			else if (lasthit.lasthit === 4)
-				player4.score++;
+			setballafterpoint(canvas, ball);
+			setplayerafterpoint(canvas, player1, player2, player3, player4);
+			socket.send(JSON.stringify({ 'message': "score", 'playerid': lasthit.lasthit}));
 			lasthit.lasthit = null;
 		}
-		setballafterpoint(canvas, ball);
-		setplayerafterpoint(canvas, player1, player2, player3, player4);
-		if (player1.score === 5 || player2.score === 5 || player3.score === 5 || player4.score === 5)
-			start = 0;
 
 	}
 
@@ -239,6 +248,12 @@ async function loadPongMulti(){
 				t_game.ball.dx = data['balldx'];
 				t_game.ball.dy = data['balldy'];
 				t_game.ball.speed = data['ballspeed'];
+			}
+			if (is_host === false && data['message'] === "end")
+			{
+				start = 0;
+				// print_score(player1, player2, player3, player4);
+				// reset score
 			}
 			if (data['message'] === "move player")
 			{
@@ -267,6 +282,18 @@ async function loadPongMulti(){
 					t_game.player4.update(canvas);
 				}
 			}
+			if (data['message'] === "score")
+			{
+				if (data['playerid'] === 1)
+					t_game.player1.score++;
+				else if (data['playerid'] === 2)
+					t_game.player2.score++;
+				else if (data['playerid'] === 3)
+					t_game.player3.score++;
+				else if (data['playerid'] === 4)
+					t_game.player4.score++;
+				console.log("score", t_game.player1.score, t_game.player2.score, t_game.player3.score, t_game.player4.score);
+			}
 		};
 	let result = t_game.ball.update(canvas, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball);
 	if (is_host === true)
@@ -285,6 +312,11 @@ async function loadPongMulti(){
 				socket.send(JSON.stringify({'message':"start ball",
 				'ballx':t_game.ball.x, 'bally':t_game.ball.y ,'balldx':t_game.ball.dx, 'balldy':t_game.ball.dy, 'ballspeed':t_game.ball.speed}));
 			}
+		}
+		if (t_game.player1.score >= 5 || t_game.player2.score >= 5 || t_game.player3.score >= 5 || t_game.player4.score >= 5)
+		{
+			socket.send(JSON.stringify({ 'message': "end"}));
+			start = 0;
 		}
 	}
 	}
@@ -330,40 +362,6 @@ async function loadPongMulti(){
 			socket.send(JSON.stringify({ 'message': "move player", 'playerid': 4, 'playerx': cplayer.x, 'playery': cplayer.y }));
 			cplayer.update(canvas);
 		}
-		// {
-		// 	if (event.key === "ArrowLeft")
-		// 		t_game.player1.goLeft();
-		// 	else if (event.key === "ArrowRight")
-		// 		t_game.player1.goRight();
-		// }
-		/*if (event.key === "ArrowLeft")
-		{
-			if (cplayer === t_game.player3)
-				t_game.player3.goLeft();
-			else if (cplayer === t_game.player4)
-				t_game.player4.goLeft();
-		}
-		else if (event.key === "ArrowRight")
-		{
-			if (cplayer === t_game.player3)
-				t_game.player3.goRight();
-			else if (cplayer === t_game.player4)
-				t_game.player4.goRight();
-		}
-		else if (event.key === "ArrowUp")
-		{
-			if (cplayer === t_game.player1)
-				t_game.player1.goUp();
-			else if (cplayer === t_game.player2)
-				t_game.player2.goUp();
-		}
-		else if (event.key === "ArrowDown")
-		{
-			if (cplayer === t_game.player1)
-				t_game.player1.goDown();
-			else if (cplayer === t_game.player2)
-				t_game.player2.goDown();
-		}*/
 	}
 	
 	/* Mouvement des raquettes */
@@ -387,20 +385,15 @@ async function loadPongMulti(){
 				socket.send(JSON.stringify({ 'message': "move player", 'playerid': playerid, 'playerx': cplayer.x, 'playery': cplayer.y }));
 			}
 		}
-		// if (event.key === "ArrowLeft" || event.key === "ArrowRight")
-		// {
-		// 	if (cplayer === t_game.player3)
-		// 		t_game.player3.stop();
-		// 	else if (cplayer === t_game.player4)
-		// 		t_game.player4.stop();
-		// }
-		// else if (event.key === "ArrowUp" || event.key === "ArrowDown")
-		// {
-		// 	if (cplayer === t_game.player1)
-		// 		t_game.player1.stop();
-		// 	else if (cplayer === t_game.player2)
-		// 		t_game.player2.stop();
-		// }
+		else if (playerid === 3 || playerid === 4)
+		{
+			if (event.key === "ArrowUp" || event.key === "ArrowDown")
+			{
+				t_game.player3.stop();
+				t_game.player4.stop();
+				socket.send(JSON.stringify({ 'message': "move player", 'playerid': playerid, 'playerx': cplayer.x, 'playery': cplayer.y }));
+			}
+		}
 	}
 	
 	document.body.addEventListener("keyup", (event) =>
@@ -444,7 +437,7 @@ async function loadPongMulti(){
 	
 	function loop(chrono)
 	{
-		console.log(chrono)
+		// console.log(chrono)
 		if (start === 0)
 		{
 			clearInterval(interval);
@@ -455,6 +448,8 @@ async function loadPongMulti(){
 		draw();
 		requestAnimationFrame(loop);
 	}
+
+
 	
 	function initvariables()
 	{
