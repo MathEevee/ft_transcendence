@@ -67,6 +67,16 @@ async function clearPlayerList()
 	}
 }
 
+async function istheOnlyPlayer(playerss)
+{
+	for (let i = 0; i < playerss.length; i++)
+	{
+		if (!(playerss[i].player.username.startsWith('AI_')) && playerss[i].player.username !== await getUserName())
+			return false;
+	}
+	return true;
+}
+
 async function displayPlayerTournament()
 {
 	if (window.location.pathname !== '/games/pong/tournament/' && window.location.pathname !== '/games/spaceinvaders/tournament/')
@@ -109,6 +119,13 @@ async function displayPlayerTournament()
 				{
 					inviteButton.style.display = 'block';
 					inviteButton.disabled = false;
+					if (await istheOnlyPlayer(playerss))
+					{
+						cell.style.color = 'yellow';
+						teamcell.style.color = 'yellow';
+						startButton.style.display = 'block';
+
+					}
 				}
 			}
 		}
@@ -120,7 +137,6 @@ function startmatchmaking()
 	if (window.location.pathname !== '/games/pong/tournament/' && window.location.pathname !== '/games/spaceinvaders/tournament/')
 		return;
 	const playersList = Array.from(players);
-	console.log(playersList);
 	const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 	fetch('/authe/api/tournaments/matchmaking/', {
 		method: 'POST',
@@ -179,7 +195,6 @@ async function startTournoi()
 {
 	const playersList = Array.from(players);
 
-	console.log("playersList", playersList);
 	if (playersList.length < 8)
 		await filltournament(playersList);
 	else
@@ -188,7 +203,6 @@ async function startTournoi()
 			await startmatchmaking();
 		}, 500);
 	}
-
 }
 
 async function checkPlayer(playername)
@@ -278,8 +292,6 @@ async function setupPlayerList()
 
 					inviteButton.style.display = 'block';
 					inviteButton.disabled = false;
-
-					console.log(players);
 				}
 			})
 			.catch(err => {
