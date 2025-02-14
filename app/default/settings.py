@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.oauth2',
+    'csp',
     'rest_framework',
     'channels',
     'apps.authe',
@@ -150,6 +151,11 @@ USE_L10N = True
 USE_TZ = True
 
 APPEND_SLASH = True
+
+# Définir la politique de sécurité du contenu (CSP)
+CSP_DEFAULT_SRC = ["'self'", "https:", "data:", "blob:"]
+CSP_STYLE_SRC = ["'self'", "'unsafe-inline'"]  # ⚠️ Moins sécurisé, à éviter si possible
+CSP_SCRIPT_SRC = ["'self'"]
 
 
 # Static files (CSS, JavaScript, Images)
