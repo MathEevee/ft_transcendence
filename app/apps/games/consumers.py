@@ -377,6 +377,7 @@ class MultiPlayerConsumer(AsyncWebsocketConsumer):
 
 	async def connect(self, *args, **kwargs):
 		self.user = self.scope['user']
+		# check is here
 		if self.user.is_authenticated:
 			await self.accept()
 			print("\033[31m" + f'{self.user.username} connected game' + "\033[0m")

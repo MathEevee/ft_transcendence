@@ -1,6 +1,12 @@
 import { liveChat } from "/static/js/chatbox.js";
 import { display_graph } from "/static/js/graph.js";
 
+let pageDestructorFn = null;
+
+export function setPageDestructor(fn) {
+    pageDestructorFn = fn;
+}
+
 const allPage = {
     "/games/pong/local/": () => import("/static/js/pong.js").then(module => module.loadPong()),
     "/games/pong/online/": () => import("/static/js/pong.js").then(module => module.loadPong()),
@@ -29,6 +35,10 @@ function loadPage(path) {
 }
 
 async function changePage(path, disableHistory) {
+    if (pageDestructorFn) {
+        pageDestructorFn();
+        pageDestructorFn = null
+    }
     const response = await fetch(path);
     if (response.ok) {
         const content = await response.text();

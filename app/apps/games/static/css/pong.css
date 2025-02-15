@@ -306,3 +306,19 @@ body {
 }
 
 
+
+/*mettre le tableau des scores contenant des divs de l class player-info, le mettre a droire de facon aaptative a la borne d'arcade et a la taille de l'ecran*/
+#player-info {
+	display: none;
+	position: fixed;
+	right: 20px;
+	top: 50%;
+	transform: translateY(-50%);
+	width : 220px;
+	background-color: #1a0033;
+	border-radius: 10px;
+}
+
+/* div#player-info.tournament-body > div.tournament-player {
+} */
+

@@ -3,21 +3,30 @@ import { Player } from "/static/js/pongMulti/player.js";
 import { point } from "/static/js/pongMulti/point.js";
 import { sizeofstringdisplayed } from "/static/js/pongMulti/utils.js";
 import { lasthit } from "/static/js/pongMulti/player.js";
+import { setPageDestructor } from "/static/js/index.js";
 
 function create_scoreboard(username, playerid)
 {
-
-	// const currentmatch = document.getElementsByClassName("tournament-player");
-	// const player1name = document.createElement("h3");
-
-	// player1name.setAttribute("id", "player1");
-
-	// player1name.textContent = username;
-	// currentmatch[0].appendChild(player1name);
-
-	// console.log(currentmatch);
-	// console.log(player1name);
-	// refaire un bout d'html pour afficher les scores
+    console.log('create scoreboard');
+	console.log('username',username, 'playerid',playerid);
+    let playerNames = document.querySelectorAll('#player-info .tournament-player h3');
+    
+	if (playerid === 1)
+	{
+		playerNames[0].textContent = username;
+	}
+	else if (playerid === 2)
+	{
+		playerNames[1].textContent = username;
+	}
+	else if (playerid === 3)
+	{
+		playerNames[2].textContent = username;
+	}
+	else if (playerid === 4)
+	{
+		playerNames[3].textContent = username;
+	}
 }
 
 async function loadPongMulti(){
@@ -29,6 +38,7 @@ async function loadPongMulti(){
 	const inviteinput = document.getElementById('invite');
 	const divofbox = document.getElementById('game-info-player');
 	chatbox.style.display = "none";
+
 	let playerid = 1;
 	
 	var all_players = [];
@@ -38,6 +48,7 @@ async function loadPongMulti(){
 	const paddleHeight = 75;
 	const paddleWidth = 5;
 	let is_host = true;
+	let close = false;
 	
 	var playername = "";
 	
@@ -54,46 +65,71 @@ async function loadPongMulti(){
 	const wsURL = `${wsProtocol}//${window.location.host}/ws/pong/multiplayer/`;
 	let socket;
 
-
 	if (socket === undefined)
 		socket = new WebSocket(wsURL);
 
+	setPageDestructor(() => {
+		console.log("destroying pong multiplayer (destructor fn)");
+		if (start === 1)
+			socket.send(JSON.stringify({ 'message': "disconnected", 'player': playername , 'start': 'started', 'playerid': playerid}));
+		else
+			socket.send(JSON.stringify({ 'message': "disconnected", 'player': playername , 'start': 'not started', 'playerid': playerid}));
+		socket.close();
+	});
+
 	if (socket.readyState === WebSocket.OPEN)
 	{
-		socket.send(JSON.stringify({ 'message': "join", 'player': playername }));
+		socket.send(JSON.stringify({ 'message': "join", 'player': playername , 'playerid': playerid}));
 	}
 	
 	socket.onopen = function (e) {
 		console.log("Connected to server");
-		socket.send(JSON.stringify({ 'message': "join", 'player': playername }));
+		socket.send(JSON.stringify({ 'message': "join", 'player': playername, 'playerid': playerid }));
 	};
 
 	socket.onmessage = function (e) {
 		const data = JSON.parse(e.data);
-		console.log(data);
+		console.log('ici',data);
+		if (data['message'] === "player_id")
+		{
+			console.log('ca passe la', data)
+			playerid = data['value'];
+			is_host = playerid === 1;
+			console.log("am i host", is_host);
+
+		}
 		if (data['message'] === "join")
 		{
 			if (all_players.includes(data.player) === false)
 			{
+				socket.send(JSON.stringify({ 'message': "join", 'player': playername , 'playerid': playerid}));
 				all_players.push(data.player);
-				socket.send(JSON.stringify({ 'message': "join", 'player': playername }));
+				console.log('check', data);
+				console.log('all_players', all_players);
 			}
-		}
-		if (data['message'] === "player_id") {
-			playerid = data['value'];
-			is_host = playerid === 1;
-			console.log("am i host", is_host);
+			create_scoreboard(data['player'], data['playerid']);
 		}
 		if (data['message'] === "start")
 		{
-			console.log(all_players);
 			startPong();
+		}
+		if (data['message'] === "disconnected")
+		{
+			let removeplayer = data['player'];
+			for (let i = 0; i < all_players.length; i++)
+			{
+				if (all_players[i] === removeplayer)
+					all_players[i] = null;
+			}
+			// print_score(player1, player2, player3, player4);
+			// reset score
 		}
 	};
 
-	const colorpalette = { white: "#FFFFFF", black: "#000000", red: "#FF0000", green: "#00FF00", blue: "#0000FF", yellow: "#FFFF00", cyan: "#00FFFF", magenta: "#FF00FF", silver: "#C0C0C0", gray: "#808080", maroon: "#800000", olive: "#808000", purple: "#800080", teal: "#008080", navy: "#000080", orange: "#FFA500", lime: "#00FF00", aqua: "#00FFFF", fuchsia: "#FF00FF", brown: "#A52A2A", papayawhip: "#FFEFD5", peachpuff: "#FFDAB9", peru: "#CD853F", pink: "#FFC0CB", plum: "#DDA0DD", powderblue: "#B0E0E6", purple: "#800080", red: "#FF0000", rosybrown: "#BC8F8F", royalblue: "#4169E1", saddlebrown: "#8B4513", salmon: "#FA8072", sandybrown: "#F4A460", seagreen: "#2E8B57", seashell: "#FFF5EE", sienna: "#A0522D", silver: "#C0C0C0", skyblue: "#87CEEB", slateblue: "#6A5ACD", slategray: "#708090", snow: "#FFFAFA", springgreen: "#00FF7F", steelblue: "#4682B4", tan: "#D2B48C", teal: "#008080", thistle: "#D8BFD8", tomato: "#FF6347", turquoise: "#40E0D0", violet: "#EE82EE", wheat: "#F5DEB3", white: "#FFFFFF", whitesmoke: "#F5F5F5", yellow: "#FFFF00", yellowgreen: "#9ACD32" };
+	const tabscore = document.getElementById('player-info');
+	tabscore.style.display = "block";
 
-	create_scoreboard(playername, playerid);
+	const colorpalette = { white: "#FFFFFF", black: "#000000", red: "#FF0000", green: "#00FF00", blue: "#0000FF", yellow: "#FFFF00", cyan: "#00FFFF", magenta: "#FF00FF", silver: "#C0C0C0", gray: "#808080", maroon: "#800000", olive: "#808000", purple: "#800080", teal: "#008080", navy: "#000080", orange: "#FFA500", lime: "#00FF00", aqua: "#00FFFF", fuchsia: "#FF00FF", brown: "#A52A2A", papayawhip: "#FFEFD5", peachpuff: "#FFDAB9", peru: "#CD853F", pink: "#FFC0CB", plum: "#DDA0DD", powderblue: "#B0E0E6", purple: "#800080", red: "#FF0000", rosybrown: "#BC8F8F", royalblue: "#4169E1", saddlebrown: "#8B4513", salmon: "#FA8072", sandybrown: "#F4A460", seagreen: "#2E8B57", seashell: "#FFF5EE", sienna: "#A0522D", silver: "#C0C0C0", skyblue: "#87CEEB", slateblue: "#6A5ACD", slategray: "#708090", snow: "#FFFAFA", springgreen: "#00FF7F", steelblue: "#4682B4", tan: "#D2B48C", teal: "#008080", thistle: "#D8BFD8", tomato: "#FF6347", turquoise: "#40E0D0", violet: "#EE82EE", wheat: "#F5DEB3", white: "#FFFFFF", whitesmoke: "#F5F5F5", yellow: "#FFFF00", yellowgreen: "#9ACD32" };
 
 	if (window.location.pathname === "/games/pong/multiplayer/")
 	{
@@ -105,6 +141,8 @@ async function loadPongMulti(){
 		// }, 1000);
 		//add score
 	}
+
+	
 
 	const colorset =
 	{
