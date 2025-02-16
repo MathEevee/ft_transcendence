@@ -922,6 +922,7 @@ function loadPong() {
 						})
 					})
 				}
+				gameId = null;
 			}
 			else if (gamemode === "online_tournament")
 			{

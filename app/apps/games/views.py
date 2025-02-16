@@ -103,7 +103,7 @@ def game_pong_online(request):
                 player2 = Player.objects.create(user = user2, game = game, team = None, is_host = False, is_IA = False)
                 player2.save()
                 return JsonResponse({"id": game.id})
-            elif ((data['ended_at'] != None) and Game.get(id=data['id']).ended_at == None):
+            elif ((data['ended_at'] != None) and Game.objects.get(id=data['id']).ended_at == None):
                 game = Game.objects.get(id=data['id'])
                 player1 = Player.objects.get(game = game, is_host = True)
                 player2 = Player.objects.get(game = game, is_host = False)

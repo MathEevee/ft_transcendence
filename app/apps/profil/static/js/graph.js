@@ -63,6 +63,8 @@ async function getGame(id) {
 
 function parse_data(data) {
     console.log(data);
+    if (data === null)
+        return "Error with the enregistrement of the date";
     var date = data.split('T')[0];
     date += '\n';
     date += data.split('T')[1].split('.')[0];
