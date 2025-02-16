@@ -105,15 +105,20 @@ class Tournament(models.Model):
 		PlayerEntry.objects.create(tournament=self, player=player, team_name=team_name)
 
 	def remove_player(self, player):
-		entry = self.get_player_entry(player)
-		entry.delete()
+		player_entry = self.player_entries.filter(player=player)
+		if not player_entry.exists():
+			raise ValueError(f"Player {player.username} is not in the tournament.")
+		player_entry.delete()
 
-	def add_match(self, team1, team2):
-		MatchEntry.objects.create(tournament=self, match=Match.objects.create(player1=team1, player2=team2))
+	def add_match(self, player1, player2):
+		if self.match_entries.filter(match__player1=player1, match__player2=player2).exists():
+			raise ValueError("Match already exists.")
+		match = Match.objects.create(player1=player1, player2=player2)
+		MatchEntry.objects.create(tournament=self, match=match)
 
-	def remove_match(self, team1, team2):
-		entry = self.get_match(team1, team2)
-		entry.delete()
+	def remove_match(self, player1, player2):
+		match = self.get_match(player1, player2)
+		match.delete()
 
 	def start(self):
 		if self.players.count() < 8:
@@ -134,8 +139,8 @@ class Tournament(models.Model):
 		self.save()
 		return self.winner
 	
-	def get_match(self, team1, team2):
-		return self.match_entries.get(team1=team1, team2=team2)
+	def get_match(self, player1, player2):
+		return self.match_entries.get(match__player1=player1, match__player2=player2)
 	
 	def get_player_entry(self, player):
 		return self.player_entries.get(player=player)
@@ -145,6 +150,9 @@ class Tournament(models.Model):
 	
 	def get_matches(self):
 		return  self.match_entries.all()
+	
+	def get_first_match(self):
+		return self.match_entries.first()
 	
 	def get_winner(self):
 		return self.winner

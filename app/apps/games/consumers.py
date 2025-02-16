@@ -5,6 +5,8 @@ from apps.authe.models import CustomUser, Tournament, PlayerEntry, MatchEntry, M
 from apps.games.models import Game, Player
 from asgiref.sync import sync_to_async
 from django.http import JsonResponse
+from collections import defaultdict
+from django.db import transaction
 
 
 class PongConsumer(AsyncWebsocketConsumer):
@@ -67,16 +69,11 @@ class PongConsumer(AsyncWebsocketConsumer):
 		data = json.loads(text_data)
 		message = data['message']
 		print("\033[31m" + f'{data}' + "\033[0m")
-		if message == 'start':
-			print('test')
-			# game = await sync_to_async(Game.objects.create)(type=data['typegame'], nb_players_required=2, started_at = datetime.datetime.fromtimestamp(data['started_at'] / 1000))
-			# username1 = await sync_to_async(CustomUser.objects.get)(username=data['player1'])
-			# player1 = await sync_to_async(Player.objects.create)(user=username1, game=game, team=None, is_host=True, is_IA=False)
-			# username2 = await sync_to_async(CustomUser.objects.get)(username=data['player2'])
-			# player2 = await sync_to_async(Player.objects.create)(user=username2, game=game, team=None, is_host=False, is_IA=False)
-		if message == 'end':
-			print('test')
-
+		if message == 'IAonly':
+			self.send(text_data=json.dumps({
+				'message': 'IAonly',
+			}))
+			return
 		if 'player' in data:
 			player = data['player']
 		else:
@@ -166,15 +163,8 @@ class PongTournoiConsumer(AsyncWebsocketConsumer):
 	async def receive(self, text_data):
 		data = json.loads(text_data)
 		message = data['message']
-		print("\033[31mtournament" + f'{data}' + "\033[0m")
+		# print("\033[31mtournament" + f'{data}' + "\033[0m")
 
-		if message == 'start':
-			print('test')
-			# game = await sync_to_async(Game.objects.create)(type=data['typegame'], nb_players_required=2, started_at = datetime.datetime.fromtimestamp(data['started_at'] / 1000))
-			# username1 = await sync_to_async(CustomUser.objects.get)(username=data['player1'])
-			# player1 = await sync_to_async(Player.objects.create)(user=username1, game=game, team=None, is_host=True, is_IA=False)
-			# username2 = await sync_to_async(CustomUser.objects.get)(username=data['player2'])
-			# player2 = await sync_to_async(Player.objects.create)(user=username2, game=game, team=None, is_host=False, is_IA=False)
 		if message == 'ready':
 			players_ready[data['player']].append(data['player'])
 			if len(players_ready) == 2:
@@ -209,24 +199,45 @@ class PongTournoiConsumer(AsyncWebsocketConsumer):
 		else:
 			score2 = None
 		if message == 'end':
-			players_winner_by_match[data['id']].append(data['winner'])
-			current_match = await sync_to_async(Match.objects.get)(id=data['match_id'])
-			current_match.set_winner()
-			current_match.set_ended()
-			current_match.save()
+			print("\033[31m" + f'{data}' + "\033[0m")
+			winner = await sync_to_async(CustomUser.objects.get)(username=data['winner'])
+			players_winner_by_match[winner].append(winner)
+			print("\033[31m" + f'{players_winner_by_match.values()}' + "\033[0m")
+			if data['tournament_type'] == 'pong':
+				types = True
+			else:
+				types = False
+			tournament = await sync_to_async(lambda: Tournament.objects.filter(type_pong=types).first())()
+			#delete match of the winner
+			player1 = await sync_to_async(CustomUser.objects.filter)(username=data['player1'])
+			player2 = await sync_to_async(CustomUser.objects.filter)(username=data['player2'])
+			if player1 != winner:
+				await sync_to_async(lambda: tournament.remove_player(player1))()
+			if player2 != winner:
+				await sync_to_async(lambda: tournament.remove_player(player2))()
+			match = await sync_to_async(lambda: tournament.get_first_match())()
+			if not match:
+				raise ValueError("Aucun match trouvé dans ce tournoi.")
+			await sync_to_async(lambda: match.delete(), thread_sensitive=True)()
 			if len(players_winner_by_match) == 2:
-				player1 = await sync_to_async(CustomUser.objects.get)(username=players_winner_by_match[0])
-				player2 = await sync_to_async(CustomUser.objects.get)(username=players_winner_by_match[1])
-				tounament = await sync_to_async(Tournament.objects.get)(id=data['tournament_id'])
-				tounament.create_next_match(player1, player2)
+				# print("\033[31m" + f'{players_winner_by_match}' + "\033[0m")
+				await sync_to_async(lambda: tournament.add_match(players_winner_by_match.popitem()[0], players_winner_by_match.popitem()[0]))()
 				players_winner_by_match.clear()
-				players_ready.clear()
-				tounament.save()
+			if await sync_to_async(lambda: tournament.match_entries.count())() == 0:
+				await sync_to_async(tournament.end)()
+				await sync_to_async(tournament.set_winner)(winner)
+				await self.send(text_data=json.dumps({
+					'message': 'end tournament the winner is' + winner.username,
+				}))
+				#delete le tournoi
+				await sync_to_async(tournament.delete)()
+				return
+			await self.send_to_all('next_match')
 			return
-
-
 		await self.send_to_all(message, player, ball, playery, ballx, bally, score1, score2)
 
+
+#SPACE BATTLE==========================================================================================================
 
 class SpaceConsumer(AsyncWebsocketConsumer):
 
@@ -241,17 +252,16 @@ class SpaceConsumer(AsyncWebsocketConsumer):
 				'message': f'{self.user.username} connected',
 			}))
 
-	async def send_to_all(self, message, player=None, ball=None, playery=None, ballx=None, bally=None, score1=None, score2=None):
+	async def send_to_all(self, message, player=None, bullets=None, playerx=None, playery=None, bulletx=None, life=None, bullet=None):
 		for socket in user_sockets:
 			await socket.send(text_data=json.dumps({
 				'message': message,
 				'player': player,
-				'ball': ball,
+				'bullets': bullets,
+				'x': playerx,
 				'y': playery,
-				'ballx': ballx,
-				'bally': bally,
-				'score1': score1,
-				'score2': score2,
+				'life': life,
+				'bullet': bullet,
 			}))
 
 	async def connect(self):
@@ -287,11 +297,7 @@ class SpaceConsumer(AsyncWebsocketConsumer):
 	async def receive(self, text_data):
 		data = json.loads(text_data)
 		message = data['message']
-		print("\033[31m" + f'{data}' + "\033[0m")
-		if message == 'start':
-			print('test')
-			# game = await sync_to_async
-
+		await self.send_to_all(message, data.get('player'), data.get('bullets'), data.get('playerx'), data.get('playery'), data.get('bulletx'), data.get('life'), data.get('bullet'))
 
 class SpaceTournoiConsumer(AsyncWebsocketConsumer):
 
@@ -306,17 +312,16 @@ class SpaceTournoiConsumer(AsyncWebsocketConsumer):
 				'message': f'{self.user.username} connected',
 			}))
 
-	async def send_to_all(self, message, player=None, ball=None, playery=None, ballx=None, bally=None, score1=None, score2=None):
+	async def send_to_all(self, message, player=None, bullets=None, playerx=None, playery=None, bulletx=None, life=None, bullet=None):
 		for socket in user_sockets:
 			await socket.send(text_data=json.dumps({
 				'message': message,
 				'player': player,
-				'ball': ball,
+				'bullets': bullets,
+				'x': playerx,
 				'y': playery,
-				'ballx': ballx,
-				'bally': bally,
-				'score1': score1,
-				'score2': score2,
+				'life': life,
+				'bullet': bullet,
 			}))
 
 	async def connect(self):
@@ -352,9 +357,51 @@ class SpaceTournoiConsumer(AsyncWebsocketConsumer):
 	async def receive(self, text_data):
 		data = json.loads(text_data)
 		message = data['message']
-		print("\033[31m" + f'{data}' + "\033[0m")
-
-		await self.send_to_all(message)
+		if message == 'end':
+			print("\033[31m" + f'{data}' + "\033[0m")
+			winner = await sync_to_async(CustomUser.objects.get)(username=data['winner'])
+			players_winner_by_match[winner].append(winner)
+			print("\033[31m" + f'{players_winner_by_match.values()}' + "\033[0m")
+			if data['tournament_type'] == 'pong':
+				types = True
+			else:
+				types = False
+			tournament = await sync_to_async(lambda: Tournament.objects.filter(type_pong=types).first())()
+			print("\033[31m" + f'{tournament}' + "\033[0m")
+			if not tournament:
+				await self.send_to_all('Tournament not found')
+				return
+			#delete match of the winner
+			player1 = await sync_to_async(CustomUser.objects.filter(username=data['player1']).first, thread_sensitive=True)()
+			player2 = await sync_to_async(CustomUser.objects.filter(username=data['player2']).first, thread_sensitive=True)()
+			if not player1 or not player2:
+				await self.send_to_all('Player not found')
+				return
+			if player1 == winner:
+				await sync_to_async(lambda: tournament.remove_player(player2))()
+			else:
+				await sync_to_async(lambda: tournament.remove_player(player1))()
+			match = await sync_to_async(lambda: tournament.get_first_match())()
+			if not match:
+				raise ValueError("Aucun match trouvé dans ce tournoi.")
+			await sync_to_async(lambda: match.delete(), thread_sensitive=True)()
+			if len(players_winner_by_match) == 2:
+				# print("\033[31m" + f'{players_winner_by_match}' + "\033[0m")
+				await sync_to_async(lambda: tournament.add_match(players_winner_by_match.popitem()[0], players_winner_by_match.popitem()[0]))()
+				players_winner_by_match.clear()
+			if await sync_to_async(lambda: tournament.match_entries.count())() == 0:
+				await sync_to_async(tournament.end)()
+				await sync_to_async(tournament.set_winner)(winner)
+				await self.send(text_data=json.dumps({
+					'message': 'end tournament the winner is ' + winner.username,
+				}))
+				#delete le tournoi
+				await sync_to_async(tournament.delete)()
+				return
+			await self.send_to_all('next_match')
+			print("\033[31m" + "sending next match" + "\033[0m")
+			return
+		await self.send_to_all(message, data.get('player'), data.get('bullets'), data.get('playerx'), data.get('playery'), data.get('bulletx'), data.get('life'), data.get('bullet'))
 
 		
 class MultiPlayerConsumer(AsyncWebsocketConsumer):

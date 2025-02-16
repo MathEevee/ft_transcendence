@@ -67,6 +67,16 @@ async function clearPlayerList()
 	}
 }
 
+async function istheOnlyPlayer(playerss)
+{
+	for (let i = 0; i < playerss.length; i++)
+	{
+		if (!(playerss[i].player.username.startsWith('AI_')) && playerss[i].player.username !== await getUserName())
+			return false;
+	}
+	return true;
+}
+
 async function displayPlayerTournament()
 {
 	if (window.location.pathname !== '/games/pong/tournament/' && window.location.pathname !== '/games/spaceinvaders/tournament/')
@@ -76,7 +86,6 @@ async function displayPlayerTournament()
 	const data = await response.json();
 	const tabplayers = document.getElementById('games-table');
 
-	console.log("data", data);
 	for (let i = 0; i < data.length; i++)
 	{
 		if (data[i].type_pong === tournamentId)
@@ -110,6 +119,13 @@ async function displayPlayerTournament()
 				{
 					inviteButton.style.display = 'block';
 					inviteButton.disabled = false;
+					if (await istheOnlyPlayer(playerss))
+					{
+						cell.style.color = 'yellow';
+						teamcell.style.color = 'yellow';
+						startButton.style.display = 'block';
+
+					}
 				}
 			}
 		}
@@ -121,7 +137,6 @@ function startmatchmaking()
 	if (window.location.pathname !== '/games/pong/tournament/' && window.location.pathname !== '/games/spaceinvaders/tournament/')
 		return;
 	const playersList = Array.from(players);
-	console.log(playersList);
 	const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 	fetch('/authe/api/tournaments/matchmaking/', {
 		method: 'POST',
@@ -169,12 +184,6 @@ async function filltournament(playersList)
 	}).then(response => response.json()).then(response => {
 		if (response.error)
 			console.warn(`Error filling tournament: ${response.error}`);
-		else
-		{
-			playersList = response.players;
-			console.log('Tournament filled', playersList);
-		}
-	console.log('Tournament filled', playersList);
 	})
 	.catch(err => {
 		console.error(`Error filling tournament: ${err}`);
@@ -189,8 +198,11 @@ async function startTournoi()
 	if (playersList.length < 8)
 		await filltournament(playersList);
 	else
-		await startmatchmaking();
-
+	{
+		setTimeout(async () => {
+			await startmatchmaking();
+		}, 500);
+	}
 }
 
 async function checkPlayer(playername)
@@ -280,8 +292,6 @@ async function setupPlayerList()
 
 					inviteButton.style.display = 'block';
 					inviteButton.disabled = false;
-
-					console.log(players);
 				}
 			})
 			.catch(err => {
@@ -296,17 +306,19 @@ async function setupPlayerList()
 			allconversations["other"] = [];
 		allconversations["other"].push({
 			'from': 'Tournament',
-			'message': 'The tournament is starting',
+			'message': 'The ' + (tournamentId ? 'Pong' : 'Space Battle') + ' tournament is starting',
 		});
 		for (let i = 0; i < players.length; i++)
 		{
 			socket.send(JSON.stringify({
 				'to': players[i].player.username,
-				'message': 'The tournament is starting',
+				'message': 'The ' + (tournamentId ? 'Pong' : 'Space Battle') + ' tournament is starting',
 			}));
 		}
 		startTournoi();
+		setTimeout(() => {
 		changePage('/games/'+(tournamentId ? 'pong' : 'spaceinvaders')+ '/online/tournament/', false);
+		}, 1000);
 		//todo send request to start the tournament
 		//todo send request to add in db the match history
 	});

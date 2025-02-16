@@ -19,6 +19,7 @@ from .models import CustomUser, Message, Tournament, PlayerEntry, Match, MatchEn
 from .forms import RegistrationForm, LoginForm, UserSettingsForm
 from .serializer import CustomUserSerializer, TournamentSerializer, MatchSerializer
 from random import randint
+from django.db.models import Count
 from .decorators import logout_required
 
 logger = logging.getLogger(__name__)
@@ -29,8 +30,9 @@ def auth_with_42(request):
 	# redirect_uri = '<VOTRE_REDIRECT_URI>'
 	redirect_uri = request.build_absolute_uri(reverse('authe:auth_callback'))
 	tmpsplit = redirect_uri.split('/')
-	tmpsplit[2] += ':8080'
+	tmpsplit[0] = 'https:'
 	redirect_uri = '/'.join(tmpsplit)
+	print("\033[1;32mredirect_uri: ", redirect_uri, "\033[0m")
 	scope = 'public'  # Demande d'accès aux informations publiques de l'utilisateur
 	auth_url = f'https://api.intra.42.fr/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}'
 	return redirect(auth_url)
@@ -44,8 +46,9 @@ def auth_callback(request):
 		return redirect('/')  # Rediriger vers page home
 	redirect_uri = request.build_absolute_uri(reverse('authe:auth_callback'))
 	tmpsplit = redirect_uri.split('/')
-	tmpsplit[2] += ':8080'
+	tmpsplit[0] = 'https:'
 	redirect_uri = '/'.join(tmpsplit)
+	print("\033[1;32mredirect_uri: ", redirect_uri, "\033[0m")
 
 	# Préparer la requête pour obtenir un token
 	token_url = 'https://api.intra.42.fr/oauth/token'
@@ -354,42 +357,66 @@ class MatchmakingAPIView(APIView):
 			status=status.HTTP_200_OK,
 	)
 
+
 class FillTournamentAPIView(APIView):
 	permission_classes = [AllowAny]
 
 	def get(self, request):
-		# Récupérer les tournois
+		# Récupérer tous les tournois
 		tournaments = Tournament.objects.all()
 		serializer = TournamentSerializer(tournaments, many=True)
 		return Response(serializer.data)
-	
+
 	def post(self, request, *args, **kwargs):
 		# Récupérer les données envoyées par le POST
-		tournament_id = request.data.get('tournament_id')
-		nb_players = request.data.get('nb_players')
+		tournament_type = request.data.get('tournament_type')  # Renommé pour éviter confusion avec un ID
+		nb_players = int(request.data.get('nb_players', 0))
 
-		# Récupérer le tournoi
-		tournament = get_object_or_404(Tournament, type_pong=tournament_id)
+		# Vérifier le type de tournoi
+		if tournament_type == 'pong':
+			type_pong = True
+			tournamentName = "Pong"
+		else:
+			type_pong = False
+			tournamentName = "SpaceBattle"
 
-		# Vérifier si le tournoi est plein
+		# Récupérer le tournoi correspondant
+		tournament = Tournament.objects.filter(type_pong=type_pong).annotate(player_count=Count('player_entries')).first()
+		if not tournament:
+			return Response({"error": "No tournament found for this type."}, status=status.HTTP_404_NOT_FOUND)
+
+		print(f"\033[1;32mFilling tournament {tournament.player_entries.count()}...\033[0m")
+
+		# Vérifier si le tournoi est déjà plein
 		if tournament.player_entries.count() >= 8:
 			return Response(
 				{"error": "Tournament is already full."},
 				status=status.HTTP_400_BAD_REQUEST,
 			)
 
-		if tournament_id:
-			tournamentName = "Pong"
-		else:
-			tournamentName = "SpaceBattle"
+		# Supprimer uniquement les IA associées à CE tournoi
+		for player in tournament.player_entries.all():
+			if player.player.username.startswith("AI_") and tournament.player_entries.filter(player=player.player).exists():
+				print(f"\033[1;32mRemoving AI player {player.player.username}...\033[0m")
+				tournament.remove_player(player.player)
 
-		# ajouter des ia
-		print(f"\033[1;32mAdding {8 - nb_players} AI players to the tournament...\033[0m")
-		for i in range(8 - nb_players):
-			player = CustomUser.objects.create(username=f"AI_{i + nb_players}_{tournamentName}", email=f"ia@{i + nb_players}_{tournamentName}.com")
-			player.save()
-			if tournament.player_entries.count() <= 7:
-				tournament.add_player(player, team_name=f"AI_of_the_doom_{i + nb_players}")
+		# Vérifier combien de places sont encore disponibles
+		remaining_slots = 8 - tournament.player_entries.count()
+
+		print(f"\033[1;32mAdding {remaining_slots} AI players to the tournament...\033[0m")
+		for i in range(remaining_slots):
+			ai_username = f"AI_{i + 1}_{tournamentName}"
+			ai_email = f"ia_{i + 1}_{tournamentName}@example.com"
+
+			# Vérifier si l'IA existe déjà
+			ai_player, created = CustomUser.objects.get_or_create(username=ai_username, defaults={'email': ai_email})
+			if created:
+				print(f"\033[1;32mCreated AI player {ai_username}\033[0m")
+
+			# Ajouter l'IA au tournoi
+			tournament.add_player(ai_player, team_name=f"AI_of_the_doom_{i + 1}")
+
+		tournament.matchmaking = False
 		tournament.save()
 
 		# Réponse réussie
@@ -397,7 +424,8 @@ class FillTournamentAPIView(APIView):
 			{
 				"message": "Tournament filled with AI players.",
 				"tournament_id": tournament.id,
-				"nb_players": nb_players,
+				"nb_players": tournament.player_entries.count(),
 			},
 			status=status.HTTP_200_OK,
-	)
+		)
+

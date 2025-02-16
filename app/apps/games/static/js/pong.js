@@ -19,6 +19,7 @@ function loadPong() {
 	let readybutton;
 	let pongtournamentsocket;
 	var gameId = null;
+	let tournament_id;
 	chatbox.style.display = "none";
 	
 	async function getUserName() {
@@ -62,7 +63,8 @@ function loadPong() {
 	const player2 = { x: canvas.width - paddleWidth, y: canvas.height / 2 - paddleHeight / 2, width: paddleWidth, height: paddleHeight, dy: 0 , ismoving: false};
 	
 	let beplayer = player1;
-	let is_host = 1;
+	let is_host = true;
+	let doubleia = 0;
 	// Gamemode
 	var gamemode = "";
 	if (window.location.pathname === "/games/pong/local/")
@@ -100,6 +102,7 @@ function loadPong() {
 	let option = 0;
 
 	let playeria = player2;
+	let matchId = 0;
 	
 	//options
 	const colorpalette = ["#FFFFFF", "#000000", "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"];
@@ -179,56 +182,161 @@ function loadPong() {
 
 	function isIA(player)
 	{
-		if (player.includes("AI") || player.includes("ai"))
+		if (player.includes("AI"))
 			return true;
 		return false;
 	}
 
-	function playerready()
+	async function fetchNewlatch()
+	{
+		let response = await fetch('/authe/api/tournaments/');
+		let data = await response.json();
+		let tournament;
+
+		for (let i = 0; i < data.length; i++)
+		{
+			if (data[i].type_pong === true)
+			{
+				tournament = data[i];
+				break;
+			}
+		}
+
+		if (tournament === undefined)
+			return ;
+		//delete all match
+		const matchlist = document.getElementById("match-list");
+		while (matchlist.firstChild)
+			matchlist.removeChild(matchlist.firstChild);
+
+		if (tournament.match_entries.length === 0)
+			return ;
+		for (let i = 0; i < tournament.match_entries.length; i++)
+			putMatchList(tournament.match_entries[i]);
+	}
+
+	function inittournamentsocket()
+	{
+		if (pongtournamentsocket)
+			return ;
+		pongtournamentsocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/tournament/`);
+		pongtournamentsocket.onopen = async () =>
+		{
+			console.log('connected to pong tournament');
+		}
+		pongtournamentsocket.onmessage = async (e) =>
+		{
+			const data = JSON.parse(e.data);
+			// console.log("data", data);
+			if (data.message === 'start')
+				startPong();
+			else if (data.message === 'move')
+			{
+				if (data.player === 'player1')
+					player1.y = data.y;
+				else if (data.player === 'player2')
+					player2.y = data.y;
+				if (data.ballx && data.bally)
+				{
+					ball.x = data.ballx;
+					ball.y = data.bally;
+				}
+			}
+			else if (data.message === 'point')
+			{
+				score1 = data.score1;
+				score2 = data.score2;
+				if (score1 === 5 || score2 === 5)
+				{
+					clearendgame();
+					start = 0;
+					matchId++;
+					setTimeout(async  () => {
+						await fetchNewlatch();
+						startMatch(null);
+					} , 2000);
+				}
+			}
+			else if (data.message.includes('end tournament'))
+			{
+				console.log("end tournament");
+				start = 0;
+				context.clearRect(0, 0, canvas.width, canvas.height);
+				context.fillText(data.message, canvas.width / 2 - sizeofstringdisplayed(data.message).width / 2, canvas.height / 2);
+				putplayerinmatch("", "");
+			}
+
+		}
+		pongtournamentsocket.onclose = () =>
+		{
+			console.log('disconnected from pong tournament');
+			pongtournamentsocket = null;
+		}
+	}
+
+	async function playerready()
 	{
 		readybutton.style.display = "none";
-		pongtournamentsocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/tournament/`);
-		pongtournamentsocket.onopen = async () => {
-			console.log('connected to pong tournament');
+		if (pongtournamentsocket)
+		{
 			pongtournamentsocket.send(JSON.stringify({
 				'message': 'ready',
 				'player': await getUserName(),
 			}));
-
-			pongtournamentsocket.onmessage = async (e) => {
-				const data = JSON.parse(e.data);
-				console.log("data", data);
-				if (data.message === 'start')
-					startPong();
-				else if (data.message === 'move')
-				{
-					if (data.player === 'player1')
-						player1.y = data.y;
-					else if (data.player === 'player2')
-						player2.y = data.y;
-				}
-				else if (data.message === 'point')
-				{
-					score1 = data.score1;
-					score2 = data.score2;
-				}
-				else if (data.message === 'end')
-				{
-					start = 0;
-					clearendgame();
-				}
-			}
 		}
-
 		if (iaisactive === 1)
 			startPong();
+	}
+
+	async function isRealHost()
+	{
+		const response = await fetch('/authe/api/tournaments/');
+		const data = await response.json();
+		let tournament;
+		let all_ia = 1;
+
+		for (let i = 0; i < data.length; i++)
+		{
+			if (data[i].type_pong === true)
+			{
+				tournament = data[i];
+				break;
+			}
+		}
+		if (tournament === undefined)
+			return false;
+		for (let i = 0; i < tournament.player_entries.length; i++)
+		{
+			if (tournament.player_entries[i].player.username === await getUserName() && tournament.player_entries[i].is_host === true)
+			{
+				all_ia = 0;
+				return true;
+			}
+			if (!tournament.player_entries[i].player.username.startsWith("AI_"))
+				all_ia = 0;
+		}
+		if (all_ia === 1)
+			return true;
+		return false;
 	}
 	
 	async function startMatch(match)
 	{
 		const matchlist = document.getElementById("match-list");
-		const playerone = match.player1;
-		const playertwo = match.player2;
+		if (matchlist.childElementCount === 0)
+			return ;
+		let playerone;
+		let playertwo;
+		if (match)
+		{
+			playerone = match.player1;
+			playertwo = match.player2;
+		}
+		else
+		{
+			playerone = matchlist.firstChild.firstChild.textContent.split(" vs ")[0];
+			playertwo = matchlist.firstChild.firstChild.textContent.split(" vs ")[1];
+		}
 	
 		if (playerone === undefined || playertwo === undefined)
 			return ;
@@ -237,6 +345,7 @@ function loadPong() {
 		putplayerinmatch(playerone, playertwo);
 		if (playerone === await getUserName() || playertwo === await getUserName())
 		{
+			doubleia = 0;
 			if (!allconversations["other"])
 				allconversations["other"] = [];
 			allconversations["other"].push({
@@ -247,15 +356,15 @@ function loadPong() {
 			if (playerone === await getUserName())
 			{
 				beplayer = player1;
-				is_host = 1;
+				is_host = true;
 			}
 			else
 			{
 				beplayer = player2;
 				if (isIA(playerone))
-					is_host = 1;
+					is_host = true;
 				else
-					is_host = 0;
+					is_host = false;
 			}
 		}
 		if (isIA(playerone))
@@ -268,7 +377,18 @@ function loadPong() {
 			playeria = player2;
 			iaisactive = 1;
 		}
-
+		if (isIA(playerone) && isIA(playertwo))
+		{
+			doubleia = 1;
+			is_host = await isRealHost();
+			if (is_host && pongtournamentsocket)
+			{
+				pongtournamentsocket.send(JSON.stringify({
+					'message': 'start',
+				}));
+				startPong();
+			}
+		}
 		readybutton.addEventListener('click', playerready);
 	}
 	
@@ -292,23 +412,23 @@ function loadPong() {
 
 		redbutton.disabled = true;
 		redbutton.style.display = "none";
-
+		
 		for (let i = 0; i < data.length; i++)
 		{
 			if (data[i].type_pong === true)
-			{
-				tournament = data[i];
-				break;
+				{
+					tournament = data[i];
+					tournament_id = tournament.id;
+					break;
+				}
 			}
-		}
-	
+			
 		if (tournament === undefined)
 			return ;
-	
-		console.log(tournament);
+		inittournamentsocket();
 		for (let i = 0; i < tournament.match_entries.length; i++)
 			putMatchList(tournament.match_entries[i]);
-	
+		
 		await startMatch(tournament.match_entries[0]);
 		tournament.match_entries.pop();
 	}
@@ -515,7 +635,7 @@ function loadPong() {
 	/* Mouvement des raquettes */
 	document.addEventListener("keydown", (event) =>
 	{
-		if (chatbox.style.display !== "none")
+		if (chatbox.style.display !== "none" || start === 0 || doubleia === 1)
 			return ;
 		else if (start === 1)
 			keyhookdownforgame(event);
@@ -621,11 +741,35 @@ function loadPong() {
 			player2.y += player2.dy;
 			player2.y = Math.max(Math.min(player2.y, canvas.height - paddleHeight), 0);
 		}
-		if (iaisactive === 1)
+		if (iaisactive === 1 && is_host === true)
 		{
-			if ((AItouch === 0 && playeria === player2) || (AItouch === 1 && playeria === player1))
+			if (doubleia === 0)
 			{
-				if (playeria === player2)
+				if ((AItouch === 0 && playeria === player2) || (AItouch === 1 && playeria === player1))
+				{
+					if (playeria === player2)
+					{
+						if (AIdest > player2.y && AIdest < player2.y + paddleHeight)
+							return ;
+						if (player2.y < AIdest)
+							player2.y += speed;
+						else if (player2.y > AIdest)
+							player2.y -= speed;
+					}
+					else if (playeria === player1)
+					{
+						if (AIdest > player1.y && AIdest < player1.y + paddleHeight)
+							return ;
+						if (player1.y < AIdest)
+							player1.y += speed;
+						else if (player1.y > AIdest)
+							player1.y -= speed;
+					}
+				}
+			}
+			else if (doubleia === 1)
+			{
+				if (AItouch === 0)
 				{
 					if (AIdest > player2.y && AIdest < player2.y + paddleHeight)
 						return ;
@@ -634,7 +778,7 @@ function loadPong() {
 					else if (player2.y > AIdest)
 						player2.y -= speed;
 				}
-				else
+				if (AItouch === 1)
 				{
 					if (AIdest > player1.y && AIdest < player1.y + paddleHeight)
 						return ;
@@ -720,13 +864,13 @@ function loadPong() {
 					}
 				}
 		}
-		else if (beplayer === player2 && is_host === 1)
+		else if (beplayer === player2 && is_host === true && pongtournamentsocket)
 		{
 			if (ball.x < 0)
-				score1++;
-			else
 				score2++;
-			if (is_host)
+			else
+				score1++;
+			if (is_host && pongtournamentsocket)
 			{
 				pongtournamentsocket.send(JSON.stringify({
 					'message': 'point',
@@ -740,14 +884,10 @@ function loadPong() {
 			clearendgame();
 			if (gamemode === "online")
 			{
-				if (gamesocket)
+				if (gamesocket && gameId)
 				{
 					gamesocket.send(JSON.stringify({
 						'message': 'end',
-						// 'player1':divofbox.childNodes[0].textContent,
-						// 'player2':divofbox.childNodes[1].textContent,
-						// 'ended_at': Date.now(),
-						// 'typegame': 'Pong 1v1',
 					}));
 					fetch('/games/pong_online/', {
 						method: 'POST',
@@ -762,19 +902,11 @@ function loadPong() {
 							'score2': score2,
 						})
 					})
-					.then(response => response.json())
-					.then(data => {
-						gameId = null;
-					})
 				}
-				else if (bebousocket)
+				else if (bebousocket && gameId)
 				{
 					bebousocket.send(JSON.stringify({
 						'message': 'end',
-						// 'player1':divofbox.childNodes[0].textContent,
-						// 'player2':divofbox.childNodes[1].textContent,
-						// 'ended_at': Date.now(),
-						// 'typegame': 'Pong 1v1',
 					}));
 					fetch('/games/pong_online/', {
 						method: 'POST',
@@ -788,22 +920,22 @@ function loadPong() {
 							'score1': score1,
 							'score2': score2,
 						})
-					})
-					.then(response => response.json())
-					.then(data => {
-						gameId = null;
 					})
 				}
 			}
 			else if (gamemode === "online_tournament")
 			{
-				if (is_host)
+				if (is_host && pongtournamentsocket)
 				{
 					pongtournamentsocket.send(JSON.stringify({
 						'message': 'end',
 						'score1': score1,
 						'score2': score2,
 						'winner': score1 === 5 ? document.getElementById("player1").textContent : document.getElementById("player2").textContent,
+						'match_id': matchId,
+						'player1': document.getElementById("player1").textContent, 
+						'player2': document.getElementById("player2").textContent,
+						'tournament_type': window.location.pathname.split("/")[2],
 					}));
 				}
 			}
@@ -941,8 +1073,12 @@ function loadPong() {
 	
 	function loop()
 	{
-		if (update() || start === 0)
-			return 1;
+		// is_host = is_host === 1 ? true : false;
+		if (is_host === true)
+		{
+			if (update() || start === 0)
+				return 1;
+		}
 		draw();
 		requestAnimationFrame(loop);
 	}
@@ -992,17 +1128,37 @@ function loadPong() {
 		}
 		else if (gamemode === "online_tournament" && start === 1)
 		{
-			if (is_host === 1)
+			if (is_host === true || doubleia === 1)
 			{
 				setInterval(async () =>
 				{
 					if (start === 0)
 						return ;
-					pongtournamentsocket.send(JSON.stringify({
-						'message': 'move',
-						'player': await getUserName(),
-						'y': beplayer === player1 ? player1.y : player2.y,
-					}));
+					if (pongtournamentsocket && doubleia === 0)
+					{
+						pongtournamentsocket.send(JSON.stringify({
+							'message': 'move',
+							'player': await getUserName(),
+							'y': beplayer === player1 ? player1.y : player2.y,
+						}));
+					}
+					else if (pongtournamentsocket && doubleia === 1 && is_host === true)
+					{
+						pongtournamentsocket.send(JSON.stringify({
+							'message': 'move',
+							'player': "player1",
+							'bally': ball.y,
+							'ballx': ball.x,
+							'y': player1.y,
+						}));
+						pongtournamentsocket.send(JSON.stringify({
+							'message': 'move',
+							'player': "player2",
+							'bally': ball.y,
+							'ballx': ball.x,
+							'y': player2.y,
+						}));
+					}
 				}, 1000 / 20);
 			}
 		}
@@ -1010,12 +1166,12 @@ function loadPong() {
 	
 	function startPong()
 	{
-		if (start === 1 || (option === 1 && gamemode !== "online"))
+		if (start === 1)
 			return ;
 		initvariables();
 		countdown();
 		start = 1;
-		if (iaisactive === 1 && start === 1)
+		if (iaisactive === 1 && start === 1 && is_host === true)
 		{
 			fetch('/games/local-ia-start/', {
 				method: 'POST',
@@ -1036,7 +1192,7 @@ function loadPong() {
 				interval = setInterval(updateAI, 1000);
 			}, 5000);
 		}
-		if ((gamemode === "online" || gamemode === "online-tournament") && start === 1)
+		if ((gamemode === "online" || gamemode === "online_tournament") && start === 1)
 			setTimeout(sendmove, 5000);
 		setTimeout(loop, 5000);
 	}
@@ -1152,6 +1308,7 @@ function loadPong() {
 
 	if (gamemode === "online" && joinagame)
 	{
+		// is_host = false;
 		if (bebousocket == undefined)
 			bebousocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/`)
 		beplayer = player2;
@@ -1248,6 +1405,7 @@ function loadPong() {
 						})
 						.then(async response => await response.json())
 						.then(data => {
+							console.log(data.id);
 							gameId = data.id;
 						})
 					}
@@ -1272,6 +1430,7 @@ function loadPong() {
 						})
 						.then(async response => await response.json())
 						.then(data => {
+							console.log(data.id);
 							gameId = data.id;
 						})
 					}
