@@ -5,10 +5,52 @@ import { sizeofstringdisplayed } from "/static/js/pongMulti/utils.js";
 import { lasthit } from "/static/js/pongMulti/player.js";
 import { setPageDestructor } from "/static/js/index.js";
 
+function update_score(score1, score2, score3, score4)
+{
+	document.getElementById('player1').textContent = score1;
+	document.getElementById('player2').textContent = score2;
+	document.getElementById('player3').textContent = score3;
+	document.getElementById('player4').textContent = score4;
+}
+
+function set_new_id(playerid, username)
+{
+	let removed = 0;
+	document.getElementById('player1').textContent = '0';
+	document.getElementById('player2').textContent = '0';
+	document.getElementById('player3').textContent = '0';
+	document.getElementById('player4').textContent = '0';
+    let playerNames = document.querySelectorAll('#player-info .tournament-player h3');
+	if (playerNames[0].textContent === "Player 1" && playerNames[1].textContent !== "Player 2")
+	{
+		playerNames[0].textContent = playerNames[1].textContent;
+		playerNames[1].textContent = "Player 2";
+		removed++;
+	}
+	if (playerNames[1].textContent === "Player 2" && playerNames[2].textContent !== "Player 3")
+	{
+		playerNames[1].textContent = playerNames[2].textContent;
+		playerNames[2].textContent = "Player 3";
+		removed++;
+	}
+	if (playerNames[2].textContent === "Player 3" && playerNames[3].textContent !== "Player 4")
+	{
+		playerNames[2].textContent = playerNames[3].textContent;
+		playerNames[3].textContent = "Player 4";
+		removed++;
+	}
+	if (playerNames[3].textContent === "Player 4" && playerid === 5)
+		playerNames[3].textContent = username;
+	if (removed !== 0)
+	{
+		if (playerid > removed)
+			playerid -= removed;
+	}
+	return playerid;
+}
+
 function create_scoreboard(username, playerid)
 {
-    console.log('create scoreboard');
-	console.log('username',username, 'playerid',playerid);
     let playerNames = document.querySelectorAll('#player-info .tournament-player h3');
     
 	if (playerid === 1)
@@ -48,7 +90,6 @@ async function loadPongMulti(){
 	const paddleHeight = 75;
 	const paddleWidth = 5;
 	let is_host = true;
-	let close = false;
 	
 	var playername = "";
 	
@@ -67,6 +108,64 @@ async function loadPongMulti(){
 
 	if (socket === undefined)
 		socket = new WebSocket(wsURL);
+
+	function remove_in_tab(removed)
+	{
+		console.log("before playerid", playerid);
+		let playerNames = document.querySelectorAll('#player-info .tournament-player h3');
+		let removedid = 0;
+
+		if (playerNames[0].textContent === removed)
+			removedid = 1;
+		else if (playerNames[1].textContent === removed)
+			removedid = 2;
+		else if (playerNames[2].textContent === removed)
+			removedid = 3;
+		else if (playerNames[3].textContent === removed)
+			removedid = 4;
+
+		if (start === 0 && removedid !== 0)
+		{
+			for (let i = removedid - 1; i < 3; i++)
+			{
+				playerNames[i].textContent = playerNames[i + 1].textContent;
+				if (playerNames[i].textContent === "Player 3" && i === 1)
+					playerNames[i].textContent = "Player 2";
+				if (playerNames[i].textContent === "Player 4" && i === 2)
+					playerNames[i].textContent = "Player 3";
+				}
+			if (playerid > removedid)
+				playerid--;
+			if (playerid === 1)
+				is_host = true;
+			playerNames[3].textContent = "Player 4";
+		}
+		else if (start === 1 && removedid !== 0)
+		{
+			if (removedid === 1)
+				playerNames[0].textContent = "Player 1";
+			else if (removedid === 2)
+				playerNames[1].textContent = "Player 2";
+			else if (removedid === 3)
+				playerNames[2].textContent = "Player 3";
+			else if (removedid === 4)
+				playerNames[3].textContent = "Player 4";
+
+			if (removedid === 1)
+			{
+				if (playerNames[1].textContent !== "Player 2" && playerid === 2)
+					is_host = true;
+				else if (playerNames[1].textContent === "Player 2" && playerNames[2].textContent !== "Player 3" && playerid === 3)
+					is_host = true;
+				else if (playerNames[1].textContent === "Player 2" && playerNames[2].textContent === "Player 3" && playerNames[3].textContent !== "Player 4" && playerid === 4)
+					is_host = true;
+			}
+		}
+		console.log("removedid", removedid);
+		console.log("after playerid", playerid);
+		console.log("is_host", is_host);
+
+	}
 
 	setPageDestructor(() => {
 		console.log("destroying pong multiplayer (destructor fn)");
@@ -89,13 +188,10 @@ async function loadPongMulti(){
 
 	socket.onmessage = function (e) {
 		const data = JSON.parse(e.data);
-		console.log('ici',data);
 		if (data['message'] === "player_id")
 		{
-			console.log('ca passe la', data)
 			playerid = data['value'];
 			is_host = playerid === 1;
-			console.log("am i host", is_host);
 
 		}
 		if (data['message'] === "join")
@@ -103,9 +199,6 @@ async function loadPongMulti(){
 			if (all_players.includes(data.player) === false)
 			{
 				socket.send(JSON.stringify({ 'message': "join", 'player': playername , 'playerid': playerid}));
-				all_players.push(data.player);
-				console.log('check', data);
-				console.log('all_players', all_players);
 			}
 			create_scoreboard(data['player'], data['playerid']);
 		}
@@ -116,13 +209,7 @@ async function loadPongMulti(){
 		if (data['message'] === "disconnected")
 		{
 			let removeplayer = data['player'];
-			for (let i = 0; i < all_players.length; i++)
-			{
-				if (all_players[i] === removeplayer)
-					all_players[i] = null;
-			}
-			// print_score(player1, player2, player3, player4);
-			// reset score
+			remove_in_tab(removeplayer);
 		}
 	};
 
@@ -252,10 +339,13 @@ async function loadPongMulti(){
 		player2.y = 5;
 		player4.x = 5;
 		player4.y = 312.5;
-		socket.send(JSON.stringify({ 'message': "move player", 'playerid': 1, 'playerx': player1.x, 'playery': player1.y }));
-		socket.send(JSON.stringify({ 'message': "move player", 'playerid': 2, 'playerx': player2.x, 'playery': player2.y }));
-		socket.send(JSON.stringify({ 'message': "move player", 'playerid': 3, 'playerx': player3.x, 'playery': player3.y }));
-		socket.send(JSON.stringify({ 'message': "move player", 'playerid': 4, 'playerx': player4.x, 'playery': player4.y }));
+		if (socket.readyState === WebSocket.OPEN)
+		{
+			socket.send(JSON.stringify({ 'message': "move player", 'playerid': 1, 'playerx': player1.x, 'playery': player1.y }));
+			socket.send(JSON.stringify({ 'message': "move player", 'playerid': 2, 'playerx': player2.x, 'playery': player2.y }));
+			socket.send(JSON.stringify({ 'message': "move player", 'playerid': 3, 'playerx': player3.x, 'playery': player3.y }));
+			socket.send(JSON.stringify({ 'message': "move player", 'playerid': 4, 'playerx': player4.x, 'playery': player4.y }));
+		}
 	}
 
 	function setafterpoint(canvas, player1, player2, player3, player4, ball)
@@ -290,6 +380,7 @@ async function loadPongMulti(){
 			if (is_host === false && data['message'] === "end")
 			{
 				start = 0;
+				playerid = set_new_id(playerid, playername);
 				// print_score(player1, player2, player3, player4);
 				// reset score
 			}
@@ -330,7 +421,12 @@ async function loadPongMulti(){
 					t_game.player3.score++;
 				else if (data['playerid'] === 4)
 					t_game.player4.score++;
-				console.log("score", t_game.player1.score, t_game.player2.score, t_game.player3.score, t_game.player4.score);
+				update_score(t_game.player1.score, t_game.player2.score, t_game.player3.score, t_game.player4.score);
+			}
+			if (data['message'] === "disconnected")
+			{
+				let removeplayer = data['player'];
+				remove_in_tab(removeplayer);
 			}
 		};
 	let result = t_game.ball.update(canvas, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball);
@@ -491,7 +587,6 @@ async function loadPongMulti(){
 	
 	function initvariables()
 	{
-		console.log("init");
 		t_game.player1 = new Player(canvas.width / 2 - paddleHeight / 2, canvas.height - paddleWidth * 2, paddleHeight, paddleWidth, colorset.team1, speed);
 		t_game.player2 = new Player(canvas.width / 2 - paddleHeight / 2, paddleWidth, paddleHeight, paddleWidth, colorset.team2, speed);
 		t_game.player3 = new Player(canvas.width - paddleWidth * 2, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team3, speed);

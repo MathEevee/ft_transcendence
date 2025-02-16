@@ -403,12 +403,27 @@ class MultiPlayerConsumer(AsyncWebsocketConsumer):
 			await self.close()
 
 	async def disconnect(self, close_code):
-		await self.send_to_all(f'{self.user.username} disconnected')
-		await self.send(text_data=json.dumps({
-			'message': f"{self.user.username} disconnected",
-		}))
-		print("\033[31m" + f'{self.user.username} disconnected' + "\033[0m")
-		multi_player_games.remove(self)
+		print("\033[31m" + f'{self} disconnected' + "\033[0m")
+	
+		try:
+			await self.send_to_all(f'{self.user.username} disconnected')
+			await self.send(text_data=json.dumps({
+    	        'message': f"{self.user.username} disconnected",
+			}))
+		except Exception as e:
+			print("\033[33m" + f"Error sending disconnect message: {e}" + "\033[0m")
+
+		# Debugging: Vérifier si self est dans la liste
+		print("\033[34m" + f"multi_player_games before remove: {[id(obj) for obj in multi_player_games]}" + "\033[0m")
+		print("\033[34m" + f"Current self id: {id(self)}" + "\033[0m")
+
+		# Supprimer uniquement si présent
+		if self in multi_player_games:
+			multi_player_games.remove(self)
+			print("\033[32m" + f'{self.user.username} removed from multi_player_games' + "\033[0m")
+		else:
+			print("\033[33m" + f'Warning: {self.user.username} was not in multi_player_games' + "\033[0m")
+
 		await self.close()
 
 	async def receive(self, text_data):
