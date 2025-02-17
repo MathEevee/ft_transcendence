@@ -40,7 +40,9 @@ function set_new_id(playerid, username)
 		removed++;
 	}
 	if (playerNames[3].textContent === "Player 4" && playerid === 5)
+	{
 		playerNames[3].textContent = username;
+	}
 	if (removed !== 0)
 	{
 		if (playerid > removed)
@@ -111,7 +113,6 @@ async function loadPongMulti(){
 
 	function remove_in_tab(removed)
 	{
-		console.log("before playerid", playerid);
 		let playerNames = document.querySelectorAll('#player-info .tournament-player h3');
 		let removedid = 0;
 
@@ -133,7 +134,7 @@ async function loadPongMulti(){
 					playerNames[i].textContent = "Player 2";
 				if (playerNames[i].textContent === "Player 4" && i === 2)
 					playerNames[i].textContent = "Player 3";
-				}
+			}
 			if (playerid > removedid)
 				playerid--;
 			if (playerid === 1)
@@ -161,10 +162,6 @@ async function loadPongMulti(){
 					is_host = true;
 			}
 		}
-		console.log("removedid", removedid);
-		console.log("after playerid", playerid);
-		console.log("is_host", is_host);
-
 	}
 
 	setPageDestructor(() => {
@@ -199,7 +196,9 @@ async function loadPongMulti(){
 			if (all_players.includes(data.player) === false)
 			{
 				socket.send(JSON.stringify({ 'message': "join", 'player': playername , 'playerid': playerid}));
+				create_scoreboard(playername, playerid);
 			}
+			all_players.push(data.player);
 			create_scoreboard(data['player'], data['playerid']);
 		}
 		if (data['message'] === "start")
@@ -209,7 +208,11 @@ async function loadPongMulti(){
 		if (data['message'] === "disconnected")
 		{
 			let removeplayer = data['player'];
+			if (playerid === 5)
+				socket.send(JSON.stringify({ 'message': "join", 'player': playername , 'playerid': 4}));
 			remove_in_tab(removeplayer);
+			create_scoreboard(playername, playerid);
+			all_players = all_players.filter(e => e !== removeplayer);
 		}
 	};
 
@@ -377,10 +380,10 @@ async function loadPongMulti(){
 				t_game.ball.dy = data['balldy'];
 				t_game.ball.speed = data['ballspeed'];
 			}
-			if (is_host === false && data['message'] === "end")
+			if (is_host === false && data['message'] === "end" && start === 1)
 			{
 				start = 0;
-				playerid = set_new_id(playerid, playername);
+				return ;
 				// print_score(player1, player2, player3, player4);
 				// reset score
 			}
@@ -428,6 +431,31 @@ async function loadPongMulti(){
 				let removeplayer = data['player'];
 				remove_in_tab(removeplayer);
 			}
+			if (data['message'] === "start" && start === 0)
+			{
+				playerid = set_new_id(playerid, playername);
+				create_scoreboard(playername, playerid);
+				startPong();
+			}
+			if (data['message'] === "join" && start === 0)
+			{
+				if (all_players.includes(data.player) === false)
+				{
+					socket.send(JSON.stringify({ 'message': "join", 'player': playername , 'playerid': playerid}));
+					create_scoreboard(playername, playerid);
+				}
+				all_players.push(data.player);
+				create_scoreboard(data['player'], data['playerid']);
+			}
+			if (data['message'] === "disconnected")
+			{
+				let removeplayer = data['player'];
+				if (playerid === 5 && start === 0)
+					socket.send(JSON.stringify({ 'message': "join", 'player': playername , 'playerid': 4}));
+				remove_in_tab(removeplayer);
+				create_scoreboard(playername, playerid);
+				all_players = all_players.filter(e => e !== removeplayer);
+			}
 		};
 	let result = t_game.ball.update(canvas, t_game.player1, t_game.player2, t_game.player3, t_game.player4, t_game.ball);
 	if (is_host === true)
@@ -451,6 +479,9 @@ async function loadPongMulti(){
 		{
 			socket.send(JSON.stringify({ 'message': "end"}));
 			start = 0;
+			// create_scoreboard(playername, playerid);
+			// playerid = set_new_id(playerid, playername);
+			return ;
 		}
 	}
 	}
@@ -536,8 +567,6 @@ async function loadPongMulti(){
 			return ;
 		if (event.key === "r" || event.key === "R")
 			startPong();
-		else if (event.key === "p")
-			start = 0;
 		else if (event.key === "o" || event.key === "O")
 			toggleFullscreen(canvas);
 		if (start === 1)
@@ -620,6 +649,9 @@ async function loadPongMulti(){
 		else
 			t_game.ball.dy = -1;
 		start = 1;
+		if (is_host === true)
+			socket.send(JSON.stringify({'message':"start ball",
+			'ballx':t_game.ball.x, 'bally':t_game.ball.y ,'balldx':t_game.ball.dx, 'balldy':t_game.ball.dy, 'ballspeed':t_game.ball.speed}));
 		if (playerid === 1)
 		{
 			cplayer = t_game.player1;
@@ -642,11 +674,9 @@ async function loadPongMulti(){
 	{
 		if (start === 1)
 			return ;
-		start = 1;
 		// countdown();
 		// setTimeout(loop, 5000);
-		if (start === 1)
-			initvariables();
+		initvariables();
 		if (is_host === true)
 			socket.send(JSON.stringify({'message':"move ball",
 			'ballx':t_game.ball.x, 'bally':t_game.ball.y ,'balldx':t_game.ball.dx, 'balldy':t_game.ball.dy, 'ballspeed':t_game.ball.speed}));
@@ -668,6 +698,12 @@ async function loadPongMulti(){
 	wait();
 	redbutton.addEventListener("click", () =>
 	{
+		let playerNames = document.querySelectorAll('#player-info .tournament-player h3');
+		if (playerNames[3].textContent === "Player 4" && start === 0)
+		{
+			alert("You need to be 4 players to start the game");
+			return;
+		}
 		socket.send(JSON.stringify({ 'message': "start"}));
 		startPong();
 	});

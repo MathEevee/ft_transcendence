@@ -11,7 +11,7 @@ Profil
 
 {% block content %}
 {% include "navbar.html" %}
-<div class="row" style="margin:0;padding:0">
+<div class="row">
     <div class="col-md-8 offset-md-2">
         <h1 class="text-center">Profil</h1>
         <div class="card mt-4">
@@ -28,8 +28,7 @@ Profil
                 <p>Last login: {{ user.last_login|date:"F d, Y H:i" }}</p>
                 <img    src="{{ user.profil_picture }}"
                         alt="Photo de profil"
-                        class="img-thumbnail mx-auto d-block"
-                        style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
+                        class="img-thumbnail mx-auto d-block">
             </div>
         </div>
         <div class="mt-4">
