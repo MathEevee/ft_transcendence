@@ -150,8 +150,10 @@ def settings_view(request):
 			user = form.save(commit=False)
 
 			# Vérifier si un nouveau fichier est uploadé
-			if 'uploaded_picture' in request.FILES:
-				user.uploaded_picture = request.FILES['uploaded_picture']
+			uploaded_file = request.FILES.get('uploaded_picture', None)
+			if uploaded_file:
+				user.uploaded_picture.save(uploaded_file.name, uploaded_file, save=False)
+				user.profil_picture = "" # vide avatar par défaut
 			
 			user.save()
 			messages.success(request, "Modifications réussies !")

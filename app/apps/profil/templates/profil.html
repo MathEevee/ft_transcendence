@@ -26,8 +26,8 @@ Profil
                 <p>Email: {{ user.email }}</p>
                 <p>Joined: {{ user.date_joined|date:"F d, Y" }}</p>
                 <p>Last login: {{ user.last_login|date:"F d, Y H:i" }}</p>
-                <img    src="{{ user.profil_picture }}"
-                        alt="Photo de profil"
+                <img    src="{{ user.get_avatar_url }}"
+                        alt="Avatar"
                         class="img-thumbnail mx-auto d-block">
             </div>
         </div>
