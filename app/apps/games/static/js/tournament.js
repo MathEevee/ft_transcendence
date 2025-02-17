@@ -167,7 +167,6 @@ function startmatchmaking()
 async function filltournament(playersList)
 {
 	let nbplayers = playersList.length;
-
 	const csrftoken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 	await fetch('/authe/api/tournaments/fill/', {
 		method: 'POST',
@@ -177,7 +176,7 @@ async function filltournament(playersList)
 		},
 		body: JSON.stringify(
 			{
-				tournament_id: tournamentId,
+				tournament_type: tournamentId ? 'pong' : 'spaceinvaders',
 				nb_players: nbplayers,
 			}
 		),
@@ -300,7 +299,7 @@ async function setupPlayerList()
 			});
 	});
 	
-	startButton.addEventListener('click', () => {
+	startButton.addEventListener('click', async () => {
 
 		if (!allconversations["other"])
 			allconversations["other"] = [];
@@ -315,12 +314,10 @@ async function setupPlayerList()
 				'message': 'The ' + (tournamentId ? 'Pong' : 'Space Battle') + ' tournament is starting',
 			}));
 		}
-		startTournoi();
+		await startTournoi();
 		setTimeout(() => {
 		changePage('/games/'+(tournamentId ? 'pong' : 'spaceinvaders')+ '/online/tournament/', false);
 		}, 1000);
-		//todo send request to start the tournament
-		//todo send request to add in db the match history
 	});
 
 	inviteButton.addEventListener('keypress', async (e) => {

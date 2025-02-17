@@ -328,7 +328,7 @@ class MatchmakingAPIView(APIView):
 		for player in players:
 			print(f"\033[1;32m- {player}\033[0m")
 
-		# Créer les matchs aléatoirement
+		# Créer les matchs aléatoirement et sans doublons
 		matchs = []
 		for i in range(4):
 			team1 = players.pop(randint(0, len(players) - 1))
@@ -380,6 +380,7 @@ class FillTournamentAPIView(APIView):
 			type_pong = False
 			tournamentName = "SpaceBattle"
 
+		print(f"\033[1;32mFilling tournament {tournamentName}...\033[0m")
 		# Récupérer le tournoi correspondant
 		tournament = Tournament.objects.filter(type_pong=type_pong).annotate(player_count=Count('player_entries')).first()
 		if not tournament:

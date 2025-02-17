@@ -172,11 +172,10 @@ function loadPong() {
 			while (currentmatch[i].firstChild)
 				currentmatch[i].removeChild(currentmatch[i].firstChild);
 		}
-	
+		
 		player1name.textContent = player1;
-		currentmatch[0].appendChild(player1name);
-	
 		player2name.textContent = player2;
+		currentmatch[0].appendChild(player1name);
 		currentmatch[1].appendChild(player2name);
 	}
 
@@ -337,12 +336,11 @@ function loadPong() {
 			playerone = matchlist.firstChild.firstChild.textContent.split(" vs ")[0];
 			playertwo = matchlist.firstChild.firstChild.textContent.split(" vs ")[1];
 		}
-	
 		if (playerone === undefined || playertwo === undefined)
 			return ;
 	
-		matchlist.removeChild(matchlist.firstChild);
 		putplayerinmatch(playerone, playertwo);
+		matchlist.removeChild(matchlist.firstChild);
 		if (playerone === await getUserName() || playertwo === await getUserName())
 		{
 			doubleia = 0;

@@ -369,6 +369,7 @@ async function displayTournamentGame()
 	if (tournament === undefined)
 		return ;
 	inittournamentsocket();
+	console.log(tournament.match_entries);
 	for (let i = 0; i < tournament.match_entries.length; i++)
 		putMatchList(tournament.match_entries[i]);
 
@@ -874,7 +875,6 @@ function updateAI()
 	AIdest = {x: randomIntFromInterval(0, canvas.width), y: playeria === t_game.player1 ? randomIntFromInterval(50, canvas.height / 2 - 50) : randomIntFromInterval(canvas.height / 2 + 50, canvas.height - 80)};
 	if (doubleia)
 		AIdest2 = {x: randomIntFromInterval(0, canvas.width), y: randomIntFromInterval(canvas.height / 2 + 50, canvas.height - 80)};
-	// console.log(AIdest);
 }
 
 /*============================================GAME LOOP============================================*/
@@ -918,7 +918,7 @@ function countdown()
 	}, 1000);
 }
 
-function initvariables()
+async function initvariables()
 {
 	t_game = {
 		player1: new Player(canvas.width / 2 - 10, 50, 5, 5, 0, 0, 7, 0, 0, 0, 0, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10], 6),
@@ -957,7 +957,7 @@ function initvariables()
 			doubleia = 1;
 		if (player1.startsWith("AI_") || player2.startsWith("AI_"))
 			iaisactive = 1;
-		if (player1 === getUserName())
+		if (player1 === await getUserName())
 			beplayer = t_game.player1;
 		else
 			beplayer = t_game.player2;
