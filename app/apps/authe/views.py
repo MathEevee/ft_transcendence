@@ -145,10 +145,14 @@ def register_view(request):
 @login_required
 def settings_view(request):
 	if request.method == 'POST':
-		form = UserSettingsForm(request.POST, instance=request.user)
+		form = UserSettingsForm(request.POST, request.FILES, instance=request.user)
 		if form.is_valid():
 			user = form.save(commit=False)
-			user.profil_picture = request.POST.get('profil_picture', user.profil_picture)
+
+			# Vérifier si un nouveau fichier est uploadé
+			if 'uploaded_picture' in request.FILES:
+				user.uploaded_picture = request.FILES['uploaded_picture']
+			
 			user.save()
 			messages.success(request, "Modifications réussies !")
 			return redirect(reverse('profil:profil', kwargs={'username': user.username}))
@@ -163,7 +167,11 @@ def settings_view(request):
 	avatars_dir = os.path.join(settings.BASE_DIR, 'static/pictures/')
 	avatars = [f"/static/pictures/{img}" for img in os.listdir(avatars_dir) if img.endswith(('.png', '.jpg', '.jpeg'))]
 
-	return render(request, 'settings.html', {'form': form, 'avatars': avatars, 'selected_avatar': request.user.profil_picture})
+	return render(request, 'settings.html', {
+		'form': form,
+		'avatars': avatars,
+		'selected_avatar': request.user.get_avatar_url()
+	})
 
 class CustomPasswordChangeView(PasswordChangeView):
 	template_name = 'password_change.html'

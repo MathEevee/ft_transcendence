@@ -15,12 +15,15 @@ Settings
 <div class="body-container">
     <h2>Settings</h2> 
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
 
         <a href="{% url 'authe:password_change' %}">Change my password</a>
     
+        <label for="id_uploaded_picture">Upload a new avatar:</label>
+        <input type="file" name="uploaded_picture" id="id_uploaded_picture">
+
         <div id="avatar-selection" class="avatar-selection">
             {% for avatar in avatars %}
             <label>

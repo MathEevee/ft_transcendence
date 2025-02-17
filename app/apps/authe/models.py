@@ -5,7 +5,8 @@ from django.utils.timezone import now
 class CustomUser(AbstractUser):
 	intra_id = models.CharField(max_length=255, null=True, blank=True, unique=True) # accept NULL for register.html
 	email = models.EmailField(unique=True)
-	profil_picture = models.CharField(max_length=255, null=True, blank=True)
+	profil_picture = models.CharField(max_length=255, default='/static/pictures/user-avatar-01.png')  # Avatar par défaut
+	uploaded_picture = models.ImageField(upload_to='avatars/', null=True, blank=True) # stockage avatars uploadés
 	is_online = models.BooleanField(default=False)
 	last_login = models.DateTimeField(null=True, blank=True)
 
@@ -33,6 +34,11 @@ class CustomUser(AbstractUser):
 		self.save()
 
 	def get_profil_picture(self):
+		return self.profil_picture
+
+	def get_avatar_url(self):
+		if self.uploaded_picture:
+			return self.uploaded_picture.url
 		return self.profil_picture
 	
 	def get_intra_id(self):

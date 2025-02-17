@@ -20,10 +20,11 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
 class UserSettingsForm(forms.ModelForm):
+    uploaded_picture = forms.ImageField(required=False, label="Upload new avatar")
 
     class Meta:
         model = User
-        fields = ['username', 'email']
+        fields = ['username', 'email', 'uploaded_picture']
         labels = {
             'username'  : 'Username',
             'email'     : 'Email',

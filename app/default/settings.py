@@ -160,6 +160,11 @@ CSP_STYLE_SRC = ["'self'", "'unsafe-inline'"]  # ⚠️ Moins sécurisé, à év
 CSP_SCRIPT_SRC = ["'self'"]
 
 
+MEDIA_URL = '/media/'  
+MEDIA_ROOT = [
+    BASE_DIR / 'media'
+]
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
