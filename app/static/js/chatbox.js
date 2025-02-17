@@ -175,30 +175,8 @@ async function printallConversations(of) {
 				.then(response => {
 					if (response.error)
 						console.warn(`Error adding player to tournament: ${response.error}`);
-					else
-					{
-						if (window.location.pathname.split('/')[3] === 'tournament')
-						{
-							const row = document.createElement('tr');
-							const cell = document.createElement('td');
-							const text = document.createTextNode(username);
-							const teamcell = document.createElement('td');
-							const team = document.createTextNode(teamName);
-			
-							cell.appendChild(text);
-							teamcell.appendChild(team);
-							row.appendChild(cell);
-							row.appendChild(teamcell);
-							tabplayers.appendChild(row);
-	
-							joinButton.disabled = true;
-							joinButton.style.backgroundColor = 'grey';
-						}
-					}
 				})
 				.catch(err => {
-					if (window.location.pathname.split('/')[3] === 'tournament')
-						joinButton.disabled = true;
 					console.error(`Error adding player to tournament: ${err}`);
 				});
 

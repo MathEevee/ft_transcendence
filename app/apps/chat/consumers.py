@@ -105,3 +105,4 @@ class ChatConsumer(AsyncWebsocketConsumer):
 				'is_tournament': is_tournament,
 				'tournamentType': tournamentType
 			}))
+

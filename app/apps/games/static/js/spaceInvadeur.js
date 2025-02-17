@@ -14,6 +14,7 @@ const chatbox = document.getElementById('box');
 const inviteinput = document.getElementById('invite');
 const divofbox = document.getElementById('game-info-player');
 const redbutton = document.getElementById('redButton');
+let readybutton;
 chatbox.style.display = "none";
 
 /*socket*/
@@ -24,6 +25,8 @@ let gamesocket;
 let bebousocket;
 let spacetournamentsocket;
 
+let matchId = 0;
+
 /*player*/
 
 let lasshootplayer1 = 0;
@@ -31,10 +34,14 @@ let lasshootplayer2 = 0;
 
 let is_host = true;
 let beplayer;
-
+let winner;
 /*ia*/
-let isdoubleia = 0;
+let doubleia = 0;
 let iaisactive = 0;
+let AIdest = {x: 0, y: 0};
+let AIdest2 = {x: 0, y: 0};
+let AIshoot = false;
+let playeria = 0;
 
 /*Game*/
 let gamemode;
@@ -43,19 +50,20 @@ let interval;
 let gameName = "SpaceBattle";
 
 /*tournament*/
+
 let tournament_id;
 
 if (document.location.pathname === "/games/spaceinvaders/online/tournament/")
 {
+	divofbox.style.display = "none";
 	readybutton = document.getElementById("ready-btn");
-	tournament_id = document.getElementById("tournament-id").textContent;
-	spacetournamentsocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/games/spaceinvaders/tournament/${tournament_id}/`);
 	gamemode = "online_tournament";
 }
 else if (document.location.pathname === "/games/spaceinvaders/")
 	gamemode = "online";
 
-/*============================================INITIALIZATION============================================*/
+
+/*============================================SOCKET TOURNAMENT============================================*/
 
 async function getUserName() {
 	const response = await fetch('/authe/api/me/');
@@ -68,8 +76,9 @@ function putplayerinmatch(player1, player2)
 	const currentmatch = document.getElementsByClassName("tournament-player");
 	const player1name = document.createElement("h3");
 	const player2name = document.createElement("h3");
-	const playscore = document.createElement("p");
-	const playscore2 = document.createElement("p");
+
+	player1name.setAttribute("id", "player1");
+	player2name.setAttribute("id", "player2");
 
 	// delete allcurrentmatch;
 	for (let i = 0; i < currentmatch.length; i++)
@@ -79,29 +88,255 @@ function putplayerinmatch(player1, player2)
 	}
 
 	player1name.textContent = player1;
-	playscore.textContent = "0";
 	currentmatch[0].appendChild(player1name);
-	currentmatch[0].appendChild(playscore);
 
 	player2name.textContent = player2;
-	playscore2.textContent = "0";
 	currentmatch[1].appendChild(player2name);
-	currentmatch[1].appendChild(playscore2);
+}
+
+async function istheOnlyPlayer()
+{
+	const response = await fetch('/authe/api/tournaments/');
+	const data = await response.json();
+
+	for (let i = 0; i < data.length; i++)
+	{
+		if (data[i].type_pong === false)
+		{
+			let playerss = Array.from(data[i].player_entries);
+			for (let i = 0; i < playerss.length; i++)
+			{
+				if (!(playerss[i].player.username.startsWith('AI_')) && playerss[i].player.username !== await getUserName())
+					return false;
+			}
+			return true;
+		}
+	}
 }
 
 async function startMatch(match)
 {
 	const matchlist = document.getElementById("match-list");
-	const player1 = match.player1;
-	const player2 = match.player2;
-
-	if (player1 === undefined || player2 === undefined)
+	if (matchlist.childElementCount === 0)
+		return ;
+	let playerone;
+	let playertwo;
+	if (match)
+	{
+		playerone = match.player1;
+		playertwo = match.player2;
+	}
+	else
+	{
+		playerone = matchlist.firstChild.firstChild.textContent.split(" vs ")[0];
+		playertwo = matchlist.firstChild.firstChild.textContent.split(" vs ")[1];
+	}
+	if (playerone === undefined || playertwo === undefined)
 		return ;
 
 	matchlist.removeChild(matchlist.firstChild);
-	putplayerinmatch(player1, player2);
-	if (player1 === await getUserName())
+	putplayerinmatch(playerone, playertwo);
+	if (playerone === await getUserName() || playertwo === await getUserName())
 	{
+		doubleia = 0;
+		if (!allconversations["other"])
+			allconversations["other"] = [];
+		allconversations["other"].push({
+			'from': 'Tournament',
+			'message': 'You are in a match hurry up!',
+		});
+		readybutton.style.display = "flex";
+		if (playerone === await getUserName())
+		{
+			beplayer = t_game.player1;
+			is_host = true;
+		}
+		else
+		{
+			beplayer = t_game.player2;
+			if (isIA(playerone))
+				is_host = true;
+			else
+				is_host = false;
+		}
+	}
+	if (isIA(playerone))
+	{
+		playeria = t_game.player1;
+		iaisactive = 1;
+	}
+	if (isIA(playertwo))
+	{
+		playeria = t_game.player2;
+		iaisactive = 1;
+	}
+	if (isIA(playerone) && isIA(playertwo))
+	{
+		doubleia = 1;
+		is_host = await isRealHost();
+		if (await istheOnlyPlayer())
+			is_host = true;
+		if (spacetournamentsocket && is_host)
+		{
+			spacetournamentsocket.send(JSON.stringify({
+				'message': 'start',
+			}));
+			startGame();
+		}
+	}
+	readybutton.addEventListener('click', playerready);
+}
+
+async function playerready()
+{
+	readybutton.style.display = "none";
+	if (spacetournamentsocket)
+	{
+		spacetournamentsocket.send(JSON.stringify({
+			'message': 'ready',
+			'player': await getUserName(),
+		}));
+	}
+	if (iaisactive === 1)
+		startGame();
+}
+
+async function isRealHost()
+{
+	const response = await fetch('/authe/api/tournaments/');
+	const data = await response.json();
+	let tournament;
+	let all_ia = 1;
+
+	for (let i = 0; i < data.length; i++)
+	{
+		if (data[i].type_pong === false)
+		{
+			tournament = data[i];
+			break;
+		}
+	}
+	if (tournament === undefined)
+		return false;
+	for (let i = 0; i < tournament.player_entries.length; i++)
+	{
+		if (tournament.player_entries[i].player.username === await getUserName() && tournament.player_entries[i].is_host === true)
+		{
+			all_ia = 0;
+			return true;
+		}
+		if (!tournament.player_entries[i].player.username.startsWith("AI_"))
+			all_ia = 0;
+	}
+	if (all_ia === 1)
+		return true;
+	return false;
+}
+
+async function fetchNewlatch()
+{
+	let response = await fetch('/authe/api/tournaments/');
+	let data = await response.json();
+	let tournament;
+
+	for (let i = 0; i < data.length; i++)
+	{
+		if (data[i].type_pong === false)
+		{
+			tournament = data[i];
+			break;
+		}
+	}
+
+	if (tournament === undefined)
+		return ;
+	//delete all match
+	const matchlist = document.getElementById("match-list");
+	while (matchlist.firstChild)
+		matchlist.removeChild(matchlist.firstChild);
+
+	if (tournament.match_entries.length === 0)
+		return ;
+	for (let i = 0; i < tournament.match_entries.length; i++)
+		putMatchList(tournament.match_entries[i]);
+}
+
+function inittournamentsocket()
+{
+	if (spacetournamentsocket)
+		return ;
+	spacetournamentsocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/spacebattle/tournament/`);
+	spacetournamentsocket.onopen = async () =>
+	{
+		console.log('connected to space battle tournament');
+	}
+	spacetournamentsocket.onmessage = async (e) =>
+	{
+		const data = JSON.parse(e.data);
+		// console.log("data", data);
+		console.log(data.message);
+		if (data.message === 'start')
+			startGame();
+		if (data.message.includes('disconnected'))
+		{
+			start = 0;
+			let playerdisconnect = data.message.split(' ')[0];
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.fillStyle = colorset.backgroundcolor;
+			context.fillRect(0, 0, canvas.width, canvas.height);
+			context.fillStyle = colorset.fontcolor;
+			context.font = "50px Arial";
+			context.fillText(playerdisconnect + " disconnected", canvas.width / 2 - sizeofstringdisplayed(playerdisconnect + " disconnected").width / 2, canvas.height / 2);
+			while (divofbox.firstChild)
+				divofbox.removeChild(divofbox.firstChild);
+			inviteinput.style.display = "block";
+			spacetournamentsocket.close();
+			spacetournamentsocket = undefined;
+			setTimeout(wait, 2000);
+			return ;
+		}
+		else if (data.message.includes('connected'))
+		{
+			putnameinbox(data.message.split(' ')[0]);
+		}
+		else if (data.message === 'start')
+			startGame();
+		else if (data.message.includes('move'))
+		{
+			if (data.player === 'player1')
+			{
+				t_game.player1.y = data.y;
+				t_game.player1.x = data.x;
+			}
+		}
+		else if (data.message === 'shoot')
+		{
+			t_game.bullets.push(Bullet.copy(data.bullet));
+		}
+		else if (data.message === 'next_match')
+		{
+			clearendgame();
+			start = 0;
+			matchId++;
+			setTimeout(async () => {
+				await fetchNewlatch();
+				startMatch(null);
+			} , 2000);
+		}
+		else if (data.message.includes('end tournament'))
+		{
+			console.log("end tournament");
+			start = 0;
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.fillText(data.message, canvas.width / 2 - sizeofstringdisplayed(data.message).width / 2, canvas.height / 2);
+			putplayerinmatch("", "");
+		}
+
+	}
+	spacetournamentsocket.onclose = () =>
+	{
+		console.log('disconnected from space battle tournament');
+		spacetournamentsocket = null;
 	}
 }
 
@@ -133,7 +368,8 @@ async function displayTournamentGame()
 
 	if (tournament === undefined)
 		return ;
-
+	inittournamentsocket();
+	console.log(tournament.match_entries);
 	for (let i = 0; i < tournament.match_entries.length; i++)
 		putMatchList(tournament.match_entries[i]);
 
@@ -153,6 +389,8 @@ else if (document.location.pathname === "/games/spaceinvaders/")
 {
 	gamemode = "online";
 }
+
+/*============================================INITIALIZATION============================================*/
 
 class Player
 {
@@ -332,6 +570,22 @@ async function checkPlayer(playername)
 
 /*draw functions for the game*/
 
+function clearendgame()
+{
+	if(iaisactive === 1)
+	{
+		if (interval)
+			clearInterval(interval);
+		interval = null;
+	}
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	context.fillStyle = colorset.backgroundcolor;
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	context.fillStyle = colorset.fontcolor;
+	context.fillText(t_game.player1.life <= 0 ? document.getElementById("player2").textContent + " wins" : document.getElementById("player1").textContent + " wins", canvas.width / 2 - sizeofstringdisplayed(t_game.player1.life <= 0 ? document.getElementById("player2").textContent + " wins" : document.getElementById("player1").textContent + " wins").width / 2, canvas.height / 2);
+	setTimeout(wait, 2000);
+}
+
 function putnameinbox(name)
 {
 	if (divofbox.childElementCount >= 2)
@@ -440,6 +694,50 @@ function draw(canvas, context, t_game)
 
 function updateplayer(canvas, context, player1, player2)
 {
+	if (iaisactive === 1 && start === 1)
+	{
+		let now = Date.now();
+		if (playeria === player1 || doubleia === 1)
+		{
+			if (player1.x + player1.width / 2 < AIdest.x)
+				player1.dx = 7;
+			else if (player1.x > AIdest.x)
+				player1.dx = -7;
+			if (player1.y + player1.height / 2 < AIdest.y)
+				player1.dy = 7;
+			else if (player1.y > AIdest.y)
+				player1.dy = -7;
+			if (player1.x + player1.width / 2 > AIdest.x && player1.x - 10 < AIdest.x)
+				player1.dx = 0;
+			if (player1.y + player1.height / 2 > AIdest.y && player1.y - 10 < AIdest.y)
+				player1.dy = 0;
+			if (AIshoot === true && now - lasshootplayer1 > 100)
+			{
+				lasshootplayer1 = now;
+				t_game.bullets = t_game.bullets.concat([Bullet.copy(new Bullet(player1.x - player1.width / 2 + (modelebullet.length / 2) * 10, player1.y + player1.height, 10, 10, 0, -1, 20, 1, "player1", [player1.x + player1.width / 2, player1.y + player1.height, 10, 10]))]);
+			}
+		}
+		if (playeria === player2 || doubleia === 1)
+		{
+			if (player2.x + player2.width / 2 < (doubleia === 1 ? AIdest2.x : AIdest.x))
+				player2.dx = 7;
+			else if (player2.x > (doubleia === 1 ? AIdest2.x : AIdest.x))
+				player2.dx = -7;
+			if (player2.y + player2.height / 2 < (doubleia === 1 ? AIdest2.y : AIdest.y))
+				player2.dy = 7;
+			else if (player2.y > (doubleia === 1 ? AIdest2.y : AIdest.y))
+				player2.dy = -7;
+			if (player2.x + player2.width / 2 > (doubleia === 1 ? AIdest2.x : AIdest.x) && player2.x - 10 < (doubleia === 1 ? AIdest2.x : AIdest.x))
+				player2.dx = 0;
+			if (player2.y + player2.height / 2 > (doubleia === 1 ? AIdest2.y : AIdest.y) && player2.y - 10 < (doubleia === 1 ? AIdest2.y : AIdest.y))
+				player2.dy = 0;
+			if (((AIshoot === true && doubleia === 0) ||( AIshoot === false && doubleia === 1)) && now - lasshootplayer2 > 100)
+			{
+				lasshootplayer2 = now;
+				t_game.bullets = t_game.bullets.concat([Bullet.copy(new Bullet(player2.x - player2.width / 2 + (modelebullet.length / 2) * 10, player2.y - player2.height, 10, 10, 0, 1, 20, 1, "player2", [player2.x + player2.width / 2, player2.y - player2.height, 10, 10]))]);
+			}
+		}
+	}
 	player1.x += player1.dx;
 	player2.x += player2.dx;
 	player1.x = Math.min(Math.max(player1.x, 0), canvas.width - player1.width * modeleplayer1[0].length);
@@ -477,23 +775,39 @@ function gamefinished(canvas, context, t_game)
 		return (0);
 	else
 	{
-		if (gamesocket && t_game.player1.life <= 0 || t_game.player2.life <= 0) 
+		if (gamesocket && (t_game.player1.life <= 0 || t_game.player2.life <= 0))
 		{
-			console.log('end');
 			gamesocket.send(JSON.stringify({
 				'message': 'end',
+			}));
+		}
+		else if (spacetournamentsocket && (t_game.player1.life <= 0 || t_game.player2.life <= 0))
+		{
+			spacetournamentsocket.send(JSON.stringify({
+				'message': 'end',
+				'winner': t_game.player1.life <= 0 ? document.getElementById("player2").textContent : document.getElementById("player1").textContent,
+				'match_id': matchId,
+				'player1': document.getElementById("player1").textContent, 
+				'player2': document.getElementById("player2").textContent,
+				'tournament_type': window.location.pathname.split("/")[2],
 			}));
 		}
 	}
 	if (t_game.player1.life <= 0)
 	{
-		prinsmg(context, "Player 2 wins", canvas.width / 2 - 150, canvas.height / 2);
+		if (window.location.pathname === "/games/spaceinvaders/online/tournament/")
+			prinsmg(context, document.getElementById("player2").textContent + " wins", canvas.width / 2 - 150, canvas.height / 2);
+		else
+			prinsmg(context, "Player 2 wins", canvas.width / 2 - 150, canvas.height / 2);
 		setTimeout(wait, 2000);
 		return (1);
 	}
 	else if (t_game.player2.life <= 0)
 	{
-		prinsmg(context, "Player 1 wins", canvas.width / 2 - 150, canvas.height / 2);
+		if (window.location.pathname === "/games/spaceinvaders/online/tournament/")
+			prinsmg(context, document.getElementById("player1").textContent + " wins", canvas.width / 2 - 150, canvas.height / 2);
+		else
+			prinsmg(context, "Player 1 wins", canvas.width / 2 - 150, canvas.height / 2);
 		setTimeout(wait, 2000);
 		return (1);
 	}
@@ -512,31 +826,11 @@ function updatebullets(canvas, context, t_game)
 		{
 			t_game.player2.life--;
 			t_game.bullets.splice(i, 1);
-			setTimeout(() => {
-				if (gamesocket)
-				{
-					gamesocket.send(JSON.stringify({
-						'message': 'touch',
-						'player': 'player2',
-						'life': t_game.player2.life,
-					}));
-				}
-			}, 100);
 		}
 		else if (t_game.bullets[i].playersbullet === "player2" && hitboxcollision(t_game.bullets[i].hitbox, t_game.player1.hitbox))
 		{
 			t_game.player1.life--;
 			t_game.bullets.splice(i, 1);
-			setTimeout(() => {
-				if (gamesocket)
-				{
-					gamesocket.send(JSON.stringify({
-						'message': 'touch',
-						'player': 'player1',
-						'life': t_game.player1.life,
-					}));
-				}
-			}, 100);
 		}
 		else if (t_game.bullets[i].playersbullet === "player1")
 		{
@@ -561,6 +855,28 @@ function update()
 		updatebullets(bullets, canvas, context, aliens, score);
 }
 
+/*============================================AI============================================*/
+
+function randomIntFromInterval(min, max)
+{
+	return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function updateAI()
+{
+	if (start === 0 || iaisactive === 0)
+	{
+		if (interval)
+			clearInterval(interval);
+		interval = null;
+		return ;
+	}
+	AIshoot = !AIshoot;
+	AIdest = {x: randomIntFromInterval(0, canvas.width), y: playeria === t_game.player1 ? randomIntFromInterval(50, canvas.height / 2 - 50) : randomIntFromInterval(canvas.height / 2 + 50, canvas.height - 80)};
+	if (doubleia)
+		AIdest2 = {x: randomIntFromInterval(0, canvas.width), y: randomIntFromInterval(canvas.height / 2 + 50, canvas.height - 80)};
+}
+
 /*============================================GAME LOOP============================================*/
 		
 function gameloop()
@@ -570,6 +886,10 @@ function gameloop()
 	if (update(canvas, context, t_game))
 	{
 		start = 0;
+		clearInterval(interval);
+		interval = null;
+		if (iaisactive === 1)
+			iaisactive = 0;
 		return (1);
 	}
 	draw(canvas, context, t_game);
@@ -598,7 +918,7 @@ function countdown()
 	}, 1000);
 }
 
-function initvariables()
+async function initvariables()
 {
 	t_game = {
 		player1: new Player(canvas.width / 2 - 10, 50, 5, 5, 0, 0, 7, 0, 0, 0, 0, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10], 6),
@@ -613,15 +933,52 @@ function initvariables()
 	else
 		beplayer = t_game.player2;
 	bullets = [];
+	if (beplayer === t_game.player1)
+		playeria = t_game.player2;
+	else
+		playeria = t_game.player1;
+	if (playeria === t_game.player2)
+		AIdest = {x: canvas.width / 2 - 10, y: canvas.height - 110};
+	else
+		AIdest = {x: canvas.width / 2 - 10, y: 50};
+	AIshoot = false;
+	if (doubleia)
+		AIdest2 = {x: canvas.width / 2 - 10, y: canvas.height - 110};
+	if (window.location.pathname === "/games/spaceinvaders/online/tournament/")
+	{
+		const player1 = document.getElementById("player1").textContent;
+		const player2 = document.getElementById("player2").textContent;
+
+		if (player1.startsWith("AI_"))
+			playeria = t_game.player1;
+		else if (player2.startsWith("AI_"))
+			playeria = t_game.player2;
+		if (player1.startsWith("AI_") && player2.startsWith("AI_"))
+			doubleia = 1;
+		if (player1.startsWith("AI_") || player2.startsWith("AI_"))
+			iaisactive = 1;
+		if (player1 === await getUserName())
+			beplayer = t_game.player1;
+		else
+			beplayer = t_game.player2;
+	}
 }
 
 function startGame()
 {
 	if (start === 1)
 		return ;
+	if (!gamesocket && !bebousocket)
+		iaisactive = 1;
 	countdown();
 	initvariables();
 	start = 1;
+	if (iaisactive === 1 && start === 1 && is_host === true)
+	{
+		setTimeout(() => {
+			interval = setInterval(updateAI, 1000);
+		}, 4000);
+	}
 	setTimeout(sendmove, 4000);
 	setTimeout(gameloop, 4000);
 }
@@ -645,7 +1002,7 @@ wait();
 /*down*/
 function keyhookdownforgame(event)
 {
-	if (start === 0 || forcountdown === 1)
+	if (start === 0 || forcountdown === 1 || doubleia === 1)
 		return ;
 	const now = Date.now();
 	if (event.key === "ArrowLeft" && t_game.player1.left === 0 && beplayer === t_game.player1)
@@ -698,6 +1055,13 @@ function keyhookdownforgame(event)
 				'message': 'shoot',
 				'bullet': new Bullet(t_game.player1.x - t_game.player1.width / 2 + (modelebullet.length / 2) * 10, t_game.player1.y + t_game.player1.height, 10, 10, 0, -1, 20, 1, "player1", [t_game.player1.x + t_game.player1.width / 2, t_game.player1.y + t_game.player1.height, 10, 10]),
 			}));
+		else if (spacetournamentsocket)
+		{
+			spacetournamentsocket.send(JSON.stringify({
+				'message': 'shoot',
+				'bullet': new Bullet(t_game.player1.x - t_game.player1.width / 2 + (modelebullet.length / 2) * 10, t_game.player1.y + t_game.player1.height, 10, 10, 0, -1, 20, 1, "player1", [t_game.player1.x + t_game.player1.width / 2, t_game.player1.y + t_game.player1.height, 10, 10]),
+			}));
+		}
 		else
 			t_game.bullets.push(new Bullet(t_game.player1.x - t_game.player1.width / 2 + (modelebullet.length / 2) * 10 , t_game.player1.y + t_game.player1.height, 10, 10, 0, -1, 20, 1, "player1", [t_game.player1.x + t_game.player1.width / 2, t_game.player1.y + t_game.player1.height, 10, 10]));
 	}
@@ -709,6 +1073,13 @@ function keyhookdownforgame(event)
 		if (gamesocket)
 		{
 			gamesocket.send(JSON.stringify({
+				'message': 'shoot',
+				'bullet': new Bullet(t_game.player2.x - t_game.player2.width / 2 + (modelebullet.length / 2) * 10, t_game.player2.y - t_game.player2.height, 10, 10, 0, 1, 20, 1, "player2", [t_game.player2.x + t_game.player2.width / 2, t_game.player2.y - t_game.player2.height, 10, 10]),
+			}));
+		}
+		else if (spacetournamentsocket)
+		{
+			spacetournamentsocket.send(JSON.stringify({
 				'message': 'shoot',
 				'bullet': new Bullet(t_game.player2.x - t_game.player2.width / 2 + (modelebullet.length / 2) * 10, t_game.player2.y - t_game.player2.height, 10, 10, 0, 1, 20, 1, "player2", [t_game.player2.x + t_game.player2.width / 2, t_game.player2.y - t_game.player2.height, 10, 10]),
 			}));
@@ -730,7 +1101,7 @@ document.addEventListener('keydown', function(event)
 
 function keyhookupforgame(event)
 {
-	if (start === 0 || forcountdown === 1)
+	if (start === 0 || forcountdown === 1 || doubleia === 1)
 		return ;
 	if (event.key === "ArrowLeft" && t_game.player1.left === 1 && beplayer === t_game.player1)
 	{
@@ -909,6 +1280,16 @@ function sendmove()
 					'bullets': t_game.bullets,
 				}));
 			}
+			else if (spacetournamentsocket)
+			{
+				spacetournamentsocket.send(JSON.stringify({
+					'message': 'move',
+					'player': 'player1',
+					'playerx': t_game.player1.x,
+					'playery': t_game.player1.y,
+					'bullets': t_game.bullets,
+				}));
+			}
 		}, 1000 / 20);
 	}
 	else if (gamemode === "online_tournament" && start === 1)
@@ -974,13 +1355,6 @@ if (gamemode === "online" && joinagame)
 					t_game.player2.x = data.x;
 				}
 			}
-			// else if (data.message === 'touch')
-			// {
-			// 	if (data.player === 'player1')
-			// 		t_game.player1.life = data.life;
-			// 	else if (data.player === 'player2')
-			// 		t_game.player2.life = data.life;
-			// }
 			else if (data.message === 'shoot')
 			{
 				t_game.bullets.push(Bullet.copy(data.bullet));
@@ -1003,7 +1377,6 @@ if (gamemode === "online")
 		{
 			if (start === 0)
 			{
-				console.log('start');
 				if (gamesocket)
 				{
 					gamesocket.send(JSON.stringify({
@@ -1013,6 +1386,12 @@ if (gamemode === "online")
 				else if (bebousocket)
 				{
 					bebousocket.send(JSON.stringify({
+						'message': 'start',
+					}));
+				}
+				else if (spacetournamentsocket)
+				{
+					spacetournamentsocket.send(JSON.stringify({
 						'message': 'start',
 					}));
 				}

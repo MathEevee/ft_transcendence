@@ -105,9 +105,9 @@ class Tournament(models.Model):
 		PlayerEntry.objects.create(tournament=self, player=player, team_name=team_name)
 
 	def remove_player(self, player):
-		player_entry = self.player_entries.filter(player=player)
-		if not player_entry.exists():
-			raise ValueError("Player is not in the tournament.")
+		player_entry = self.player_entries.filter(player=player).first()
+		if not player_entry:
+			raise ValueError(f"Player {player.username} is not in the tournament.")
 		player_entry.delete()
 
 	def add_match(self, player1, player2):

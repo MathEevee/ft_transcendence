@@ -172,11 +172,10 @@ function loadPong() {
 			while (currentmatch[i].firstChild)
 				currentmatch[i].removeChild(currentmatch[i].firstChild);
 		}
-	
+		
 		player1name.textContent = player1;
-		currentmatch[0].appendChild(player1name);
-	
 		player2name.textContent = player2;
+		currentmatch[0].appendChild(player1name);
 		currentmatch[1].appendChild(player2name);
 	}
 
@@ -213,8 +212,6 @@ function loadPong() {
 			return ;
 		for (let i = 0; i < tournament.match_entries.length; i++)
 			putMatchList(tournament.match_entries[i]);
-
-		console.log("tournament", tournament);
 	}
 
 	function inittournamentsocket()
@@ -230,7 +227,6 @@ function loadPong() {
 		{
 			const data = JSON.parse(e.data);
 			// console.log("data", data);
-			console.log("message", data.message);
 			if (data.message === 'start')
 				startPong();
 			else if (data.message === 'move')
@@ -251,12 +247,11 @@ function loadPong() {
 				score2 = data.score2;
 				if (score1 === 5 || score2 === 5)
 				{
-					console.log("end game");
 					clearendgame();
 					start = 0;
 					matchId++;
-					setTimeout( () => {
-						fetchNewlatch();
+					setTimeout(async  () => {
+						await fetchNewlatch();
 						startMatch(null);
 					} , 2000);
 				}
@@ -267,6 +262,7 @@ function loadPong() {
 				start = 0;
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				context.fillText(data.message, canvas.width / 2 - sizeofstringdisplayed(data.message).width / 2, canvas.height / 2);
+				putplayerinmatch("", "");
 			}
 
 		}
@@ -321,7 +317,6 @@ function loadPong() {
 		if (all_ia === 1)
 			return true;
 		return false;
-		
 	}
 	
 	async function startMatch(match)
@@ -341,12 +336,11 @@ function loadPong() {
 			playerone = matchlist.firstChild.firstChild.textContent.split(" vs ")[0];
 			playertwo = matchlist.firstChild.firstChild.textContent.split(" vs ")[1];
 		}
-	
 		if (playerone === undefined || playertwo === undefined)
 			return ;
 	
-		matchlist.removeChild(matchlist.firstChild);
 		putplayerinmatch(playerone, playertwo);
+		matchlist.removeChild(matchlist.firstChild);
 		if (playerone === await getUserName() || playertwo === await getUserName())
 		{
 			doubleia = 0;
@@ -385,7 +379,6 @@ function loadPong() {
 		{
 			doubleia = 1;
 			is_host = await isRealHost();
-			console.log("is_host", is_host);
 			if (is_host && pongtournamentsocket)
 			{
 				pongtournamentsocket.send(JSON.stringify({
@@ -430,7 +423,7 @@ function loadPong() {
 			
 		if (tournament === undefined)
 			return ;
-				inittournamentsocket();
+		inittournamentsocket();
 		for (let i = 0; i < tournament.match_entries.length; i++)
 			putMatchList(tournament.match_entries[i]);
 		
@@ -927,6 +920,7 @@ function loadPong() {
 						})
 					})
 				}
+				gameId = null;
 			}
 			else if (gamemode === "online_tournament")
 			{

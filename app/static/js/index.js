@@ -1,12 +1,18 @@
 import { liveChat } from "/static/js/chatbox.js";
 import { display_graph } from "/static/js/graph.js";
 
+let pageDestructorFn = null;
+
+export function setPageDestructor(fn) {
+    pageDestructorFn = fn;
+}
+
 const allPage = {
     "/games/pong/local/": () => import("/static/js/pong.js").then(module => module.loadPong()),
     "/games/pong/online/": () => import("/static/js/pong.js").then(module => module.loadPong()),
     "/games/pong/online/tournament/": () => import("/static/js/pong.js").then(module => module.loadPong()),
     "/games/pong/solo/": () => import("/static/js/pong.js").then(module => module.loadPong()),
-    "/games/pong/multiplayer/": () => import("/static/js/pongMulti/pongMulti.js").then(module => module.loadPongMulti()),
+    "/games/pong/multiplayer/": () => import("/static/js/pongMulti/pongMulti.js").then(module => module .loadPongMulti()),
     "/games/spaceinvaders/": () => import("/static/js/spaceInvadeur.js").then(module => module.loadSpaceInvadersGame()),
     "/games/spaceinvaders/online/tournament/": () => import("/static/js/spaceInvadeur.js").then(module => module.loadSpaceInvadersGame()),
     "/games/pong/tournament/": () => import("/static/js/tournament.js").then(module => module.loadTournament()),
@@ -29,6 +35,10 @@ function loadPage(path) {
 }
 
 async function changePage(path, disableHistory) {
+    if (pageDestructorFn) {
+        pageDestructorFn();
+        pageDestructorFn = null
+    }
     const response = await fetch(path);
     if (response.ok) {
         const content = await response.text();
