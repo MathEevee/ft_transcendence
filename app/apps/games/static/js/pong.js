@@ -1,5 +1,6 @@
 import { allconversations } from "/static/js/chatbox.js";
 import { joinagame } from "/static/js/chatbox.js";
+import { setPageDestructor } from "/static/js/index.js";
 import { setjoinagame } from "/static/js/chatbox.js";
 
 function loadPong() {
@@ -27,6 +28,17 @@ function loadPong() {
 		const data = await response.json();
 		return data.username;
 	}
+
+setPageDestructor(() => {
+		if (gamesocket)
+			gamesocket.close();
+		if (bebousocket)
+			bebousocket.close();
+		if (pongtournamentsocket)
+			pongtournamentsocket.close();
+	setjoinagame(false);
+});
+
 	
 	function putnameinbox(name)
 	{
@@ -216,13 +228,15 @@ function loadPong() {
 
 	function inittournamentsocket()
 	{
-		if (pongtournamentsocket)
+		if (pongtournamentsocket && pongtournamentsocket.readyState === WebSocket.OPEN)
 			return ;
 		pongtournamentsocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/pong/tournament/`);
+
 		pongtournamentsocket.onopen = async () =>
 		{
 			console.log('connected to pong tournament');
 		}
+
 		pongtournamentsocket.onmessage = async (e) =>
 		{
 			const data = JSON.parse(e.data);
@@ -264,12 +278,14 @@ function loadPong() {
 				context.fillText(data.message, canvas.width / 2 - sizeofstringdisplayed(data.message).width / 2, canvas.height / 2);
 				putplayerinmatch("", "");
 			}
-
 		}
-		pongtournamentsocket.onclose = () =>
+		if (pongtournamentsocket.readyState === WebSocket.OPEN)
 		{
-			console.log('disconnected from pong tournament');
-			pongtournamentsocket = null;
+			pongtournamentsocket.onclose = () =>
+			{
+				console.log('disconnected from pong tournament');
+				pongtournamentsocket = null;
+			}
 		}
 	}
 
@@ -589,7 +605,10 @@ function loadPong() {
 		if(iaisactive === 1)
 		{
 			if (interval)
+			{
 				clearInterval(interval);
+				console.log("interval cleared");
+			}
 			interval = null;
 		}
 		context.clearRect(0, 0, canvas.width, canvas.height);
@@ -938,7 +957,7 @@ function loadPong() {
 					}));
 				}
 			}
-			else if (iaisactive === 1)
+			else if (iaisactive === 1 && gamemode === "solo")
 			{
 				fetch('/games/local-ia-end/', {
 					method: 'POST',
@@ -1170,7 +1189,7 @@ function loadPong() {
 		initvariables();
 		countdown();
 		start = 1;
-		if (iaisactive === 1 && start === 1 && is_host === true)
+		if (iaisactive === 1 && start === 1 && is_host === true && doubleia === 0 && gamemode === "solo")
 		{
 			fetch('/games/local-ia-start/', {
 				method: 'POST',

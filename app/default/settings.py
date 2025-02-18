@@ -42,7 +42,8 @@ ALLOWED_HOSTS = [
     'backend',
     'nginx',
     '10.12.248.210',
-    '10.13.248.127'
+    '10.13.248.127',
+    '*',  # ⚠️ À ne pas utiliser en production
 ]
 
 # Application definition
