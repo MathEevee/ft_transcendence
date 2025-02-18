@@ -1,6 +1,7 @@
 import { allconversations } from "/static/js/chatbox.js";
 import { joinagame } from "/static/js/chatbox.js";
 import { setjoinagame } from "/static/js/chatbox.js";
+import { setPageDestructor } from "/static/js/index.js";
 
 function loadSpaceInvadersGame(){
 	
@@ -233,6 +234,17 @@ async function isRealHost()
 	return false;
 }
 
+setPageDestructor(() => {
+	console.log("destroying pong multiplayer (destructor fn)");
+	if (gamesocket)
+		gamesocket.close();
+	if (bebousocket)
+		bebousocket.close();
+	if (spacetournamentsocket)
+		spacetournamentsocket.close();
+	setjoinagame(false);
+});
+
 async function fetchNewlatch()
 {
 	let response = await fetch('/authe/api/tournaments/');
@@ -263,7 +275,7 @@ async function fetchNewlatch()
 
 function inittournamentsocket()
 {
-	if (spacetournamentsocket)
+	if (spacetournamentsocket && spacetournamentsocket.readyState === WebSocket.OPEN)
 		return ;
 	spacetournamentsocket = new WebSocket(`${wsProtocol}//${window.location.host}/ws/spacebattle/tournament/`);
 	spacetournamentsocket.onopen = async () =>
@@ -274,7 +286,6 @@ function inittournamentsocket()
 	{
 		const data = JSON.parse(e.data);
 		// console.log("data", data);
-		console.log(data.message);
 		if (data.message === 'start')
 			startGame();
 		if (data.message.includes('disconnected'))
@@ -325,7 +336,6 @@ function inittournamentsocket()
 		}
 		else if (data.message.includes('end tournament'))
 		{
-			console.log("end tournament");
 			start = 0;
 			context.clearRect(0, 0, canvas.width, canvas.height);
 			context.fillText(data.message, canvas.width / 2 - sizeofstringdisplayed(data.message).width / 2, canvas.height / 2);
@@ -369,10 +379,8 @@ async function displayTournamentGame()
 	if (tournament === undefined)
 		return ;
 	inittournamentsocket();
-	console.log(tournament.match_entries);
 	for (let i = 0; i < tournament.match_entries.length; i++)
 		putMatchList(tournament.match_entries[i]);
-
 	await startMatch(tournament.match_entries[0]);
 	tournament.match_entries.pop();
 }

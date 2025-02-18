@@ -34,13 +34,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 ALLOWED_HOSTS = [
     # SITE_URL,
-    'les-requetes-mystiques.fr',
-    'localhost',
-    '127.0.0.1',
-    '172.0.18.1',
-    'backend',
-    'nginx',
-    '10.12.248.210'
+    '*',  # ⚠️ À ne pas utiliser en production
 ]
 
 # Application definition
