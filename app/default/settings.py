@@ -30,6 +30,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8080",
     "https://les-requetes-mystiques.fr",
     "https://10.12.248.210",
+    "https://10.13.248.127",
 ]
 
 ALLOWED_HOSTS = [
@@ -40,7 +41,8 @@ ALLOWED_HOSTS = [
     '172.0.18.1',
     'backend',
     'nginx',
-    '10.12.248.210'
+    '10.12.248.210',
+    '10.13.248.127'
 ]
 
 # Application definition

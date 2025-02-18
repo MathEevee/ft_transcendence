@@ -1,6 +1,4 @@
 function buildGraphScore(scores, canvas, context, scoreMoyen, totalGame) {
-    context.fillStyle = 'rgb(0, 0, 255)';
-    context.fillRect(300, 10, canvas.width - 310, canvas.height - 20);
     let width = 320;
     let height = canvas.height - 14;
     var i = scores.length - 10;
@@ -17,16 +15,59 @@ function buildGraphScore(scores, canvas, context, scoreMoyen, totalGame) {
         i = 0;
     for (var j = 0; j < scores.length; i++, j++) {
         context.beginPath();
+        context.fillStyle = 'white';
+        context.strokeStyle = 'white';
         context.arc(width + (j * 28), height - (scores[i] * 14), 2, 0, 2 * Math.PI);
         context.stroke();
     }
+
+    context.beginPath();
+
+    //abcisse
+    context.fillStyle = 'rgb(0, 0, 0)';
+    context.strokeStyle = 'black';
+    context.moveTo(300, height);
+    context.lineTo(canvas.width - 10, height);
+    context.lineWidth = 1;
+    context.stroke();
+    //match number
+    context.fillStyle = 'rgb(255, 255, 255)';
+    context.fillText('1', 290 + 28, height + 14);
+    context.fillText('2', 290 + 28 * 2, height + 14);
+    context.fillText('3', 290 + 28 * 3, height + 14);
+    context.fillText('4', 290 + 28 * 4, height + 14);
+    context.fillText('5', 290 + 28 * 5, height + 14);
+    context.fillText('6', 290 + 28 * 6, height + 14);
+    context.fillText('7', 290 + 28 * 7, height + 14);
+    context.fillText('8', 290 + 28 * 8, height + 14);
+    context.fillText('9', 290 + 28 * 9, height + 14);
+    context.fillText('10', 290 + 28 * 10, height + 14);
+
+    //ordonnée
+    context.fillStyle = 'rgb(0, 0, 0)';
+    context.strokeStyle = 'black';
+    context.moveTo(300, 10);
+    context.lineTo(300, canvas.height - 10);
+    context.lineWidth = 1;
+    context.stroke();
+    //point
+    context.fillStyle = 'rgb(255, 255, 255)';
+    context.fillText('0', 290, canvas.height - 10);
+    context.fillText('1', 290, canvas.height - 10 - 14);
+    context.fillText('2', 290, canvas.height - 10 - 28);
+    context.fillText('3', 290, canvas.height - 10 - 42);
+    context.fillText('4', 290, canvas.height - 10 - 56);
+    context.fillText('5', 290, canvas.height - 10 - 70);
+
 
 
     context.beginPath();
     var i = scores.length - 10;
     if (i < 0)
         i = 0;
-    for (var j = 0; j < scores.length - 1; i++, j++) {
+    for (var j = 0; j < scores.length - 1; i++, j++){
+        context.fillStyle = 'rgb(255, 255, 255)';
+        context.strokeStyle = 'rgb(255, 255, 255)';
         context.moveTo(width + (j * 28), height - (scores[i] * 14));
         context.lineTo(width + ((j + 1) * 28), height - (scores[i + 1] * 14));
     }
@@ -134,8 +175,6 @@ async function print_game_ia(game) {
 }
 
 function print_data_game_online_duo(data, game) {
-    console.log('data',data);
-    console.log('game',game);
     const tableBody = document.querySelector('#PongHistoryOnline tbody');
     // On parcourt chaque jeu et on crée une ligne pour chaque
     const row = document.createElement('tr');
@@ -186,6 +225,24 @@ async function print_game_online_duo(game) {
     });
 }
 
+function draw_win_loose(canvas, context, games, win) {
+
+    context.fillStyle = 'rgb(0, 255, 0)';
+
+    context.fillRect(60, canvas.height - (win /games) * canvas.height, 60, canvas.height);
+    context.fillStyle = 'rgb(255, 255, 255)';
+    context.font = '20px';
+    context.fillText(win / games * 100 + '%', 60, canvas.height - (win / games) * canvas.height - 10);
+
+    context.fillStyle = 'rgb(255, 0, 0)';
+    context.fillRect(160, canvas.height - ((games - win) / games) * canvas.height, 60, canvas.height);
+    context.fillStyle = 'rgb(255, 255, 255)';
+    context.font = '20px';
+    context.fillText(((games - win) / games) * 100 + '%', 160, canvas.height - ((games - win) / games) * canvas.height - 10);
+
+}
+
+
 async function display_graph(){
     const canvas = document.getElementById('PongIA');
     var context = canvas.getContext('2d');
@@ -232,9 +289,12 @@ async function display_graph(){
             }
         }
     }
-    
-    context.fillRect(60, canvas.height - (games_pong_casu_solo_win / games_pong_casu_solo) * canvas.height, 60, canvas.height);
-    context.fillRect(160, canvas.height - ((games_pong_casu_solo - games_pong_casu_solo_win) / games_pong_casu_solo) * canvas.height, 60, canvas.height);
+
+    draw_win_loose(canvas, context, games_pong_casu_solo, games_pong_casu_solo_win);
+
+
+
+
     buildGraphScore(games_pong_casu_solo_all, canvas, context, games_pong_casu_solo_score, games_pong_casu_solo);
     
     //build the graph
@@ -244,6 +304,7 @@ async function display_graph(){
     context.fillRect(60, canvasduo.height - (games_pong_casu_duo_win / games_pong_casu_duo) * canvasduo.height, 60, canvasduo.height);
     context.fillRect(160, canvasduo.height - ((games_pong_casu_duo - games_pong_casu_duo_win) / games_pong_casu_solo) * canvasduo.height, 60, canvasduo.height);
     buildGraphScore(games_pong_casu_duo_all, canvasduo, context, games_pong_casu_duo_score, games_pong_casu_duo);
+    draw_win_loose(canvasduo, context, games_pong_casu_duo, games_pong_casu_duo_win);
 }
     
 
