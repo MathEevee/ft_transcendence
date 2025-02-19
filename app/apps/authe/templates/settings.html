@@ -32,7 +32,7 @@ Settings
             <label>
                 <input type="radio" name="profil_picture" value="{{ avatar }}" hidden
                     {% if avatar == selected_avatar %} checked {% endif %}>
-                <img src="{{ avatar }}" class="avatar" {% if avatar == selected_avatar %} selected {% endif %}" alt="Avatar">
+                <img src="{{ avatar }}" class="avatar" {% if avatar == selected_avatar %} selected {% endif %} alt="Avatar">
             </label>
             {% endfor %}
         </div>
