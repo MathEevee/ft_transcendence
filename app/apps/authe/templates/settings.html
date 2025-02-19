@@ -20,12 +20,6 @@ Settings
         {{ form.as_p }}
 
         <a href="{% url 'authe:password_change' %}">Change my password</a>
-    
-        <!--<label for="id_uploaded_picture">Upload a new avatar:</label>
-        <input type="file" name="uploaded_picture" id="id_uploaded_picture">
-    -->
-        <!-- Champ caché qui stocke l'avatar sélectionné -->
-        <input type="hidden" id="selected_avatar_input" name="profil_picture" value="{{ selected_avatar }}">
 
         <div id="avatar-selection" class="avatar-selection">
             {% for avatar in avatars %}
@@ -44,7 +38,6 @@ Settings
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         let avatars = document.querySelectorAll("#avatar-selection label img");
-        let hiddenInput = document.getElementById("selected_avatar_input");
         avatars.forEach(img => {
             img.addEventListener("click", function () {
                 // reset selected
@@ -54,8 +47,6 @@ Settings
                 // check the new select
                 this.previousElementSibling.checked = true;
 
-                // Mettre à jour la valeur du champ caché
-                hiddenInput.value = this.getAttribute("src");
             });
         });
     });
