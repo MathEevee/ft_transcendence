@@ -149,6 +149,11 @@ def settings_view(request):
 		if form.is_valid():
 			user = form.save(commit=False)
 
+			# Vérifie si un avatar par défaut est sélectionné
+			selected_avatar = request.POST.get('profil_picture')
+			if selected_avatar:
+				user.profil_picture = selected_avatar
+			
 			# Vérifier si un nouveau fichier est uploadé
 			uploaded_file = request.FILES.get('uploaded_picture', None)
 			if uploaded_file:
