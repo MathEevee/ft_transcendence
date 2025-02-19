@@ -7,20 +7,20 @@ import { setPageDestructor } from "/static/js/index.js";
 
 function update_score(score1, score2, score3, score4)
 {
-	document.getElementById('player1').textContent = score1;
-	document.getElementById('player2').textContent = score2;
-	document.getElementById('player3').textContent = score3;
-	document.getElementById('player4').textContent = score4;
+	document.getElementById('playerMulti1').textContent = score1;
+	document.getElementById('playerMulti2').textContent = score2;
+	document.getElementById('playerMulti3').textContent = score3;
+	document.getElementById('playerMulti4').textContent = score4;
 }
 
 function set_new_id(playerid, username)
 {
 	let removed = 0;
-	document.getElementById('player1').textContent = '0';
-	document.getElementById('player2').textContent = '0';
-	document.getElementById('player3').textContent = '0';
-	document.getElementById('player4').textContent = '0';
-    let playerNames = document.querySelectorAll('#player-info .tournament-player h3');
+	document.getElementById('playerMulti1').textContent = '0';
+	document.getElementById('playerMulti2').textContent = '0';
+	document.getElementById('playerMulti3').textContent = '0';
+	document.getElementById('playerMulti4').textContent = '0';
+    let playerNames = document.querySelectorAll('#player-info-multi .multi-player h3');
 	if (playerNames[0].textContent === "Player 1" && playerNames[1].textContent !== "Player 2")
 	{
 		playerNames[0].textContent = playerNames[1].textContent;
@@ -53,7 +53,7 @@ function set_new_id(playerid, username)
 
 function create_scoreboard(username, playerid)
 {
-    let playerNames = document.querySelectorAll('#player-info .tournament-player h3');
+    let playerNames = document.querySelectorAll('#player-info-multi .multi-player h3');
     
 	if (playerid === 1)
 	{
@@ -79,9 +79,10 @@ async function loadPongMulti(){
 	const context = canvas.getContext('2d');
 	const redbutton = document.getElementById('red');
 	const chatbox = document.getElementById('box');
-	const inviteinput = document.getElementById('invite');
 	const divofbox = document.getElementById('game-info-player');
 	chatbox.style.display = "none";
+
+	
 
 	let playerid = 1;
 	
@@ -113,7 +114,7 @@ async function loadPongMulti(){
 
 	function remove_in_tab(removed)
 	{
-		let playerNames = document.querySelectorAll('#player-info .tournament-player h3');
+		let playerNames = document.querySelectorAll('#player-info-multi .multi-player h3');
 		let removedid = 0;
 
 		if (playerNames[0].textContent === removed)
@@ -216,15 +217,13 @@ async function loadPongMulti(){
 		}
 	};
 
-	const tabscore = document.getElementById('player-info');
+	const tabscore = document.getElementById('player-info-multi');
 	tabscore.style.display = "block";
 
 	const colorpalette = { white: "#FFFFFF", black: "#000000", red: "#FF0000", green: "#00FF00", blue: "#0000FF", yellow: "#FFFF00", cyan: "#00FFFF", magenta: "#FF00FF", silver: "#C0C0C0", gray: "#808080", maroon: "#800000", olive: "#808000", purple: "#800080", teal: "#008080", navy: "#000080", orange: "#FFA500", lime: "#00FF00", aqua: "#00FFFF", fuchsia: "#FF00FF", brown: "#A52A2A", papayawhip: "#FFEFD5", peachpuff: "#FFDAB9", peru: "#CD853F", pink: "#FFC0CB", plum: "#DDA0DD", powderblue: "#B0E0E6", purple: "#800080", red: "#FF0000", rosybrown: "#BC8F8F", royalblue: "#4169E1", saddlebrown: "#8B4513", salmon: "#FA8072", sandybrown: "#F4A460", seagreen: "#2E8B57", seashell: "#FFF5EE", sienna: "#A0522D", silver: "#C0C0C0", skyblue: "#87CEEB", slateblue: "#6A5ACD", slategray: "#708090", snow: "#FFFAFA", springgreen: "#00FF7F", steelblue: "#4682B4", tan: "#D2B48C", teal: "#008080", thistle: "#D8BFD8", tomato: "#FF6347", turquoise: "#40E0D0", violet: "#EE82EE", wheat: "#F5DEB3", white: "#FFFFFF", whitesmoke: "#F5F5F5", yellow: "#FFFF00", yellowgreen: "#9ACD32" };
 
 	if (window.location.pathname === "/games/pong/multiplayer/")
 	{
-		inviteinput.style.display = "block";
-		divofbox.style.display = "block";
 		// setTimeout(() => {
 		// 	document.getElementById('game-info-player').style.display = "block";
 		// 	document.getElementById('playername').style.display = "block";
@@ -698,7 +697,7 @@ async function loadPongMulti(){
 	wait();
 	redbutton.addEventListener("click", () =>
 	{
-		let playerNames = document.querySelectorAll('#player-info .tournament-player h3');
+		let playerNames = document.querySelectorAll('#player-info-multi .multi-player h3');
 		if (playerNames[3].textContent === "Player 4" && start === 0)
 		{
 			alert("You need to be 4 players to start the game");

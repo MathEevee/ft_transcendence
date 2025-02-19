@@ -211,8 +211,22 @@ body {
     gap: 1rem;
 }
 
+.multi-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 /* Style des joueurs */
 .tournament-player {
+    background-color: #220045;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0px 4px 8px rgba(205, 106, 255, 0.3);
+}
+
+.multi-player {
     background-color: #220045;
     padding: 1rem;
     border-radius: 8px;
@@ -225,6 +239,22 @@ body {
     margin-bottom: 0.5rem;
     color: #29c7c4;
     text-shadow: 0px 0px 10px #29c7c4;
+}
+
+.multi-player h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+    color: #29c7c4;
+    text-shadow: 0px 0px 10px #29c7c4;
+}
+
+.multi-player p {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffffff;
+    background: rgba(41, 199, 196, 0.2);
+    padding: 0.5rem;
+    border-radius: 5px;
 }
 
 .tournament-player p {
@@ -309,6 +339,17 @@ body {
 
 /*mettre le tableau des scores contenant des divs de l class player-info, le mettre a droire de facon aaptative a la borne d'arcade et a la taille de l'ecran*/
 #player-info {
+	display: none;
+	position: fixed;
+	right: 20px;
+	top: 50%;
+	transform: translateY(-50%);
+	width : 220px;
+	background-color: #1a0033;
+	border-radius: 10px;
+}
+
+#player-info-multi {
 	display: none;
 	position: fixed;
 	right: 20px;

@@ -232,13 +232,13 @@ function draw_win_loose(canvas, context, games, win) {
     context.fillRect(60, canvas.height - (win /games) * canvas.height, 60, canvas.height);
     context.fillStyle = 'rgb(255, 255, 255)';
     context.font = '20px';
-    context.fillText(win / games * 100 + '%', 60, canvas.height - (win / games) * canvas.height - 10);
+    context.fillText(win / games * 100 + '%', 80, canvas.height - (win / games) * canvas.height - 10);
 
     context.fillStyle = 'rgb(255, 0, 0)';
     context.fillRect(160, canvas.height - ((games - win) / games) * canvas.height, 60, canvas.height);
     context.fillStyle = 'rgb(255, 255, 255)';
     context.font = '20px';
-    context.fillText(((games - win) / games) * 100 + '%', 160, canvas.height - ((games - win) / games) * canvas.height - 10);
+    context.fillText(((games - win) / games) * 100 + '%', 175, ((games - win) / games) + 10);
 
 }
 
