@@ -236,6 +236,10 @@ async function isRealHost()
 
 setPageDestructor(() => {
 	console.log("destroying pong multiplayer (destructor fn)");
+	start = 0;
+	if (interval)
+		clearInterval(interval);
+	interval = null;
 	if (gamesocket)
 		gamesocket.close();
 	if (bebousocket)
