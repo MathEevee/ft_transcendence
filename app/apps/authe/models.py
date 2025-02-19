@@ -6,7 +6,7 @@ class CustomUser(AbstractUser):
 	intra_id = models.CharField(max_length=255, null=True, blank=True, unique=True) # accept NULL for register.html
 	email = models.EmailField(unique=True)
 	profil_picture = models.CharField(max_length=255, default='/static/pictures/user-avatar-01.png')  # Avatar par défaut
-	uploaded_picture = models.ImageField(upload_to='avatars/', null=True, blank=True) # stockage avatars uploadés
+	uploaded_picture = models.ImageField(upload_to='avatars/', max_length=255, null=True, blank=True) # stockage avatars uploadés
 	is_online = models.BooleanField(default=False)
 	last_login = models.DateTimeField(null=True, blank=True)
 
