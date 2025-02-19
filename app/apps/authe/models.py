@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.timezone import now
 from django.core.validators import MinValueValidator, MaxValueValidator
-from .utils import validate_max_length, get_safe_filename, validate_file_extension, validate_file_size
+from .utils import validate_max_length, validate_file_extension, validate_file_size
 
 class CustomUser(AbstractUser):
 	intra_id = models.CharField(max_length=255, null=True, blank=True, unique=True, validators=[validate_max_length]) # accept NULL for register.html
@@ -40,7 +40,7 @@ class CustomUser(AbstractUser):
 
 	def get_avatar_url(self):
 		if self.uploaded_picture:
-			return get_safe_filename(self.uploaded_picture.url)
+			return self.uploaded_picture.url
 		return self.profil_picture
 	
 	def get_intra_id(self):

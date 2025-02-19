@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MaxLengthValidator
 from apps.authe.models import CustomUser
-from authe.utils import validate_max_length
+from apps.authe.utils import validate_max_length
 
 class Friend(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="friends")
