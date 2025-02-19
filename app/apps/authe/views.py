@@ -246,10 +246,11 @@ class TournamentAPIView(APIView):
 	def get(self, request):
 		data = request.data
 		if 'id' in data:
-			tournament = Tournament.objects.get(id=data.get('id'))
+			tournament = Tournament.objects.objects.prefetch_related('players', 'player_entries', 'match_entries__match').get(id=data.get('id'))
 			serializer = TournamentSerializer(tournament)
 			return Response(serializer.data)
-		tournaments = Tournament.objects.all()
+		
+		tournaments = Tournament.objects.prefetch_related('players', 'player_entries', 'match_entries__match').all()
 		serializer = TournamentSerializer(tournaments, many=True)
 		return Response(serializer.data)
 	
@@ -321,7 +322,7 @@ class MatchmakingAPIView(APIView):
 		tournament_id = request.data.get('tournament_id')
 
 		# Récupérer le tournoi
-		tournament = get_object_or_404(Tournament, type_pong=tournament_id)
+		tournament = get_object_or_404(Tournament.objects.prefetch_related('players', 'player_entries', 'match_entries__match'), type_pong=tournament_id)
 
 		# Vérifier si le tournoi est plein
 		if tournament.player_entries.count() < 8:
@@ -378,7 +379,7 @@ class FillTournamentAPIView(APIView):
 
 	def get(self, request):
 		# Récupérer tous les tournois
-		tournaments = Tournament.objects.all()
+		tournaments = Tournament.objects.prefetch_related('players', 'player_entries', 'match_entries__match').all()
 		serializer = TournamentSerializer(tournaments, many=True)
 		return Response(serializer.data)
 

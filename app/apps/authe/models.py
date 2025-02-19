@@ -1,14 +1,16 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.timezone import now
+from django.core.validators import MinValueValidator, MaxValueValidator
+from .utils import validate_max_length, get_safe_filename, validate_file_extension, validate_file_size
 
 class CustomUser(AbstractUser):
-	intra_id = models.CharField(max_length=255, null=True, blank=True, unique=True) # accept NULL for register.html
+	intra_id = models.CharField(max_length=255, null=True, blank=True, unique=True, validators=[validate_max_length]) # accept NULL for register.html
 	email = models.EmailField(unique=True)
-	profil_picture = models.CharField(max_length=255, default='/static/pictures/user-avatar-01.png')  # Avatar par défaut
-	uploaded_picture = models.ImageField(upload_to='avatars/', max_length=255, null=True, blank=True) # stockage avatars uploadés
+	profil_picture = models.CharField(max_length=255, default='/static/pictures/user-avatar-01.png', validators=[validate_max_length]) # Avatar par défaut
+	uploaded_picture = models.ImageField(upload_to='avatars/', max_length=255, null=True, blank=True, validators=[validate_file_size, validate_file_extension]) # stockage avatars uploadés
 	is_online = models.BooleanField(default=False)
-	last_login = models.DateTimeField(null=True, blank=True)
+	last_login = models.DateTimeField(auto_now=True, null=True, blank=True)
 
 	def __str__(self):
 		return self.username
@@ -38,7 +40,7 @@ class CustomUser(AbstractUser):
 
 	def get_avatar_url(self):
 		if self.uploaded_picture:
-			return self.uploaded_picture.url
+			return get_safe_filename(self.uploaded_picture.url)
 		return self.profil_picture
 	
 	def get_intra_id(self):
@@ -63,8 +65,8 @@ class Match(models.Model):
 	""" Modèle pour gérer les matchs dans un tournoi. """
 	player1 = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="team1")
 	player2 = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="team2")
-	score_team1 = models.PositiveIntegerField(default=0)
-	score_team2 = models.PositiveIntegerField(default=0)
+	score_team1 = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+	score_team2 = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
 	winner = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
 	ended_at = models.DateTimeField(null=True, blank=True)
 
@@ -95,9 +97,9 @@ class Tournament(models.Model):
 	players = models.ManyToManyField(CustomUser, through='PlayerEntry', related_name='tournament_players')
 	matchlist = models.ManyToManyField(Match, through='MatchEntry', related_name='tournament_matchlist')
 	matchmaking = models.BooleanField(default=False)
-	status = models.CharField(max_length=255, default='pending')
+	status = models.CharField(max_length=255, default='pending', validators=[validate_max_length])
 	started = models.BooleanField(default=False)
-	created_at = models.DateTimeField(default=now)
+	created_at = models.DateTimeField(auto_now_add=True)
 	started_at = models.DateTimeField(null=True, blank=True)
 	ended_at = models.DateTimeField(null=True, blank=True)
 	winner = models.ForeignKey(CustomUser, related_name='tournament_winner', on_delete=models.SET_NULL, null=True, blank=True)
@@ -171,7 +173,7 @@ class PlayerEntry(models.Model):
 	""" Modèle intermédiaire pour gérer les joueurs et noms d'équipe dans un tournoi. """
 	tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="player_entries")
 	player = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-	team_name = models.CharField(max_length=255, null=True, blank=True)
+	team_name = models.CharField(max_length=255, null=True, blank=True, validators=[validate_max_length])
 	is_host = models.BooleanField(default=False)
 
 	class Meta:
@@ -185,9 +187,9 @@ class MatchEntry(models.Model):
 	""" Modèle intermédiaire pour gérer les matchs dans un tournoi. """
 	tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="match_entries")
 	match = models.ForeignKey(Match, on_delete=models.CASCADE)
-	score_team1 = models.PositiveIntegerField(default=0)
-	score_team2 = models.PositiveIntegerField(default=0)
-	status = models.CharField(max_length=255, default='pending')
+	score_team1 = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+	score_team2 = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+	status = models.CharField(max_length=255, default='pending', validators=[validate_max_length])
 
 	class Meta:
 		unique_together = ('tournament', 'match')  # Un match ne peut être associé qu'une fois à un tournoi.
