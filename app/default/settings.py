@@ -165,8 +165,8 @@ CSP_DEFAULT_SRC = ["'self'", "https:", "data:", "blob:"]
 CSP_STYLE_SRC = ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com", "https://fonts.gstatic.com"]
 CSP_STYLE_SRC_ELEM = CSP_STYLE_SRC
 CSP_FONT_SRC = ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net"]
-CSP_SCRIPT_SRC = ["'self'", "https:", "data:", "blob:"]
-
+CSP_SCRIPT_SRC = ["'self'", "https:", "data:", "blob:", "'unsafe-eval'", "https://signin.intra.42.fr", "https://api.intra.42.fr"]
+CSP_FRAME_SRC = ["'self'", "https://signin.intra.42.fr", "https://api.intra.42.fr"]
 
 MEDIA_URL = '/media/'  
 MEDIA_ROOT = BASE_DIR / 'media'
