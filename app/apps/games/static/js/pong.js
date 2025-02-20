@@ -1262,7 +1262,7 @@ setPageDestructor(() => {
 				inviteinput.style.display = "none";
 				divofbox.style.display = "block";
 				putnameinbox(await getUserName());
-
+				is_host = true;
 				gamesocket.onmessage = function(event)
 				{
 					const data = JSON.parse(event.data);
@@ -1409,7 +1409,7 @@ setPageDestructor(() => {
 			{
 				if (start === 0)
 				{
-					if (gamesocket && gamesocket.readyState === WebSocket.OPEN)
+					if (gamesocket && gamesocket.readyState === WebSocket.OPEN && is_host === true)
 					{
 						gamesocket.send(JSON.stringify({
 							'message': 'start',
@@ -1430,11 +1430,10 @@ setPageDestructor(() => {
 						})
 						.then(async response => await response.json())
 						.then(data => {
-							console.log(data.id);
 							gameId = data.id;
 						})
 					}
-					else if (bebousocket)
+					else if (bebousocket && is_host === true)
 					{
 						bebousocket.send(JSON.stringify({
 							'message': 'start',
@@ -1455,7 +1454,6 @@ setPageDestructor(() => {
 						})
 						.then(async response => await response.json())
 						.then(data => {
-							console.log(data.id);
 							gameId = data.id;
 						})
 					}
