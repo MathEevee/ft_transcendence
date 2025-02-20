@@ -30,12 +30,16 @@ function loadPong() {
 	}
 
 setPageDestructor(() => {
-		if (gamesocket)
-			gamesocket.close();
-		if (bebousocket)
-			bebousocket.close();
-		if (pongtournamentsocket)
-			pongtournamentsocket.close();
+	start = 0;
+	if (interval)
+		clearInterval(interval);
+	interval = null;
+	if (gamesocket)
+		gamesocket.close();
+	if (bebousocket)
+		bebousocket.close();
+	if (pongtournamentsocket)
+		pongtournamentsocket.close();
 	setjoinagame(false);
 });
 
@@ -1189,23 +1193,26 @@ setPageDestructor(() => {
 		initvariables();
 		countdown();
 		start = 1;
-		if (iaisactive === 1 && start === 1 && is_host === true && doubleia === 0 && gamemode === "solo")
+		if (iaisactive === 1 && start === 1 && is_host === true)
 		{
-			fetch('/games/local-ia-start/', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content')
-				},
-				body: JSON.stringify({
-					'type' : 'Pong 1v1 IA',
-					'started_at': Date.now(),
+			if (doubleia === 0 && gamemode === "solo")
+			{
+				fetch('/games/local-ia-start/', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content')
+					},
+					body: JSON.stringify({
+						'type' : 'Pong 1v1 IA',
+						'started_at': Date.now(),
+					})
 				})
-			})
-			.then(response => response.json())
-			.then(data => {
-				gameId = data.id;
-			})
+				.then(response => response.json())
+				.then(data => {
+					gameId = data.id;
+				})
+			}
 			setTimeout(() => {
 				interval = setInterval(updateAI, 1000);
 			}, 5000);

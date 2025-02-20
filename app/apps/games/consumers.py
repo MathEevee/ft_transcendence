@@ -1,6 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .globals import user_sockets, players_ready, players_winner_by_match, multi_player_games
+from .globals import user_sockets, players_ready_pong, players_ready_space, players_winner_by_match_space, players_winner_by_match_pong, multi_player_games
 from apps.authe.models import CustomUser, Tournament, PlayerEntry, MatchEntry, Match
 from apps.games.models import Game, Player
 from asgiref.sync import sync_to_async
@@ -166,9 +166,10 @@ class PongTournoiConsumer(AsyncWebsocketConsumer):
 		# print("\033[31mtournament" + f'{data}' + "\033[0m")
 
 		if message == 'ready':
-			players_ready[data['player']].append(data['player'])
-			if len(players_ready) == 2:
+			players_ready_pong[data['player']].append(data['player'])
+			if len(players_ready_pong) == 2:
 				await self.send_to_all('start')
+				players_ready_pong.clear()
 			return
 		if 'player' in data:
 			player = data['player']
@@ -203,8 +204,8 @@ class PongTournoiConsumer(AsyncWebsocketConsumer):
 
 			# Récupérer le gagnant
 			winner = await sync_to_async(lambda: CustomUser.objects.get(username=data['winner']), thread_sensitive=True)()
-			players_winner_by_match[winner].append(winner)
-			print("\033[31m" + f'{players_winner_by_match.values()}' + "\033[0m")
+			players_winner_by_match_pong[winner].append(winner)
+			print("\033[31m" + f'{players_winner_by_match_pong.values()}' + "\033[0m")
 
 			# Déterminer le type de tournoi
 			types = True if data['tournament_type'] == 'pong' else False
@@ -236,9 +237,9 @@ class PongTournoiConsumer(AsyncWebsocketConsumer):
 			await sync_to_async(lambda: match.delete(), thread_sensitive=True)()
 
 			# Vérifier si on doit créer un nouveau match
-			if len(players_winner_by_match) == 2:
-				await sync_to_async(lambda: tournament.add_match(players_winner_by_match.popitem()[0], players_winner_by_match.popitem()[0]), thread_sensitive=True)()
-				players_winner_by_match.clear()
+			if len(players_winner_by_match_pong) == 2:
+				await sync_to_async(lambda: tournament.add_match(players_winner_by_match_pong.popitem()[0], players_winner_by_match_pong.popitem()[0]), thread_sensitive=True)()
+				players_winner_by_match_pong.clear()
 
 			# Vérifier si le tournoi est terminé
 			if await sync_to_async(lambda: tournament.match_entries.count(), thread_sensitive=True)() == 0:
@@ -376,15 +377,16 @@ class SpaceTournoiConsumer(AsyncWebsocketConsumer):
 		data = json.loads(text_data)
 		message = data['message']
 		if message == 'ready':
-			players_ready[data['player']].append(data['player'])
-			if len(players_ready) == 2:
+			players_ready_space[data['player']].append(data['player'])
+			if len(players_ready_space) == 2:
 				await self.send_to_all('start')
+				players_ready_space.clear()
 			return
 		if message == 'end':
 			print("\033[31m" + f'{data}' + "\033[0m")
 			winner = await sync_to_async(CustomUser.objects.get)(username=data['winner'])
-			players_winner_by_match[winner].append(winner)
-			print("\033[31m" + f'{players_winner_by_match.values()}' + "\033[0m")
+			players_winner_by_match_space[winner].append(winner)
+			print("\033[31m" + f'{players_winner_by_match_space.values()}' + "\033[0m")
 			if data['tournament_type'] == 'pong':
 				types = True
 			else:
@@ -408,10 +410,10 @@ class SpaceTournoiConsumer(AsyncWebsocketConsumer):
 			if not match:
 				raise ValueError("Aucun match trouvé dans ce tournoi.")
 			await sync_to_async(lambda: match.delete(), thread_sensitive=True)()
-			if len(players_winner_by_match) == 2:
+			if len(players_winner_by_match_space) == 2:
 				# print("\033[31m" + f'{players_winner_by_match}' + "\033[0m")
-				await sync_to_async(lambda: tournament.add_match(players_winner_by_match.popitem()[0], players_winner_by_match.popitem()[0]))()
-				players_winner_by_match.clear()
+				await sync_to_async(lambda: tournament.add_match(players_winner_by_match_space.popitem()[0], players_winner_by_match_space.popitem()[0]))()
+				players_winner_by_match_space.clear()
 			if await sync_to_async(lambda: tournament.match_entries.count())() == 0:
 				await sync_to_async(tournament.end)()
 				await sync_to_async(tournament.set_winner)(winner)
@@ -420,6 +422,7 @@ class SpaceTournoiConsumer(AsyncWebsocketConsumer):
 				}))
 				#delete le tournoi
 				await sync_to_async(tournament.delete)()
+				players_winner_by_match_space.clear()
 				return
 			await self.send_to_all('next_match')
 			print("\033[31m" + "sending next match" + "\033[0m")

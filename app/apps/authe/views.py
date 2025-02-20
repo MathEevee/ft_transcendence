@@ -344,17 +344,19 @@ class MatchmakingAPIView(APIView):
 		for player in players:
 			print(f"\033[1;32m- {player}\033[0m")
 
-		# Créer les matchs aléatoirement et sans doublons
+		#suprimmer les matchs précédents
+		for match in Match.objects.all():
+			match.delete()
+
+		# Créer les matchs aléatoirement
 		matchs = []
 		for i in range(4):
 			team1 = players.pop(randint(0, len(players) - 1))
 			team2 = players.pop(randint(0, len(players) - 1))
 			match = Match.objects.create(player1=team1, player2=team2)
 			matchs.append(match)
-			if tournament.match_entries.count() <= 3:
-				print(f"\033[1;32mMatch between {team1} and {team2}\033[0m")
-				tournament.add_match(team1, team2)
 			print(f"\033[1;32mMatch between {team1} and {team2}\033[0m")
+			tournament.add_match(team1, team2)
 
 		# Marquer le tournoi comme en matchmaking
 		tournament.matchmaking = True

@@ -177,7 +177,7 @@ async function startMatch(match)
 		is_host = await isRealHost();
 		if (await istheOnlyPlayer())
 			is_host = true;
-		if (spacetournamentsocket && is_host)
+		if (spacetournamentsocket && is_host && spacetournamentsocket.readyState === WebSocket.OPEN)
 		{
 			spacetournamentsocket.send(JSON.stringify({
 				'message': 'start',
@@ -235,7 +235,11 @@ async function isRealHost()
 }
 
 setPageDestructor(() => {
-	console.log("destroying pong multiplayer (destructor fn)");
+	// console.log("destroying pong multiplayer (destructor fn)");
+	start = 0;
+	if (interval)
+		clearInterval(interval);
+	interval = null;
 	if (gamesocket)
 		gamesocket.close();
 	if (bebousocket)
@@ -604,7 +608,7 @@ function putnameinbox(name)
 	playernamebox.style.display = "flex";
 	divofbox.appendChild(playernamebox);
 	if (divofbox.childElementCount >= 2)
-			inviteinput.style.display = "none";
+		inviteinput.style.display = "none";
 }
 
 function drawRect(x, y, width, height, color) {

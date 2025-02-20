@@ -5,7 +5,6 @@ function loadTournament()
 {
 
 const startButton = document.getElementById('start-tournament');
-const inviteButton = document.getElementById('player-name');
 const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 const wsURL = `${wsProtocol}//${window.location.host}/ws/chat/`;
 const socket = new WebSocket(wsURL);
@@ -117,8 +116,6 @@ async function displayPlayerTournament()
 				}
 				if (playerss[j].player.username === await getUserName())
 				{
-					inviteButton.style.display = 'block';
-					inviteButton.disabled = false;
 					if (await istheOnlyPlayer(playerss))
 					{
 						cell.style.color = 'yellow';
@@ -126,6 +123,12 @@ async function displayPlayerTournament()
 						startButton.style.display = 'block';
 
 					}
+				}
+				if (!(playerss[j].player.username.startsWith('AI_')))
+				{
+					const joinButton = document.getElementById('add-player');
+					joinButton.disabled = true;
+					joinButton.style.backgroundColor = 'grey';
 				}
 			}
 		}
@@ -289,8 +292,6 @@ async function setupPlayerList()
 					joinButton.disabled = true;
 					joinButton.style.backgroundColor = 'grey';
 
-					inviteButton.style.display = 'block';
-					inviteButton.disabled = false;
 				}
 			})
 			.catch(err => {
@@ -307,10 +308,12 @@ async function setupPlayerList()
 			'from': 'Tournament',
 			'message': 'The ' + (tournamentId ? 'Pong' : 'Space Battle') + ' tournament is starting',
 		});
-		for (let i = 0; i < players.length; i++)
+		let playerss = Array.from(players);
+		for (let i = 0; i < playerss.length; i++)
 		{
+			console.log(playerss[i].player.username);
 			socket.send(JSON.stringify({
-				'to': players[i].player.username,
+				'to': playerss[i].player.username,
 				'message': 'The ' + (tournamentId ? 'Pong' : 'Space Battle') + ' tournament is starting',
 			}));
 		}
@@ -318,32 +321,6 @@ async function setupPlayerList()
 		setTimeout(() => {
 		changePage('/games/'+(tournamentId ? 'pong' : 'spaceinvaders')+ '/online/tournament/', false);
 		}, 1000);
-	});
-
-	inviteButton.addEventListener('keypress', async (e) => {
-		if (e.key === 'Enter')
-		{
-			let playername = inviteButton.value;
-			if (await checkPlayer(playername))
-			{
-				inviteButton.value = '';
-
-				if (!allconversations[playername])
-					allconversations[playername] = [];
-				allconversations[playername].push({
-					'from': 'You',
-					'message': 'Invite ' + playername + ' to join the tournament',
-				});
-				socket.send(JSON.stringify({
-					'to': playername,
-					'message': 'Invating you to join the tournament to : ' + (tournamentId ? 'Pong' : 'Space Battle'),
-					'is_invite': true,
-					'tournament': true,
-				}));
-			}
-			else
-				console.log('Player not found');
-		}
 	});
 }
 
