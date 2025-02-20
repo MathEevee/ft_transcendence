@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from apps.authe.models import CustomUser
 from apps.games.models import Game,Player
 from apps.games.views import display_all_game
+from apps.authe.models import Tournament
 
 @login_required
 def profil_view(request, username):
@@ -25,3 +26,8 @@ def profil_view(request, username):
     }
     return render(request, 'profil.html', {'user': user_profil, 'stats': stats})
 
+@login_required
+def tournamentHistory_view(request):
+    def get(self, request):
+        tournaments = Tournament.objects.all()
+    return render(request, 'tournamentHistory.html')

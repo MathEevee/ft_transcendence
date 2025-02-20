@@ -1,14 +1,49 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Profil
+HistoryTournament
 {% endblock %}
 
 {% load static %}
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/profil.css' %}">
+<link rel="stylesheet" href="{% static 'css/tournament.css' %}">
+<link rel="stylesheet" href="{% static 'css/pong.css' %}">
 {% endblock %}
 
 {% block content %}
 {% include "navbar.html" %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="text-center">Historique des tournois</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Nom du tournoi</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Nombre de participants</th>
+                        <th scope="col">Classement</th>
+                    </tr>
+                </thead>
+                {% comment %} <tbody>
+                    {% for tournament in tournaments %}
+                    <tr>
+                        <td>{{ tournament.name }}</td>
+                        <td>{{ tournament.date }}</td>
+                        <td>{{ tournament.nb_participants }}</td>
+                        <td>{{ tournament.rank }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody> {% endcomment %}
+            </table>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
