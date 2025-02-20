@@ -31,6 +31,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://les-requetes-mystiques.fr",
     "https://10.12.248.210",
     "https://10.13.248.127",
+    "https://10.11.248.222",
 ]
 
 ALLOWED_HOSTS = [
@@ -43,6 +44,7 @@ ALLOWED_HOSTS = [
     'nginx',
     '10.12.248.210',
     '10.13.248.127',
+    '10.11.248.222',
     '*',  # ⚠️ À ne pas utiliser en production
 ]
 

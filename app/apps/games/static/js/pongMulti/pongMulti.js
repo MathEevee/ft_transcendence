@@ -88,7 +88,7 @@ async function loadPongMulti(){
 	
 	var all_players = [];
 	
-	let speed = 5;
+	let speed = 10;
 	let start = 0;
 	const paddleHeight = 75;
 	const paddleWidth = 5;
@@ -258,27 +258,30 @@ async function loadPongMulti(){
 	};
 	
 	function toggleFullscreen(element) {
-		if (!document.fullscreenElement) {
-			// Passer en plein écran
-			if (element.requestFullscreen) {
-				element.requestFullscreen();
-			} else if (element.mozRequestFullScreen) { // Pour Firefox
-				element.mozRequestFullScreen();
-			} else if (element.webkitRequestFullscreen) { // Pour Chrome, Safari et Opera
-				element.webkitRequestFullscreen();
-			} else if (element.msRequestFullscreen) { // Pour Internet Explorer/Edge
-				element.msRequestFullscreen();
-			}
-		} else {
-			// Quitter le mode plein écran
-			if (document.exitFullscreen) {
-				document.exitFullscreen();
-			} else if (document.mozCancelFullScreen) { // Pour Firefox
-				document.mozCancelFullScreen();
-			} else if (document.webkitExitFullscreen) { // Pour Chrome, Safari et Opera
-				document.webkitExitFullscreen();
-			} else if (document.msExitFullscreen) { // Pour Internet Explorer/Edge
-				document.msExitFullscreen();
+		if (window.location.pathname === "/games/pong/multiplayer/")
+		{
+			if (!document.fullscreenElement) {
+				// Passer en plein écran
+				if (element.requestFullscreen) {
+					element.requestFullscreen();
+				} else if (element.mozRequestFullScreen) { // Pour Firefox
+					element.mozRequestFullScreen();
+				} else if (element.webkitRequestFullscreen) { // Pour Chrome, Safari et Opera
+					element.webkitRequestFullscreen();
+				} else if (element.msRequestFullscreen) { // Pour Internet Explorer/Edge
+					element.msRequestFullscreen();
+				}
+			} else {
+				// Quitter le mode plein écran
+				if (document.exitFullscreen) {
+					document.exitFullscreen();
+				} else if (document.mozCancelFullScreen) { // Pour Firefox
+					document.mozCancelFullScreen();
+				} else if (document.webkitExitFullscreen) { // Pour Chrome, Safari et Opera
+					document.webkitExitFullscreen();
+				} else if (document.msExitFullscreen) { // Pour Internet Explorer/Edge
+					document.msExitFullscreen();
+				}
 			}
 		}
 	}
@@ -597,9 +600,8 @@ async function loadPongMulti(){
 		}, 1000);
 	}
 	
-	function loop(chrono)
+	function loop()
 	{
-		// console.log(chrono)
 		if (start === 0)
 		{
 			clearInterval(interval);
@@ -615,10 +617,10 @@ async function loadPongMulti(){
 	
 	function initvariables()
 	{
-		t_game.player1 = new Player(canvas.width / 2 - paddleHeight / 2, canvas.height - paddleWidth * 2, paddleHeight, paddleWidth, colorset.team1, speed);
-		t_game.player2 = new Player(canvas.width / 2 - paddleHeight / 2, paddleWidth, paddleHeight, paddleWidth, colorset.team2, speed);
-		t_game.player3 = new Player(canvas.width - paddleWidth * 2, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team3, speed);
-		t_game.player4 = new Player(paddleWidth, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team4,speed);
+		t_game.player1 = new Player(canvas.width / 2 - paddleHeight / 2, canvas.height - paddleWidth * 2, paddleHeight, paddleWidth, colorset.team1, speed * 1.5);
+		t_game.player2 = new Player(canvas.width / 2 - paddleHeight / 2, paddleWidth, paddleHeight, paddleWidth, colorset.team2, speed * 1.5);
+		t_game.player3 = new Player(canvas.width - paddleWidth * 2, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team3, speed * 1.5);
+		t_game.player4 = new Player(paddleWidth, canvas.height / 2 - paddleHeight / 2, paddleWidth, paddleHeight, colorset.team4,speed * 1.5);
 		var ballplassement = new point(0, 0);
 		ballplassement.x = Math.floor(Math.random() * 10);
 		if (ballplassement.x % 3 === 0)
@@ -673,13 +675,12 @@ async function loadPongMulti(){
 	{
 		if (start === 1)
 			return ;
-		// countdown();
-		// setTimeout(loop, 5000);
 		initvariables();
 		if (is_host === true)
 			socket.send(JSON.stringify({'message':"move ball",
 			'ballx':t_game.ball.x, 'bally':t_game.ball.y ,'balldx':t_game.ball.dx, 'balldy':t_game.ball.dy, 'ballspeed':t_game.ball.speed}));
-		loop();
+		countdown();
+		setTimeout(loop, 5000);
 	}
 	
 	function wait()
