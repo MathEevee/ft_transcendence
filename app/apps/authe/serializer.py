@@ -3,9 +3,9 @@ from rest_framework import serializers
 from .models import CustomUser, PlayerEntry, Match, MatchEntry, Tournament
 
 class CustomUserSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = CustomUser
-		fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_staff']
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'is_staff', 'is_online']
 
 class PlayerEntrySerializer(serializers.ModelSerializer):
 	player = CustomUserSerializer()  # Inclure les détails du joueur

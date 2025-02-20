@@ -197,7 +197,7 @@ setPageDestructor(() => {
 
 	function isIA(player)
 	{
-		if (player.includes("AI"))
+		if (player.startsWith("AI_"))
 			return true;
 		return false;
 	}
@@ -947,7 +947,7 @@ setPageDestructor(() => {
 			}
 			else if (gamemode === "online_tournament")
 			{
-				if (is_host && pongtournamentsocket)
+				if (is_host && pongtournamentsocket && start === 1)
 				{
 					pongtournamentsocket.send(JSON.stringify({
 						'message': 'end',

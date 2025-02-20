@@ -91,7 +91,6 @@ def auth_callback(request):
 	login(request, user)
 	user.last_login = now()
 	user.save()
-	messages.success(request, f"Bienvenue, {user.username}!")
 	return redirect(reverse('profil:profil', kwargs={'username': user.username}))
 
 def save_user(user_info):
@@ -198,7 +197,6 @@ def login_view(request):
 			user = authenticate(request, username=username, password=password)
 			if user is not None:
 				login(request, user)
-				messages.success(request, "Connexion réussie !")
 				return redirect(reverse('profil:profil', kwargs={'username': username}))
 			else:
 				messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")

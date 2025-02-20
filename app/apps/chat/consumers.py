@@ -16,7 +16,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 			if self.user.username not in user_sockets:
 				user_sockets[self.user.username] = []	
 			if len(user_sockets[self.user.username]) == 0:
-				await sync_to_async(CustomUser.objects.filter(username=self.user.username).update)(is_online=True)
+				# await sync_to_async(CustomUser.objects.filter(username=self.user.username).update)(is_online=True)
 				await sync_to_async(self.update_online_status)(True)
 				print("\033[31m" + f'{self.user.username} connected chat' + "\033[0m")
 			user_sockets[self.user.username].append(self)
@@ -27,7 +27,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 	async def disconnect(self, close_code):
 		user_sockets[self.user.username].remove(self)
 		if len(user_sockets[self.user.username]) == 0:
-			await sync_to_async(CustomUser.objects.filter(username=self.user.username).update)(is_online=False)
+			# await sync_to_async(CustomUser.objects.filter(username=self.user.username).update)(is_online=False)
 			await sync_to_async(self.update_online_status)(False)
 			print(f'{self.user.username} disconnected')
 
