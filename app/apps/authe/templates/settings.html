@@ -24,9 +24,8 @@ Settings
         <div id="avatar-selection" class="avatar-selection">
             {% for avatar in avatars %}
             <label>
-                <input type="radio" name="profil_picture" value="{{ avatar }}" hidden
-                    {% if avatar == selected_avatar %} checked {% endif %}>
-                <img src="{{ avatar }}" class="avatar" {% if avatar == selected_avatar %} selected {% endif %} alt="Avatar">
+                <input type="radio" name="profil_picture" value="{{ avatar }}"></input>
+                <img src="{{ avatar }}" class="avatar" alt="Avatar"></img>
             </label>
             {% endfor %}
         </div>
@@ -34,22 +33,5 @@ Settings
         <button class="btn-settings" type="submit">Save</button>
     </form>
 </div>
-
-<script nonce="{{ nonce }}">
-    document.addEventListener("DOMContentLoaded", function () {
-        let avatars = document.querySelectorAll("#avatar-selection label img");
-        avatars.forEach(img => {
-            img.addEventListener("click", function () {
-                // reset selected
-                avatars.forEach(i => i.classList.remove("selected"));
-                this.classList.add("selected");
-
-                // check the new select
-                this.previousElementSibling.checked = true;
-
-            });
-        });
-    });
-</script>
 
 {% endblock %}

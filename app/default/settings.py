@@ -87,6 +87,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 ROOT_URLCONF = 'default.urls'
@@ -103,7 +104,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.authe.context_processors.staff_status',
-                'apps.authe.context_processors.csp_nonce'
             ],
         },
     },
@@ -162,8 +162,10 @@ APPEND_SLASH = True
 
 # Définir la politique de sécurité du contenu (CSP)
 CSP_DEFAULT_SRC = ["'self'", "https:", "data:", "blob:"]
-CSP_STYLE_SRC = ["'self'", "'unsafe-inline'"]  # ⚠️ Moins sécurisé, à éviter si possible
-CSP_SCRIPT_SRC = ["'self'", "https:", "data:", "blob:", "'nonce-{nonce}'"]
+CSP_STYLE_SRC = ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com", "https://fonts.gstatic.com"]
+CSP_STYLE_SRC_ELEM = CSP_STYLE_SRC
+CSP_FONT_SRC = ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net"]
+CSP_SCRIPT_SRC = ["'self'", "https:", "data:", "blob:"]
 
 
 MEDIA_URL = '/media/'  
