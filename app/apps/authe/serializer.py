@@ -34,6 +34,8 @@ class MatchEntrySerializer(serializers.ModelSerializer):
 		fields = ['id', 'tournament', 'player1', 'player2', 'score_team1', 'score_team2', 'status']
 
 class TournamentSerializer(serializers.ModelSerializer):
+	player_entries = PlayerEntrySerializer(many=True)
+	match_entries = MatchEntrySerializer(many=True)
 	class Meta:
 		model = Tournament
 		fields = ['id', 'type_pong', 'players', 'player_entries', 'matchlist', 'match_entries', 'matchmaking', 'status', 'started', 'created_at', 'started_at', 'ended_at', 'winner']
