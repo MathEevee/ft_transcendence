@@ -311,7 +311,6 @@ async function setupPlayerList()
 		let playerss = Array.from(players);
 		for (let i = 0; i < playerss.length; i++)
 		{
-			console.log(playerss[i].player.username);
 			socket.send(JSON.stringify({
 				'to': playerss[i].player.username,
 				'message': 'The ' + (tournamentId ? 'Pong' : 'Space Battle') + ' tournament is starting',

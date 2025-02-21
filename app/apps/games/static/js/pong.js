@@ -244,7 +244,6 @@ setPageDestructor(() => {
 		pongtournamentsocket.onmessage = async (e) =>
 		{
 			const data = JSON.parse(e.data);
-			// console.log("data", data);
 			if (data.message === 'start')
 				startPong();
 			else if (data.message === 'move')
@@ -276,7 +275,6 @@ setPageDestructor(() => {
 			}
 			else if (data.message.includes('end tournament'))
 			{
-				console.log("end tournament");
 				start = 0;
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				context.fillText(data.message, canvas.width / 2 - sizeofstringdisplayed(data.message).width / 2, canvas.height / 2);
@@ -611,7 +609,6 @@ setPageDestructor(() => {
 			if (interval)
 			{
 				clearInterval(interval);
-				console.log("interval cleared");
 			}
 			interval = null;
 		}
@@ -1340,8 +1337,6 @@ setPageDestructor(() => {
 		bebousocket.onmessage = function(event)
 		{
 			const data = JSON.parse(event.data);
-			// console.log("data", data);
-
 			if (data.message.includes('disconnected'))
 			{
 				start = 0;

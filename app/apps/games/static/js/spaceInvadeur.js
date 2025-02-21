@@ -235,7 +235,6 @@ async function isRealHost()
 }
 
 setPageDestructor(() => {
-	// console.log("destroying pong multiplayer (destructor fn)");
 	start = 0;
 	if (interval)
 		clearInterval(interval);
@@ -289,7 +288,6 @@ function inittournamentsocket()
 	spacetournamentsocket.onmessage = async (e) =>
 	{
 		const data = JSON.parse(e.data);
-		// console.log("data", data);
 		if (data.message === 'start')
 			startGame();
 		if (data.message.includes('disconnected'))
@@ -988,8 +986,8 @@ function countdown()
 async function initvariables()
 {
 	t_game = {
-		player1: new Player(canvas.width / 2 - 10, 50, 5, 5, 0, 0, 7, 0, 0, 0, 0, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10], 6),
-		player2: new Player(canvas.width / 2 - 10, canvas.height - 110, 5, 5, 0, 0, 7, 0, 0, 0, 0, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10], 6),
+		player1: new Player(canvas.width / 2 - 10, 50, 5, 5, 0, 0, 7, 0, 0, 0, 0, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10], 5),
+		player2: new Player(canvas.width / 2 - 10, canvas.height - 110, 5, 5, 0, 0, 7, 0, 0, 0, 0, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10], 5),
 		bullets: [],
 		colorset: colorset,
 	};
@@ -1307,7 +1305,6 @@ async function sendInvite(event)
 			gamesocket.onmessage = function(event)
 			{
 				const data = JSON.parse(event.data);
-				// console.log(data);
 
 				if (data.message.includes('disconnected'))
 				{
@@ -1443,8 +1440,6 @@ if (gamemode === "online" && joinagame)
 		bebousocket.onmessage = function(event)
 		{
 			const data = JSON.parse(event.data);
-			// console.log("data", data);
-
 			if (data.message.includes('disconnected'))
 			{
 				start = 0;
