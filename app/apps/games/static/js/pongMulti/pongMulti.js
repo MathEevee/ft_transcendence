@@ -301,7 +301,6 @@ async function loadPongMulti(){
 
 	function setballafterpoint(canvas, ball)
 	{
-		// console.log("ballbefore", ball);
 		var ballplassement = new point(0, 0);
 		ballplassement.x = Math.floor(Math.random() * 10);
 		if (ballplassement.x % 3 === 0)

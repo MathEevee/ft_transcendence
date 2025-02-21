@@ -25,7 +25,7 @@ function loadPage(path) {
         allPage[path]().catch(err => console.error(`Error loading page script: ${err}`));
     else if (allPage[path + '/'])
         allPage[path + '/']().catch(err => console.error(`Error loading page script: ${err}`));
-    else if (path.split("/")[1] == 'profil' && path.split("/")[2] != 'tournamentHistory')
+    else if (path.split("/")[1] == 'profil')
         display_graph();
     if (window.location.pathname.startsWith('/authe/') && window.location.pathname != "/authe/settings/") {
         var chatBtn = document.getElementById('chat')

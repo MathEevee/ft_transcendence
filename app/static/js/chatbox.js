@@ -270,7 +270,6 @@ async function block_friend(event) {
 	})
 	.then(response => response.json())
 	.then(data => {
-		console.log(data);
 		if (data.relations === "blocked")
 		{
 			const elemcontainer = document.getElementById('FriendList');
@@ -310,7 +309,6 @@ function liveChat() {
 			status.style.fontWeight = data.status === true ? "bold" : "normal";
 			return;
 		}
-		console.log('WebSocket message received:', data);
 		if (data.from === undefined || data.message === undefined)
 			return;
 		retrieveConversations(data);
@@ -395,9 +393,6 @@ function liveChat() {
 	ChatButton.addEventListener('click', openChat);
 	minWin.addEventListener('click', closeChat);
 	selectFriend.addEventListener('click', loadBar);
-	// linkFriend.addEventListener('click', function(event) { 
-	//     pageFriend(event); 
-	// });
 	
 	search.addEventListener('keydown', function(event) {
 		addFriends(event, elemcontainer);
@@ -407,7 +402,6 @@ function liveChat() {
 		block_friend(event);
 	});
 
-	// receiveMessage();
 }
 
 function create_locked_btn(friendName)
@@ -423,7 +417,6 @@ function create_locked_btn(friendName)
 
 function loadBar(event) {
 	if (event.type === 'click') {  // Fix: change to check for 'click' event type
-		// event.preventDefault();
 		link = document.createElement("a");
 		const privatewith = document.getElementById('selectFriend');
 		const lock = document.getElementById('lock');
@@ -450,29 +443,6 @@ function loadBar(event) {
 		}
 	}
 }
-
-// function pageFriend(event) {
-// 		var url = event.target.href;
-// 		window.location.href = url;  // Voir avec les urls et les views car ca marche pas
-// }
-
-// function alreadyfriend(inputValue) {
-// 	for (let i = 0; i < friendlist.length; i++) {
-// 		if (friendlist[i] === inputValue) {
-// 			return true;
-// 		}
-// 	}
-// 	return false;
-// }
-
-// function notindatabase(inputValue) {
-// 	for (let i = 0; i < friendlist.length; i++) {
-// 		if (friendlist[i] === inputValue) {
-// 			return false;
-// 		}
-// 	}
-// 	return true;
-// }
 
 async function addFriends(event, elemcontainer) {
 	if (event.key === 'Enter') {

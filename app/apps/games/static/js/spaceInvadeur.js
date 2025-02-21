@@ -235,7 +235,6 @@ async function isRealHost()
 }
 
 setPageDestructor(() => {
-	// console.log("destroying pong multiplayer (destructor fn)");
 	start = 0;
 	if (interval)
 		clearInterval(interval);
@@ -289,7 +288,6 @@ function inittournamentsocket()
 	spacetournamentsocket.onmessage = async (e) =>
 	{
 		const data = JSON.parse(e.data);
-		// console.log("data", data);
 		if (data.message === 'start')
 			startGame();
 		if (data.message.includes('disconnected'))
@@ -901,7 +899,62 @@ function gameloop()
 		clearInterval(interval);
 		interval = null;
 		if (iaisactive === 1)
+		{
 			iaisactive = 0;
+			fetch('/games/local-ia-end/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+				},
+				body: JSON.stringify({
+					'id' : gameId,
+					'ended_at': Date.now(),
+					'score_player': t_game.player2.life,
+					'score_IA': t_game.player1.life,
+				})
+			})
+			.then(response => response.json())
+			.then(data => {
+				gameId = null;
+			})
+		}
+		else if (gamemode === "online")
+		{
+			if (gamesocket && gameId)
+			{
+				fetch('/games/pong_online/', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+					},
+					body: JSON.stringify({
+						'id' : gameId,
+						'ended_at': Date.now(),
+						'score1': t_game.player2.life,
+						'score2': t_game.player1.life,
+					})
+				})
+			}
+			else if (bebousocket && gameId)
+			{
+				fetch('/games/pong_online/', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content'),
+					},
+					body: JSON.stringify({
+						'id' : gameId,
+						'ended_at': Date.now(),
+						'score1': t_game.player2.life,
+						'score2': t_game.player1.life,
+					})
+				})
+			}
+			gameId = null;
+		}
 		return (1);
 	}
 	draw(canvas, context, t_game);
@@ -933,8 +986,8 @@ function countdown()
 async function initvariables()
 {
 	t_game = {
-		player1: new Player(canvas.width / 2 - 10, 50, 5, 5, 0, 0, 7, 0, 0, 0, 0, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10], 6),
-		player2: new Player(canvas.width / 2 - 10, canvas.height - 110, 5, 5, 0, 0, 7, 0, 0, 0, 0, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10], 6),
+		player1: new Player(canvas.width / 2 - 10, 50, 5, 5, 0, 0, 7, 0, 0, 0, 0, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10], 5),
+		player2: new Player(canvas.width / 2 - 10, canvas.height - 110, 5, 5, 0, 0, 7, 0, 0, 0, 0, [canvas.width / 2 - 10, canvas.height / 2 - 10, canvas.width / 2 + 10, canvas.height / 2 + 10], 5),
 		bullets: [],
 		colorset: colorset,
 	};
@@ -981,7 +1034,70 @@ function startGame()
 	if (start === 1)
 		return ;
 	if (!gamesocket && !bebousocket)
+	{
 		iaisactive = 1;
+		fetch('/games/local-ia-start/', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content')
+			},
+			body: JSON.stringify({
+				'type' : 'Space IA',
+				'started_at': Date.now(),
+			})
+		})
+		.then(response => response.json())
+		.then(data => {
+			gameId = data.id;
+		})
+	}
+	else if (gamemode === "online")
+	{
+		//send online space
+		if (gamesocket && gamesocket.readyState === WebSocket.OPEN && is_host === true)
+		{
+			fetch('/games/pong_online/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content')
+				},
+				body: JSON.stringify({
+					'type' : 'Space 1v1',
+					'started_at': Date.now(),
+					'ended_at': null,
+					'player1': divofbox.childNodes[0].textContent,
+					'player2': divofbox.childNodes[1].textContent,
+				})
+			})
+			.then(async response => await response.json())
+			.then(data => {
+				gameId = data.id;
+			})
+		}
+		else if (bebousocket && is_host === true)
+		{
+			fetch('/games/pong_online/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRFToken': document.querySelector("[name=csrf_token]").getAttribute('content')
+				},
+				body: JSON.stringify({
+					'type' : 'Space 1v1',
+					'started_at': Date.now(),
+					'ended_at': null,
+					'player1': divofbox.childNodes[0].textContent,
+					'player2': divofbox.childNodes[1].textContent,
+				})
+			})
+			.then(async response => await response.json())
+			.then(data => {
+				gameId = data.id;
+			})
+		}
+	}
 	countdown();
 	initvariables();
 	start = 1;
@@ -1185,11 +1301,10 @@ async function sendInvite(event)
 			inviteinput.style.display = "none";
 			divofbox.style.display = "block";
 			// putnameinbox(await getUserName());
-
+			is_host = true;
 			gamesocket.onmessage = function(event)
 			{
 				const data = JSON.parse(event.data);
-				// console.log(data);
 
 				if (data.message.includes('disconnected'))
 				{
@@ -1325,8 +1440,6 @@ if (gamemode === "online" && joinagame)
 		bebousocket.onmessage = function(event)
 		{
 			const data = JSON.parse(event.data);
-			// console.log("data", data);
-
 			if (data.message.includes('disconnected'))
 			{
 				start = 0;

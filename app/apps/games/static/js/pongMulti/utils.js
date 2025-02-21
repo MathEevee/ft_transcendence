@@ -80,7 +80,6 @@ function ispointinrectangle(point, rectangle)
 {
 	if (point === undefined || rectangle === undefined)
 	{
-		console.log("Error: ispointinrectangle: point or rectangle is undefined");
 		return (false);
 	}
 	const [A, B, C, D] = rectangle;
@@ -93,7 +92,6 @@ function ispointintriangle(point, triangle)
 {
 	if (point === undefined || triangle === undefined)
 	{
-		console.log("Error: ispointintriangle: point or triangle is undefined");
 		return (false);
 	}
 	const [A, B, C] = triangle;

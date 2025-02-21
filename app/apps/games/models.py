@@ -9,6 +9,7 @@ class Game(models.Model):
 		('Pong 1v1 IA', 'Pong 1v1 IA'),
 		('Pong multi', 'Pong multi'),
 		('Space 1v1', 'Space 1v1'),
+		('Space IA', 'Space IA'),
 	]
 
 	type = models.CharField(max_length=50, choices=GAME_TYPE_CHOICES, default='Pong 1v1')

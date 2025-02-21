@@ -244,7 +244,6 @@ setPageDestructor(() => {
 		pongtournamentsocket.onmessage = async (e) =>
 		{
 			const data = JSON.parse(e.data);
-			// console.log("data", data);
 			if (data.message === 'start')
 				startPong();
 			else if (data.message === 'move')
@@ -276,7 +275,6 @@ setPageDestructor(() => {
 			}
 			else if (data.message.includes('end tournament'))
 			{
-				console.log("end tournament");
 				start = 0;
 				context.clearRect(0, 0, canvas.width, canvas.height);
 				context.fillText(data.message, canvas.width / 2 - sizeofstringdisplayed(data.message).width / 2, canvas.height / 2);
@@ -611,7 +609,6 @@ setPageDestructor(() => {
 			if (interval)
 			{
 				clearInterval(interval);
-				console.log("interval cleared");
 			}
 			interval = null;
 		}
@@ -1262,7 +1259,7 @@ setPageDestructor(() => {
 				inviteinput.style.display = "none";
 				divofbox.style.display = "block";
 				putnameinbox(await getUserName());
-
+				is_host = true;
 				gamesocket.onmessage = function(event)
 				{
 					const data = JSON.parse(event.data);
@@ -1340,8 +1337,6 @@ setPageDestructor(() => {
 		bebousocket.onmessage = function(event)
 		{
 			const data = JSON.parse(event.data);
-			// console.log("data", data);
-
 			if (data.message.includes('disconnected'))
 			{
 				start = 0;
@@ -1409,7 +1404,7 @@ setPageDestructor(() => {
 			{
 				if (start === 0)
 				{
-					if (gamesocket && gamesocket.readyState === WebSocket.OPEN)
+					if (gamesocket && gamesocket.readyState === WebSocket.OPEN && is_host === true)
 					{
 						gamesocket.send(JSON.stringify({
 							'message': 'start',
@@ -1430,11 +1425,10 @@ setPageDestructor(() => {
 						})
 						.then(async response => await response.json())
 						.then(data => {
-							console.log(data.id);
 							gameId = data.id;
 						})
 					}
-					else if (bebousocket)
+					else if (bebousocket && is_host === true)
 					{
 						bebousocket.send(JSON.stringify({
 							'message': 'start',
@@ -1455,7 +1449,6 @@ setPageDestructor(() => {
 						})
 						.then(async response => await response.json())
 						.then(data => {
-							console.log(data.id);
 							gameId = data.id;
 						})
 					}
