@@ -19,7 +19,9 @@ Settings
         {% csrf_token %}
         {{ form.as_p }}
 
-        <a href="{% url 'authe:password_change' %}">Change my password</a>
+        {% if user.intra_id is None %}
+            <a href="{% url 'authe:password_change' %}">Change my password</a>
+        {% endif %}
 
         <div id="avatar-selection" class="avatar-selection">
             {% for avatar in avatars %}
